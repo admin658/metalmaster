@@ -1,0 +1,25 @@
+FULL BUILD BLUEPRINT
+---------------------
+This file summarizes the entire build blueprint.
+
+PHASE 1
+- Connect new features to web and mobile using hooks: useSpeedTrainer, useDailyRiff, useAchievements, useUserStats, usePracticeSessions.
+- Create UI pages for profile, daily riff, speed trainer, achievements, practice history.
+
+PHASE 2
+- Implement stats visualization including heatmaps, skill progress bars, badges.
+
+PHASE 3
+- Add daily riff scheduler with Node script or Supabase cron.
+
+PHASE 4
+- Implement AI layer: audio analysis, tab generator, tone assistant.
+
+PHASE 5
+- Final polish: loading states, error states, animations.
+
+PHASE 6
+- Demo build version for investors.
+
+PHASE 7
+- Post-demo features: community riff hub, artist masterclasses, jam track packs, shred pass, subscriptions.

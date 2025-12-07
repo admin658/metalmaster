@@ -1,0 +1,11 @@
+fastapi>=0.104.1
+pydantic>=2.5.0
+librosa>=0.10.0
+numpy>=1.21.0
+torch>=2.0.0
+uvicorn>=0.24.0
+python-multipart>=0.0.6
+basic_pitch>=0.6.2
+pytest>=7.0.0
+requests>=2.0.0
+soundfile>=0.12.1

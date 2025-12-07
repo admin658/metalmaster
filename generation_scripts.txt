@@ -1,0 +1,57 @@
+GENERATION SCRIPTS
+-------------------
+
+# Daily Riff Rotation Script (Node.js)
+
+const supabase = require('@supabase/supabase-js').createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+async function rotateDailyRiff() {
+  const { data: riffs } = await supabase.from('daily_riffs').select('*');
+  const next = riffs[Math.floor(Math.random() * riffs.length)];
+
+  await supabase.from('daily_riffs').insert({
+    riff_id: next.id,
+    created_at: new Date().toISOString()
+  });
+
+  console.log("Rotated daily riff:", next.id);
+}
+
+rotateDailyRiff();
+
+
+# Audio Analysis Service (Python/FastAPI Stub)
+
+from fastapi import FastAPI, UploadFile
+import librosa
+
+app = FastAPI()
+
+@app.post("/analyze")
+async def analyze_audio(file: UploadFile):
+    y, sr = librosa.load(file.file)
+    tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+    return {"bpm": tempo}
+
+
+# Tab Generator Service (Python Stub)
+
+@app.post("/generate-tab")
+async def generate_tab(file: UploadFile):
+    # Placeholder for Spotify Basic Pitch integration
+    return {"tab": "E|----------------"}
+
+
+# Tone Assistant Script (Node.js/GPT Integration Stub)
+
+import OpenAI from "openai";
+const ai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
+
+export async function getTone(artist, gear) {
+  const prompt = `Give metal tone settings for ${artist} using ${gear}`;
+  const res = await ai.chat.completions.create({
+    model: "gpt-5.1",
+    messages: [{ role: "user", content: prompt }]
+  });
+  return res.choices[0].message.content;
+}

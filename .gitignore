@@ -1,0 +1,47 @@
+node_modules/
+dist/
+build/
+.next/
+.expo/
+.DS_Store
+
+# Folders to ignore
+New folder/
+-p/
+venv/
+.env
+.env.local
+.env.*.local
+CP_575_B.pdf
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+coverage/
+.nyc_output/
+
+# Expo
+.env.production
+ios/
+android/
+
+# Next.js
+out/
+.vercel/
+
+# Mobile
+node_modules/
+
+# IDE
+.prettierignore
+.prettierrc
+
+packages/web/public/IMG_4521.MOV 
+alphatab/alphaTab-1.6.3.zip

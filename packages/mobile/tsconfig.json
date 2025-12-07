@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "lib": ["ES2020", "DOM"],
+    "module": "ESNext",
+    "noEmit": true,
+    "baseUrl": ".",
+    "types": ["nativewind/types"],
+    "paths": {
+      "@/*": ["./*"],
+      "@metalmaster/shared-types": ["../../packages/shared-types/src"],
+      "@metalmaster/shared-validation": ["../../packages/shared-validation/src"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

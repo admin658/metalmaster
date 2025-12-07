@@ -1,0 +1,15 @@
+// Lesson01_BasicPalmMuted.alphaTex
+{title:"Lesson 1: Basic Palm-Muted Chunk"}
+{subtitle:"Palm muting + solid downpicking on low E"}
+{tempo 120}{time 4/4}
+V: Tuning=E A D G B E
+
+# Intro – 2 bars of locked chugs
+| PM   PM   PM   PM  | PM   PM   PM   PM  |
+| E:0. E:0. E:0. E:0.| E:0. E:0. E:0. E:0.|
+
+# Verse – add a simple accent on beat 3 (power chord E5)
+| PM   PM   PM   PM  | PM   PM   E5  PM  |
+| E:0. E:0. E:0. E:0.| E:0. E:0. E:0  E:0.|
+
+# Repeat the verse 4x

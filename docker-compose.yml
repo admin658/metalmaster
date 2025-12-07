@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: metalmaster
+      POSTGRES_USER: mm_user
+      POSTGRES_PASSWORD: mm_pass
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+
+  api:
+    build:
+      context: ./packages/api
+    env_file:
+      - ./packages/api/.env.example
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+
+  web:
+    build:
+      context: ./packages/web
+    env_file:
+      - ./packages/web/.env.example
+    ports:
+      - '3001:3000'
+    depends_on:
+      - api
+
+volumes:
+  db-data:
+
+# Notes:
+# - This compose file provides a Postgres database and simple API/web containers.
+# - Supabase services (auth, storage, realtime) are not provided here; you
+#   should point `SUPABASE_URL`/`SUPABASE_ANON_KEY` env vars to a Supabase
+#   project for auth features to work correctly.

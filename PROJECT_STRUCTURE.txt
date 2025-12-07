@@ -1,0 +1,13 @@
+metal-master-vst-companion/
++-- package.json
++-- tsconfig.json
++-- src/
+¦   +-- config.ts
+¦   +-- index.ts
++-- packages/
+    +-- web/
+        +-- src/
+            +-- components/
+            ¦   +-- VstPlaybackTest.tsx
+            +-- hooks/
+                +-- useVstCompanion.ts

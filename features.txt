@@ -1,0 +1,100 @@
+SECTION 3 — FEATURE & PRODUCT DESIGN
+====================================
+3.1 Core Features Overview
+--------------------------
+Metal Master provides a structured, metal-focused guitar learning ecosystem including video lessons,
+AI-powered feedback, genre-specific jam tracks, interactive tabs, speed trainers, and progression
+systems. The features are broken into Core (MVP) and Advanced (Phase 2+).
+3.2 Video Lessons
+-----------------
+- Beginner to advanced metal techniques.
+- Topics: palm muting, chugging, tremolo picking, alternate picking, downpicking endurance, tapping,
+sweep picking, harmonics.
+- Filmed in multi-angle: picking hand, fretting hand, overhead.
+- Lesson types: Technique Drills, Riff Breakdowns, Song Workshops, Gear/Tone Tutorials.
+3.3 Interactive Tablature System
+--------------------------------
+- Real-time playback with audio + visual tab.
+- Highlighted notes during playback.
+- Adjustable speed from 25%–120%.
+- Loop sections for practice.
+- Riff difficulty tagging and XP rewards.
+- Mobile-friendly scroll mode and desktop horizontal mode.
+3.4 Speed Trainer
+-----------------
+- BPM customizable metronome integrated with tab playback.
+- Auto-increment mode for practicing faster tempos progressively.
+- Chug-tightness exercises for rhythm metal.
+- Tremolo endurance workouts with AI timing accuracy feedback.
+3.5 Jam Tracks
+--------------
+- Large library of metal subgenres: thrash, death metal, black metal, deathcore, djent, prog-metal,
+power metal.
+- Multi-tempo versions.
+- Isolated stem playback (drums only, bass only).
+- Jam track difficulty levels: Beginner Grooves, Intermediate Grooves, Advanced Blast Tracks.
+- Custom jam generator planned for Phase 2.
+3.6 Riff-of-the-Day
+--------------------
+- Daily riff release with tab + video.
+- Varies between subgenres.
+- Free users get weekly; subscribers get daily.
+- XP bonus for completing riffs within 24 hours.
+3.7 Skill Progression & Leveling System
+---------------------------------------
+- Players earn XP by completing lessons, drills, and jams.
+- Level tiers: Novice, Acolyte, Hammerhand, Thrash Apprentice, Riff Adept, Blackened Knight, Djent
+Architect, Shred Overlord.
+- XP unlocks UI skins, badges, exclusive riffs (for subscribers).
+- Backend tracks: Accuracy, Speed, Rhythm Consistency, Tone Knowledge.
+3.8 Song-Based Learning
+-----------------------
+- Original metal songs in multiple styles.
+- Step-by-step breakdowns with riff sequencing.
+- Each song doubles as a structured course with technique milestones.
+3.9 Practice Tools
+------------------
+- Chromatic tuner.
+- Metronome with metal-themed sound packs.
+- Warm-up routine generator.
+- Pick angle analyzer (Phase 2).
+3.10 User Profile & Stats
+-------------------------
+- Heatmaps: practice frequency, durations, and strengths/weaknesses.
+- Accuracy scores per riff.
+- BPM progress charts per technique.
+- Tone knowledge mastery.
+3.11 Advanced Features (Phase 2+)
+---------------------------------
+AI Technique Feedback
+- Detects timing issues, pick attack inconsistency, string noise, palm-mute depth.
+- Provides rifftype-specific feedback (thrash downpicking vs. djent breakdowns).
+- Visual timing graph.
+AI Tab Generator
+- User plays a riff; AI detects notes and outputs tab format.
+- Used for community uploads and personal transcription.
+AI Tone Assistant
+- Suggests amp, IR, and pedal settings to emulate iconic tones.
+- Matches tones for Metallica, Gojira, Meshuggah, Lamb of God, Behemoth, Arch Enemy, etc.
+- Exports presets for software amps.
+Community Riff Hub
+- Users upload riffs and tabs.
+- Upvote system.
+- Weekly challenges and featured riffs.
+- Elite subscribers can upload longer lessons or custom jam packs.
+Achievement System
+- Badges: Downpicking Demon, Sweep Sorcerer, Djent Machine, Black Metal Blizzard, Power Metal
+Paladin.
+- Achievements give XP multipliers.
+3.12 Monetizable Add-Ons
+------------------------
+- Jam Track Packs: Thrash Fury Pack, Djent Architect Pack, Blackened Ritual Pack.
+- Tone Preset Packs.
+- Exclusive Artist Masterclasses.
+- Seasonal Shred Pass (battle-pass model).
+3.13 Accessibility Features
+---------------------------
+- Left-handed mode.
+- Colorblind mode.
+- High-contrast UI for dark metal themes.
+- Adjustable tab font size.

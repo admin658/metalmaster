@@ -1,0 +1,9 @@
+{
+  "name": "@metalmaster/alphatab",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "@coderline/alphatab": "1.6.3"
+  }
+}

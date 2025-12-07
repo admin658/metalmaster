@@ -1,0 +1,12 @@
+
+.at-wrap {
+    height: 70vh;
+    margin: 0;
+}
+.editor-wrap {
+    height: 20vh;
+}
+.editor-wrap > * {
+    width: 90vw;
+    height: 20vh;
+}

@@ -1,0 +1,78 @@
+.xp-container {
+  background: #1a1a1a;
+  border-radius: 14px;
+  padding: 18px 24px;
+  color: #fff;
+  box-shadow: 0 2px 12px #d9042940;
+  width: 100%;
+  max-width: 320px;
+  margin: 16px auto;
+  position: relative;
+}
+
+.xp-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.xp-tier-icon {
+  font-size: 2rem;
+  margin-right: 10px;
+}
+
+.xp-level {
+  font-size: 1.3rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.xp-bar-bg {
+  background: #333;
+  border-radius: 8px;
+  height: 18px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.xp-bar-fill {
+  background: linear-gradient(90deg, #d90429 60%, #ffb700 100%);
+  height: 100%;
+  border-radius: 8px 0 0 8px;
+  transition: width 0.7s cubic-bezier(.4,2,.3,1);
+}
+
+.xp-bar-spark {
+  box-shadow: 0 0 16px 6px #fffbe6, 0 0 32px 12px #d90429;
+  animation: spark 1.2s linear;
+}
+
+@keyframes spark {
+  0% { filter: brightness(1.5); }
+  50% { filter: brightness(2.5); }
+  100% { filter: brightness(1); }
+}
+
+.xp-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+.xp-spark-effect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, #fffbe6 0%, #d9042900 70%);
+  opacity: 0.5;
+  animation: spark-fade 1.2s linear;
+}
+
+@keyframes spark-fade {
+  0% { opacity: 0.7; }
+  100% { opacity: 0; }
+}

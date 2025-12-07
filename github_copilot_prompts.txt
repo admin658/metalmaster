@@ -1,0 +1,79 @@
+GITHUB COPILOT PROMPTS
+----------------------
+
+# README for GitHub Copilot Code Generation
+
+Use these prompts inside your GitHub Copilot chat or inline comments to generate working code for the Metal Master project.
+
+-----------------------------------
+# 1. API Hook Generation (Web & Mobile)
+
+"Generate a React hook called useDailyRiff that calls /api/daily-riff/today, returns { data, error, loading, completeRiff }, and uses SWR for caching."
+
+"Create a React Native version of useDailyRiff using fetch and SecureStore."
+
+"Generate a useSpeedTrainer hook that supports create session, list sessions, and fetch /progress/stats."
+
+-----------------------------------
+# 2. UI Components
+
+"Generate a <DailyRiffCard /> React component that shows today's riff, difficulty, XP bonus, and a Complete button."
+
+"Generate a <SpeedTrainerStats /> component with personal bests and weekly trend data."
+
+"Generate a practice heatmap component using react-calendar-heatmap."
+
+-----------------------------------
+# 3. API Route Creation
+
+"Generate an Express route for /api/tone-assistant with POST support, Zod validation, and standardized API responses."
+
+"Generate Jest tests for speed-trainer.routes.ts including create, list, update, and delete handlers."
+
+-----------------------------------
+# 4. AI Services (Python)
+
+"Generate a FastAPI route /analyze that accepts an audio file, performs onset detection with librosa, returns tempo and timing accuracy."
+
+"Generate a FastAPI route /generate-tab that integrates Spotify Basic Pitch and returns detected notes and a simple guitar tab."
+
+-----------------------------------
+# 5. Database Migrations & RLS
+
+"Generate SQL policies for Supabase RLS where user_id matches the JWT claim for the new tables: speed_trainer_sessions, daily_riff_completions, achievements_library, user_stats, user_practice_heatmap, practice_sessions."
+
+-----------------------------------
+# 6. Cron Job / Scheduler
+
+"Generate a Node script rotateDailyRiff.ts that selects a random riff, inserts into daily_riffs, and logs success."
+
+-----------------------------------
+# 7. Full Integration Prompts
+
+"Write a Next.js page that pulls useUserStats(), displays XP, level, skill scores, and practice heatmap."
+
+"Generate Expo React Native screens for Speed Trainer, Daily Riff, Achievements, Stats, and Practice History."
+
+"Create a reusable API client wrapper with typed ApiResponse<T> and error handling."
+
+-----------------------------------
+# 8. Developer Documentation
+
+"Generate an architectural summary of Metal Master including packages, API routes, database schema, and AI services."
+
+-----------------------------------
+# 9. Tone Assistant Code
+
+"Create a Node function getToneSettings(artist, gear) that sends a prompt to GPT, validates output with Zod, and returns structured tone info."
+
+-----------------------------------
+# 10. Tab Renderer
+
+"Generate a React component that renders a guitar tab using VexFlow inside a canvas element."
+
+-----------------------------------
+
+Place this file in:
+/docs/copilot_prompts.txt
+
+Then paste prompts into GitHub Copilot Chat whenever needed.
