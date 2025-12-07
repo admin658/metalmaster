@@ -1,7 +1,7 @@
 'use client';
 
 import { useJamTracks } from '@/hooks/useMetalMasterHooks';
-
+export const dynamic = "force-dynamic";
 export default function JamPage() {
   const { jamTracks, loading } = useJamTracks();
 
