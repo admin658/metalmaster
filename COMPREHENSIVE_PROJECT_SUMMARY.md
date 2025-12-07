@@ -132,7 +132,7 @@ WHERE NOT EXISTS (SELECT 1 FROM achievements_library WHERE name = 'Beta Tester')
 
 - API dev default: `http://localhost:3001` (`/api/*`).
 - Web dev default: `http://localhost:3000`.
-- Set `NEXT_PUBLIC_API_URL=http://localhost:3001/api` for web.
+  REACT_APP_API_URL=<REDACTED>
 
 ## Tab Player Layout (Current)
 
@@ -337,35 +337,41 @@ ReaGuitar VST
 - **Diagrams:** `REAPER_ARCHITECTURE_DIAGRAMS.md`
 - **Index:** `REAPER_DOCUMENTATION_INDEX.md`
 - **Master Index:** `README_REAPER_MIDI.md`
-  
----  
-  
+
+---
+
 # Features Implementation Summary
 
 ## Overview
+
 Successfully implemented all features from `features.txt` into the Metal Master monorepo. This includes comprehensive support for Speed Trainer, Riff-of-the-Day, Achievements, User Stats, and Practice Sessions tracking.
 
 ## What Was Created
 
 ### 1. Shared Types (`packages/shared-types/src/`)
+
 Five new type files defining all feature data structures:
 
 - **`speed-trainer.types.ts`**
+
   - `SpeedTrainerSession` - Individual practice session data (BPM, accuracy, exercise type)
   - `SpeedTrainerProgress` - User's progress stats per exercise type
 
 - **`daily-riff.types.ts`**
+
   - `DailyRiff` - Today's featured riff with difficulty and XP bonus
   - `DailyRiffCompletion` - Track when users complete daily riffs
   - `UserDailyRiffStats` - Streak tracking and completion stats
 
 - **`achievement.types.ts`**
+
   - `Achievement` - Master achievement definitions with badges and XP multipliers
   - `UserAchievement` - User's earned achievements
   - `AchievementProgress` - Progress tracking for in-progress achievements
   - Badge types: downpicking_demon, sweep_sorcerer, djent_machine, etc.
 
 - **`user-stats.types.ts`**
+
   - `UserStats` - Comprehensive user progression (XP, levels, skill scores)
   - `LevelTier` - 8 progression tiers (Novice → Shred Overlord)
   - `UserPracticeHeatmap` - Daily practice calendar data
@@ -376,14 +382,16 @@ Five new type files defining all feature data structures:
   - `PracticeSessionStats` - User's practice summary statistics
 
 ### 2. Validation Schemas (`packages/shared-validation/src/`)
+
 Zod schemas for all types ensuring runtime validation:
 
 - **`speed-trainer.schemas.ts`** - CreateSpeedTrainerSession, UpdateSpeedTrainerSession, SpeedTrainerProgress
 - **`daily-riff.schemas.ts`** - DailyRiff, CreateDailyRiffCompletion, UserDailyRiffStats
 - **`achievement.schemas.ts`** - Achievement, UserAchievement, AchievementProgress
- - **`achievement.schemas.ts`** - Achievement, UserAchievement, AchievementProgress
+- **`achievement.schemas.ts`** - Achievement, UserAchievement, AchievementProgress
 
 ### Shared Schemas Package (new)
+
 - **`packages/shared-schemas`** — Standalone Zod schema workspace package (builds to CommonJS in `dist/`)
   - `src/achievements.ts` — Achievement schema and inferred types
   - `src/index.ts` — Re-exports all schemas
@@ -391,11 +399,13 @@ Zod schemas for all types ensuring runtime validation:
   - `tsconfig.json` — Compiles src → dist with declarations
 
 ### Achievement Seed Script (new)
+
 - **`packages/api/scripts/seedAchievements.ts`** — TypeScript seed script to populate `achievements` table from schema definitions. Run via `npx ts-node packages/api/scripts/seedAchievements.ts` (requires `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` environment variables).
 - **`user-stats.schemas.ts`** - UserStats, UserPracticeHeatmap, SkillCategoryStats
 - **`practice-session.schemas.ts`** - PracticeSession, CreatePracticeSession, PracticeSessionStats
 
 ### 3. Database Schema (`packages/api/db/migrations/005_features.sql`)
+
 Comprehensive migration with 6 new tables and proper indexing:
 
 - **`speed_trainer_sessions`** - Tracks all speed/tempo practice sessions
@@ -408,15 +418,18 @@ Comprehensive migration with 6 new tables and proper indexing:
 - **`practice_sessions`** - Detailed activity log for all practice types
 
 All tables include:
+
 - Proper foreign keys with cascade delete
 - Row-level security (RLS) enabled
 - Strategic indexing for query performance
 - Check constraints for data integrity
 
 ### 4. API Routes (`packages/api/src/routes/`)
+
 Four new Express route handlers, each with full CRUD + analytics:
 
 #### **`speed-trainer.routes.ts`** (`/api/speed-trainer`)
+
 - `GET /` - List user's sessions (paginated, filterable by exercise type)
 - `GET /:id` - Get single session
 - `POST /` - Create new session
@@ -425,6 +438,7 @@ Four new Express route handlers, each with full CRUD + analytics:
 - `GET /progress/stats` - Get personal bests and improvement trends
 
 #### **`daily-riff.routes.ts`** (`/api/daily-riff`)
+
 - `GET /today` - Get today's featured riff (public)
 - `GET /:id` - Get specific daily riff
 - `GET /` - List all daily riffs (paginated)
@@ -432,6 +446,7 @@ Four new Express route handlers, each with full CRUD + analytics:
 - `GET /stats/user` - Get user's streak and completion stats
 
 #### **`achievement.routes.ts`** (`/api/achievements`)
+
 - `GET /library` - List all available achievements (public)
 - `GET /` - Get user's earned achievements
 - `GET /progress` - Get progress on all achievements
@@ -440,6 +455,7 @@ Four new Express route handlers, each with full CRUD + analytics:
 - `GET /stats/summary` - Get cumulative XP multiplier from achievements
 
 #### **`user-stats.routes.ts`** (`/api/user-stats`)
+
 - `GET /` - Get user's main stats (auto-creates default record)
 - `GET /heatmap` - Practice calendar data (accepts date range)
 - `GET /skills` - Get 4 skill category scores
@@ -447,6 +463,7 @@ Four new Express route handlers, each with full CRUD + analytics:
 - `PATCH /update` - Update stats after activity (XP, practice mins, lessons)
 
 #### **`practice-session.routes.ts`** (`/api/practice-sessions`)
+
 - `GET /` - List sessions (paginated, filterable by type)
 - `GET /:id` - Get session details
 - `POST /` - Create new session record
@@ -454,6 +471,7 @@ Four new Express route handlers, each with full CRUD + analytics:
 - `GET /stats/summary` - Statistics (total sessions, avg duration, XP this week/today)
 
 All routes:
+
 - Use `authenticate` middleware for protected endpoints
 - Return standardized API response format with metadata
 - Validate input with Zod schemas
@@ -461,6 +479,7 @@ All routes:
 - Support pagination where appropriate
 
 ### 5. Integration Points
+
 - All routes registered in `packages/api/src/index.ts`
 - All schemas exported via `packages/shared-validation/src/index.ts`
 - All types exported via `packages/shared-types/src/index.ts`
@@ -469,12 +488,14 @@ All routes:
 ## Key Features Implemented
 
 ### Speed Trainer
+
 - Track metronome, chugging, tremolo, downpicking, sweep picking, tapping
 - Auto-increment BPM for progressive practice
 - Personal best tracking per exercise type
 - 7-day improvement trend calculation
 
 ### Riff-of-the-Day
+
 - Daily rotation of featured riffs by subgenre
 - Free users get weekly; subscribers get daily (flag in data)
 - 24-hour completion bonus (1.5x XP multiplier)
@@ -482,12 +503,14 @@ All routes:
 - Bonus XP system
 
 ### Achievement System
+
 - 8 prebuilt badges with XP multipliers (1.0-5.0x)
 - Progress tracking for in-progress achievements
 - Cumulative XP multiplier calculation
 - Extensible badge system
 
 ### User Progression
+
 - 8-tier level system (Novice → Shred Overlord)
 - XP-based leveling (1000 XP per level)
 - 4 skill categories: accuracy, speed, rhythm, tone knowledge (0-100 each)
@@ -495,6 +518,7 @@ All routes:
 - Daily practice heatmap for calendar visualization
 
 ### Practice Session Logging
+
 - Support for 5 session types: lesson, riff_practice, jam_session, speed_trainer, free_play
 - Accurate duration and XP tracking
 - Optional accuracy percentage
@@ -502,11 +526,13 @@ All routes:
 - Session type distribution analytics
 
 ### AI Tone Assistant
+
 - **File:** `packages/api/src/utils/getToneSettings.ts`
 - **Description:** Uses GPT-4 to generate JSON tone settings for a given artist and gear, validates with Zod, returns amp/cab/pedals/settings/description.
 - **Usage:** Called from API routes or backend services to provide tone recommendations.
 
 ### Guitar Tab Renderer
+
 - **File:** `packages/web/src/components/GuitarTabRenderer.tsx`
 - **Description:** React component using VexFlow to render guitar tab notation in SVG/canvas. Accepts tab data, draws measures/notes/frets visually.
 - **Usage:** Used in web app for tab display and preview features.
@@ -514,12 +540,14 @@ All routes:
 ## Guitar Pro Tab Player (Nov 2025)
 
 ### Shared Types (`packages/shared-types/src/tab-player.types.ts`)
+
 - **`TabTrack`** — Individual track in a song (tuning, percussion flag, mute/solo state)
 - **`TabSong`** — Master song object with metadata, BPM, duration, and track array
 - **`TabLoopSection`** — Start/end time markers for loop regions (in seconds)
 - **`TabPlayerState`** — Playback state snapshot (isPlaying, currentTime, playbackSpeed, selectedTrackId, loop)
 
 ### Web Implementation
+
 - **`packages/web/src/components/tab/TabPlayer.tsx`** (300+ lines, fully featured):
   - **Transport Controls:** Play/pause toggle, next/prev section buttons (±5s jumps)
   - **Speed Control:** Slider from 0.25x to 1.5x playback rate, synced to HTMLAudioElement
@@ -529,7 +557,8 @@ All routes:
   - **UI/UX:** Glassmorphism card (dark gradient #1a1a1a to #0f0f0f), red neon accents (#ff1744), responsive grid layout
   - **Dependencies:** HTMLAudioElement for playback, TabSong and TabLoopSection types
 
-### Mobile Implementation  
+### Mobile Implementation
+
 - **`packages/mobile/src/components/tab/TabPlayer.tsx`** (~400 lines, React Native):
   - **Audio:** Expo.Sound.createAsync() for playback with status callbacks tracking position updates
   - **Transport:** Play/pause, prev/next section, speed slider (same range as web)
@@ -540,6 +569,7 @@ All routes:
   - **Placeholder:** Accepts tab prop but does not render (future tab renderer integration)
 
 ### Enhanced Tab Renderer
+
 - **`packages/web/src/components/GuitarTabRenderer.tsx`** (extended functionality):
   - **New Props:**
     - `currentTime` (optional): Playback position in seconds — enables time-based measure highlighting
@@ -551,6 +581,7 @@ All routes:
   - **Dependencies:** VexFlow for SVG rendering, tab data structure with measures/notes
 
 ### Demo Page
+
 - **`packages/web/src/app/tab-playground/page.tsx`:**
   - Isolated testing page for TabPlayer component
   - Mock song data: Master of Puppets (3 tracks, 445 seconds, 120 BPM)
@@ -560,6 +591,7 @@ All routes:
 ## Files Created/Modified
 
 **Created:**
+
 - `packages/shared-types/src/speed-trainer.types.ts`
 - `packages/shared-types/src/daily-riff.types.ts`
 - `packages/shared-types/src/achievement.types.ts`
@@ -583,6 +615,7 @@ All routes:
 - `packages/web/src/app/tab-playground/page.tsx`
 
 **Modified:**
+
 - `packages/shared-types/src/index.ts` - Added 5 exports
 - `packages/shared-validation/src/index.ts` - Added 5 exports
 - `packages/api/src/index.ts` - Added 4 route imports and middleware registrations
@@ -593,12 +626,14 @@ All routes:
 - `packages/web/src/app/daily-riff/DailyRiffPage.tsx` - Added TypeScript types
 
 ## Build Status
+
 ✅ **API Package:** Compiles successfully
 ✅ **Shared Types:** Compiles successfully
 ✅ **Shared Validation:** Compiles successfully
 ⚠️ **Web Package:** Has pre-existing TypeScript issues unrelated to feature implementation
 
 ## Next Steps to Deploy
+
 1. Run database migrations: `yarn workspace @metalmaster/api run-migrations`
 2. Seed achievements in `achievements_library` table via Supabase
 3. Add client-side hooks in web/mobile packages to consume new APIs
@@ -606,6 +641,7 @@ All routes:
 5. Add cron job for daily riff rotation
 
 ## Testing Recommendations
+
 1. Create speed trainer session → verify BPM tracking
 2. Complete daily riff → verify 24-hour bonus logic
 3. Award achievement → verify XP multiplier applied
@@ -613,6 +649,7 @@ All routes:
 5. Level up user → verify tier progression (Novice → Acolyte at 1000 XP)
 
 ## Architecture Notes
+
 - All user data is properly isolated via user_id (Supabase RLS ready)
 - Heatmap and stats are denormalized for query efficiency
 - Achievement library is normalized (separate from user achievements)
