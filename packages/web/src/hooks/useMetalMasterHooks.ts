@@ -28,7 +28,14 @@ interface JamTrack {
   audio_url?: string;
 }
 
-const supabase = createClientComponentClient();
+let supabaseInstance: any = null;
+
+const getSupabase = () => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClientComponentClient();
+  }
+  return supabaseInstance;
+};
 
 const fallbackLessons: Lesson[] = [
   {
@@ -82,7 +89,7 @@ export function useLessons() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error: err } = await supabase.from('lessons').select('*');
+        const { data, error: err } = await getSupabase().from('lessons').select('*');
         if (err) throw err;
         const remote = data || [];
         setLessons([...fallbackLessons, ...remote]);
@@ -106,7 +113,7 @@ export function useRiffs() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error: err } = await supabase.from('riffs').select('*');
+        const { data, error: err } = await getSupabase().from('riffs').select('*');
         if (err) throw err;
         setRiffs(data || []);
       } catch (err) {
@@ -129,7 +136,7 @@ export function useJamTracks() {
     (async () => {
       let tracks = localJamTracks;
       try {
-        const { data, error: err } = await supabase.from('jam_tracks').select('*');
+        const { data, error: err } = await getSupabase().from('jam_tracks').select('*');
         if (err) throw err;
         if (data && data.length > 0) {
           tracks = [...data, ...localJamTracks];
@@ -160,7 +167,7 @@ export function useXP(userId: string) {
     
     (async () => {
       try {
-        const { data, error: err } = await supabase.from('users').select('xp,level').eq('id', userId).single();
+        const { data, error: err } = await getSupabase().from('users').select('xp,level').eq('id', userId).single();
         if (err) throw err;
         setXP(data?.xp || 0);
         setLevel(data?.level || 1);
@@ -188,7 +195,7 @@ export function useSubscriptionStatus(userId: string) {
     
     (async () => {
       try {
-        const { data, error: err } = await supabase.from('users').select('stripe_status').eq('id', userId).single();
+        const { data, error: err } = await getSupabase().from('users').select('stripe_status').eq('id', userId).single();
         if (err) throw err;
         setStatus(data?.stripe_status || 'free');
       } catch (err) {
