@@ -132,8 +132,7 @@ WHERE NOT EXISTS (SELECT 1 FROM achievements_library WHERE name = 'Beta Tester')
 
 - API dev default: `http://localhost:3001` (`/api/*`).
 - Web dev default: `http://localhost:3000`.
-- Set `NEXT_PUBLIC_API_URL=http://localhost:3001/api` for web.
-
+- Set `NEXT_PUBLIC_API_URL=<your_api_url>
 ## Tab Player Layout (Current)
 
 - Top: AlphaTab viewport full width with transport directly beneath.

@@ -58,7 +58,7 @@ yarn install
 
 2) Env
 ```bash
-cp .env .env.local # update SUPABASE_URL, SUPABASE_ANON_KEY, NEXT_PUBLIC_API_URL=http://localhost:3001/api
+cp .env .env.local # update SUPABASE_URL, SUPABASE_ANON_KEY, NEXT_PUBLIC_API_URL=<your_api_url>
 ```
 
 3) Build shared packages (when types/schemas change)
@@ -81,7 +81,7 @@ yarn workspace @metalmaster/web dev      # http://localhost:3000
 
 ## Environment Variables
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_API_URL` (default http://localhost:3001/api)
+- `NEXT_PUBLIC_API_URL` 
 - `PORT` (API only; defaults to 3001)
 
 ## Tab Player (Web)
