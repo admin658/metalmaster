@@ -1,6 +1,6 @@
 # Metal Master - Full-Stack Music Learning Platform
 
-Metal guitar learning platform spanning API, web, and mobile clients. Built with TypeScript, Express, Next.js, Expo, and Supabase.
+Metal guitar learning platform spanning API, web, and mobile clients. Built with TypeScript, Next.js (App Router + API routes), Expo, and Supabase.
 
 ## Features
 - Lessons & Riffs library
@@ -20,29 +20,23 @@ metal-master/
     shared-types/       # TypeScript models
     shared-validation/  # Zod schemas
     shared-schemas/     # Buildable schema bundle
-    api/                # Express API
-    web/                # Next.js app (App Router)
+    web/                # Next.js app (App Router + API routes under /api)
     mobile/             # Expo app
   package.json          # Workspaces
-  .env                  # Root env (NEXT_PUBLIC_API_URL, etc.)
+  .env                  # Root env (NEXT_PUBLIC_API_URL, Supabase, Stripe)
 ```
 
 ## Architecture Highlights
 - Shared types/schemas consumed by API + clients.
-- Express API + Supabase auth/RLS.
-- Next.js web app using SWR, AlphaTab tab player, and tone/3D features.
+- Next.js app hosts both web UI and API routes (under `/api/*`) using Supabase auth/RLS.
 - Expo mobile app with practice and tab playback.
 
-### API (packages/api)
-- Auth via Supabase; routes under `/api/*`.
-- Key routes: `/api/auth/login`, `/api/auth/signup`, `/api/lessons`, `/api/riffs`, `/api/tabs`, `/api/jam-tracks`, `/api/user-stats`, `/api/tone-settings`, `/api/practice-sessions`, `/api/achievements`, `/api/speed-trainer`, `/api/daily-riff`.
-- Default dev port: **3001**.
-
-### Web (packages/web)
-- Next.js (App Router), AlphaTab player at `/tab-player`, auth pages at `/auth/login` and `/auth/signup`.
+### Web & API (packages/web)
+- Next.js (App Router) with API routes under `/api/*` (auth, billing, user-stats, achievements, daily-riffs, practice-sessions, speed-trainer, etc.).
+- AlphaTab player at `/tab-player`, auth pages at `/auth/login` and `/auth/signup`.
 - Jam page `/jam` includes built-in MP3s from `public/jam` plus any Supabase jam tracks, with inline audio controls.
 - Animated flames across the site background and flickering hover flames on navigation links.
-- Default dev port: **3000**.
+- Default dev port: **3000** (API is served from the same Next instance at `/api`).
  - Tab Player extras: backing track preload for demo tabs, count-in control, learn-mode auto-slowdown on loop wrap, track selection, and synced 2D/3D highways (3D instanced, mobile-disabled).
 
 ### Mobile (packages/mobile)
@@ -70,19 +64,20 @@ yarn workspace @metalmaster/shared-schemas build
 
 4) Run dev servers
 ```bash
-yarn workspace @metalmaster/api dev      # http://localhost:3001
-yarn workspace @metalmaster/web dev      # http://localhost:3000
+yarn workspace @metalmaster/web dev      # http://localhost:3000 (serves API at /api)
 # optional: yarn workspace @metalmaster/mobile start
 ```
 
 5) Verify
-- API health: `curl http://localhost:3001/health`
+- API (via Next): `curl http://localhost:3000/api/health` (or any route)
 - Web: http://localhost:3000
 
 ## Environment Variables
-- `SUPABASE_URL`, `SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_API_URL` 
-- `PORT` (API only; defaults to 3001)
+- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (for billing webhook/service ops)
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_API_URL` (defaults to `/api` for co-located API)
+- Stripe: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO_MONTHLY`, `STRIPE_PRICE_PRO_YEARLY`
+- `APP_URL` (used for billing return URLs)
 
 ## Tab Player (Web)
 - Page: `/tab-player`

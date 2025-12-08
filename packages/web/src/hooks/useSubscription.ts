@@ -24,13 +24,12 @@ export const useSubscription = (): UseSubscriptionReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const apiBase = useMemo(() => {
-    const env = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
-    if (env) return env;
+    const env = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
+    if (env.startsWith('http') || env.startsWith('/')) return env;
     if (typeof window !== 'undefined') {
-      if (window.location.port === '3000') return 'http://localhost:3001/api';
-      return `${window.location.origin.replace(/\/$/, '')}/api`;
+      return `${window.location.origin.replace(/\/$/, '')}/${env}`.replace(/\/{2,}/g, '/');
     }
-    return 'http://localhost:3000/api';
+    return `/${env}`.replace(/\/{2,}/g, '/');
   }, []);
   const withBase = (path: string) => `${apiBase}${path}`;
   const [upgradePending, setUpgradePending] = useState(false);

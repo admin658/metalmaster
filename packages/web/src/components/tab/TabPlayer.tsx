@@ -11,7 +11,7 @@ import { createFeedbackEngine, ExpectedNote } from '../../audio/GuitarFeedbackEn
 import RiffEvaluationResult from '../feedback/RiffEvaluationResult';
 import { completeRiffXP } from '../../lib/CompleteRiffXP';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
 
 async function fetchUserAchievements(): Promise<{ id: string; name: string }[]> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;

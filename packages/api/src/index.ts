@@ -27,8 +27,25 @@ import { toneRoutes } from './routes/tone.routes';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const defaultAllowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+const envAllowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+const allowAllOrigins = envAllowedOrigins.includes('*');
+const allowedOrigins = [...defaultAllowedOrigins, ...envAllowedOrigins];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || ['http://localhost:3000', 'http://localhost:3001'],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    const isAllowed =
+      allowAllOrigins ||
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.netlify.app');
+
+    return callback(null, isAllowed);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

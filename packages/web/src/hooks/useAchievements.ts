@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { useCallback, useState } from 'react';
 import type { Achievement, UserAchievement, AchievementProgress } from '@metalmaster/shared-types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
 
 const fetcher = async (url: string, options?: RequestInit) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;

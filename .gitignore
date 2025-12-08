@@ -45,3 +45,5 @@ node_modules/
 REPLACEMENTS.TXT
 packages/web/public/IMG_4521.MOV 
 alphatab/alphaTab-1.6.3.zip
+# Local Netlify folder
+.netlify

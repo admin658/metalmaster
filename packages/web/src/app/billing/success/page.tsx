@@ -20,7 +20,7 @@ export default function BillingSuccessPage() {
         const token = localStorage.getItem('auth_token');
         if (!token) return;
 
-        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+        const apiBase = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
         const res = await fetch(`${apiBase}/user-stats`, {
           headers: {
             Authorization: `Bearer ${token}`,
