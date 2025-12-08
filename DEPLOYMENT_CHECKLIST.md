@@ -32,16 +32,16 @@
 
 **File: `packages/api/.env`**
 ```dotenv
-STRIPE_SECRET_KEY=sk_test_51234567890
-STRIPE_WEBHOOK_SECRET=whsec_test_1234567890
+STRIPE_SECRET_KEY=<your_test_secret_key>
+STRIPE_WEBHOOK_SECRET=<your_test_webhook_secret>
 STRIPE_PRICE_PRO_MONTHLY=price_1234567890
 APP_URL=http://localhost:3000
 ```
 
 **File: `.env` (root)**
 ```dotenv
-STRIPE_SECRET_KEY=sk_test_51234567890
-STRIPE_WEBHOOK_SECRET=whsec_test_1234567890
+STRIPE_SECRET_KEY=<your_test_secret_key>
+STRIPE_WEBHOOK_SECRET=<your_test_webhook_secret>
 STRIPE_PRICE_PRO_MONTHLY=price_1234567890
 APP_URL=http://localhost:3000
 ```
@@ -50,8 +50,8 @@ APP_URL=http://localhost:3000
 
 **File: `packages/api/.env.production`**
 ```dotenv
-STRIPE_SECRET_KEY=sk_live_51234567890
-STRIPE_WEBHOOK_SECRET=whsec_live_1234567890
+STRIPE_SECRET_KEY=<your_live_secret_key>
+STRIPE_WEBHOOK_SECRET=<your_live_webhook_secret>
 STRIPE_PRICE_PRO_MONTHLY=price_1234567890
 APP_URL=https://yourdomain.com
 ```

@@ -239,18 +239,18 @@ export interface UseSubscriptionReturn {
 
 ```dotenv
 # Add this to your .env file (do not commit .env to git)
-STRIPE_SECRET_KEY=sk_test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  # Place your Stripe secret key in a .env file (never commit to git)
-STRIPE_WEBHOOK_SECRET=whsec_xxx
-STRIPE_PRICE_PRO_MONTHLY=price_xxx
+STRIPE_SECRET_KEY=<your_test_secret_key>  # Store locally; never commit real keys
+STRIPE_WEBHOOK_SECRET=<your_test_webhook_secret>
+STRIPE_PRICE_PRO_MONTHLY=<your_price_id>
 APP_URL=https://metalmasterapp.com
 ```
 
 ### 5.2 API .env (`packages/api/.env`)
 
 ```dotenv
-STRIPE_SECRET_KEY=sk_test_51SbOdrJyNnFGCer3qoNkxbfmpLCBNgXxiP0RMoRA6GmA1E2U6rW0Wr91Kil5CA4MYEAA4A1aSZWBCRMlFxv6v0YW00ionNIDQV
-STRIPE_WEBHOOK_SECRET=whsec_xxx
-STRIPE_PRICE_PRO_MONTHLY=price_xxx
+STRIPE_SECRET_KEY=<your_test_secret_key>
+STRIPE_WEBHOOK_SECRET=<your_test_webhook_secret>
+STRIPE_PRICE_PRO_MONTHLY=<your_price_id>
 APP_URL=http://localhost:3000
 ```
 
