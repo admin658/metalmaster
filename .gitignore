@@ -38,7 +38,8 @@ out/
 
 # Mobile
 node_modules/
-
+docs/
+lending docs/
 # IDE
 .prettierignore
 .prettierrc
