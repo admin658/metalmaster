@@ -258,11 +258,13 @@ export default function TabPlayerShell() {
   );
 
   const [state, dispatch] = useReducer(reducer, initial);
+  const defaultLesson =
+    lessonOptions.find((lesson) => lesson.url === "/lessons/Lesson01.alphaTex") ?? lessonOptions[0];
   const [scoreUrl, setScoreUrl] = useState<string>(
-    lessonOptions[0]?.url ?? "/lessons/Lesson01.alphaTex"
+    defaultLesson?.url ?? "/lessons/Lesson01.alphaTex"
   );
   const [label, setLabel] = useState<string>(
-    lessonOptions[0]?.label ?? "Lesson 1 - Precision Chugs"
+    defaultLesson?.label ?? "Lesson 01 (ALPHATEX)"
   );
   // Replace this with the real lesson UUID from your data.
   const sessionKey = "de305d54-75b4-431b-adb2-eb6b9e546014";
@@ -329,9 +331,12 @@ export default function TabPlayerShell() {
       </div>
 
       <div className="flex flex-1 gap-3 px-3 pb-3">
-        <div className="flex min-w-0 flex-1 flex-col gap-3">
+        <div id="tab-player-fullscreen" className="flex min-w-0 flex-1 flex-col gap-3">
           <MainStage state={state} dispatch={dispatch} scoreUrl={scoreUrl} />
-          <BottomRack state={state} dispatch={dispatch} />
+          <div className="tab-player-bottom-rack">
+            <BottomRack state={state} dispatch={dispatch} />
+          </div>
+          <TopBar state={state} dispatch={dispatch} />
         </div>
 
         {state.coachOpen && (
@@ -340,8 +345,6 @@ export default function TabPlayerShell() {
           </aside>
         )}
       </div>
-
-      <TopBar state={state} dispatch={dispatch} />
     </div>
   );
 }

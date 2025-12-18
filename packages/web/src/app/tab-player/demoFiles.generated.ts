@@ -51,5 +51,10 @@ export const demoFiles: GeneratedDemoFile[] = [
     "label": "Lesson 10 (ALPHATEX)",
     "path": "/lessons/Lesson10.alphaTex",
     "description": ""
+  },
+  {
+    "label": "Lesson 4 (GP5)",
+    "path": "/lessons/Lesson 4.gp5",
+    "description": ""
   }
 ];

@@ -62,6 +62,14 @@ export const useSubscription = (): UseSubscriptionReturn => {
       });
 
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('auth_user');
+          setError(null);
+          setStatus('free');
+          setIsLoading(false);
+          return;
+        }
         const message = `Subscription status request failed (${res.status})`;
         setError(message);
         setStatus('free');

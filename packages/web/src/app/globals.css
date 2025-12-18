@@ -33,6 +33,32 @@ main {
   min-height: 100vh;
 }
 
+#tab-player-fullscreen:fullscreen {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+#tab-player-fullscreen:fullscreen .tab-player-bottom-rack {
+  display: none;
+}
+
+#tab-player-fullscreen:fullscreen .tab-player-stage {
+  flex: 1;
+  min-height: 0;
+}
+
+#tab-player-fullscreen:fullscreen .tab-player-notation {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
+#tab-player-fullscreen:fullscreen .alpha-tab-light {
+  height: 100%;
+}
+
 .card {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;

@@ -19,28 +19,28 @@ import SplashVideo from '../components/SplashVideo';
 
 const whatsNew = [
   {
-    title: 'Tab Lab: lesson demos + WebMIDI',
+    title: 'Tab player colors fixed',
     description:
-      'AlphaTab player now ships with built-in lesson demos, WebMIDI output, and a bright green UI tuned for readability.',
-    tag: 'Feature',
+      'Finally squashed the color issue so the AlphaTab UI is readable and consistent across sessions.',
+    tag: 'Fix',
     date: 'Dec 2025',
     href: '/tab-player',
   },
   {
-    title: '7 new GP5 lessons',
+    title: 'API functions updated',
     description:
-      'Palm-muting, power chords, gallops, alternate picking, and fast downpicking drills now available as bundled GP5 files.',
-    tag: 'Lessons',
+      'Refreshed our API helpers for cleaner data flow and more reliable feature wiring.',
+    tag: 'Update',
     date: 'Dec 2025',
     href: '/tab-player',
   },
   {
-    title: 'AlphaTab docs map',
+    title: 'Coming soon: videos',
     description:
-      'Quick links to installation, API, settings, AlphaTex, and guides to speed up tab-player changes.',
-    tag: 'Docs',
-    date: 'Dec 2025',
-    href: '/tab-player',
+      'Lesson videos are in the pipeline to make technique demos and guided practice way easier.',
+    tag: 'Coming soon',
+    date: 'Soon',
+    href: '/learn',
   },
 ];
 
@@ -197,9 +197,12 @@ export default function HomePage() {
             <p className="text-xs uppercase tracking-[0.22em] text-gray-400">What&apos;s New</p>
             <h2 className="font-display text-xl sm:text-2xl text-white">Fresh drops you can try now</h2>
           </div>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-metal-accent">
-            Dec 2025
-          </span>
+          <Link
+            href="/updates"
+            className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-metal-accent transition hover:border-metal-accent/50"
+          >
+            View all updates
+          </Link>
         </div>
         <div className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-1">
           {whatsNew.map((item) => (
@@ -238,12 +241,12 @@ export default function HomePage() {
             4.8 / 5
           </span>
         </div>
-        <div className="review-marquee rounded-2xl border border-white/10 bg-gradient-to-br from-gray-900/70 via-black/70 to-gray-900/70 p-4">
-          <div className="review-marquee-track">
-            {[...reviews, ...reviews].map((review, idx) => (
+        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-gray-900/70 via-black/70 to-gray-900/70 p-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {reviews.map((review, idx) => (
               <div
                 key={`${review.name}-${idx}`}
-                className={`relative min-w-[260px] max-w-xs rounded-2xl border border-white/10 bg-gradient-to-br ${review.tone} p-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]`}
+                className={`relative w-full rounded-2xl border border-white/10 bg-gradient-to-br ${review.tone} p-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]`}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0 opacity-60" />
                 <div className="relative space-y-3">

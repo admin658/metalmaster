@@ -51,40 +51,174 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
     return `${numerator}/${denominator}`;
   };
 
-  // Apply custom score/note colors once a score is loaded
+  // Apply custom score/note colors once a score is loaded.
+  // To tweak colors:
+  // - Base ink (text, stems, bars, glyphs): change `ink` and `inkMuted`.
+  // - Note/Tab colors by string: edit `stringPalette` (index = string number - 1).
+  // - Keep effects in ink so legibility stays high on white backgrounds.
   const applyColors = (score: alphaTab.model.Score) => {
-    score.style = new alphaTab.model.ScoreStyle();
-    score.style.colors.set(alphaTab.model.ScoreSubElement.Title, alphaTab.model.Color.fromJson("#426d9d"));
-    score.style.colors.set(alphaTab.model.ScoreSubElement.Artist, alphaTab.model.Color.fromJson("#4cb3d4"));
-
-    const fretColors: Record<number, alphaTab.model.Color> = {
-      12: alphaTab.model.Color.fromJson("#bb4648"),
-      13: alphaTab.model.Color.fromJson("#ab519f"),
-      14: alphaTab.model.Color.fromJson("#3953a5"),
-      15: alphaTab.model.Color.fromJson("#70ccd6"),
-      16: alphaTab.model.Color.fromJson("#6abd45"),
-      17: alphaTab.model.Color.fromJson("#e1a90e"),
+    const ink = alphaTab.model.Color.fromJson("#111827");
+    const inkMuted = alphaTab.model.Color.fromJson("#374151");
+    const stringPalette = [
+      alphaTab.model.Color.fromJson("#0f766e"),
+      alphaTab.model.Color.fromJson("#2563eb"),
+      alphaTab.model.Color.fromJson("#b45309"),
+      alphaTab.model.Color.fromJson("#dc2626"),
+      alphaTab.model.Color.fromJson("#15803d"),
+      alphaTab.model.Color.fromJson("#0284c7"),
+    ];
+    const setColors = <T,>(
+      colors: { set: (key: T, value: alphaTab.model.Color) => void },
+      elements: T[],
+      color: alphaTab.model.Color
+    ) => {
+      for (const element of elements) {
+        colors.set(element, color);
+      }
+    };
+    const getNoteColor = (note: alphaTab.model.Note) => {
+      const stringNumber = (note as any)?.string;
+      if (typeof stringNumber === "number" && stringPalette.length > 0) {
+        const clamped = Math.max(1, Math.min(stringPalette.length, stringNumber)) - 1;
+        return stringPalette[clamped];
+      }
+      return ink;
     };
 
+    score.style = new alphaTab.model.ScoreStyle();
+    setColors(
+      score.style.colors,
+      [
+        alphaTab.model.ScoreSubElement.Title,
+        alphaTab.model.ScoreSubElement.SubTitle,
+        alphaTab.model.ScoreSubElement.Artist,
+        alphaTab.model.ScoreSubElement.Album,
+        alphaTab.model.ScoreSubElement.Words,
+        alphaTab.model.ScoreSubElement.Music,
+        alphaTab.model.ScoreSubElement.WordsAndMusic,
+        alphaTab.model.ScoreSubElement.Transcriber,
+        alphaTab.model.ScoreSubElement.Copyright,
+        alphaTab.model.ScoreSubElement.CopyrightSecondLine,
+        alphaTab.model.ScoreSubElement.ChordDiagramList,
+      ],
+      ink
+    );
+
     for (const track of score.tracks) {
+      track.style = new alphaTab.model.TrackStyle();
+      setColors(
+        track.style.colors,
+        [
+          alphaTab.model.TrackSubElement.TrackName,
+          alphaTab.model.TrackSubElement.BracesAndBrackets,
+          alphaTab.model.TrackSubElement.SystemSeparator,
+          alphaTab.model.TrackSubElement.StringTuning,
+        ],
+        ink
+      );
+
       for (const staff of track.staves) {
         for (const bar of staff.bars) {
+          bar.style = new alphaTab.model.BarStyle();
+          setColors(
+            bar.style.colors,
+            [
+              alphaTab.model.BarSubElement.StandardNotationRepeats,
+              alphaTab.model.BarSubElement.GuitarTabsRepeats,
+              alphaTab.model.BarSubElement.SlashRepeats,
+              alphaTab.model.BarSubElement.NumberedRepeats,
+              alphaTab.model.BarSubElement.StandardNotationBarNumber,
+              alphaTab.model.BarSubElement.GuitarTabsBarNumber,
+              alphaTab.model.BarSubElement.SlashBarNumber,
+              alphaTab.model.BarSubElement.NumberedBarNumber,
+              alphaTab.model.BarSubElement.StandardNotationClef,
+              alphaTab.model.BarSubElement.GuitarTabsClef,
+              alphaTab.model.BarSubElement.StandardNotationKeySignature,
+              alphaTab.model.BarSubElement.NumberedKeySignature,
+              alphaTab.model.BarSubElement.StandardNotationTimeSignature,
+              alphaTab.model.BarSubElement.GuitarTabsTimeSignature,
+              alphaTab.model.BarSubElement.SlashTimeSignature,
+              alphaTab.model.BarSubElement.NumberedTimeSignature,
+            ],
+            ink
+          );
+          setColors(
+            bar.style.colors,
+            [
+              alphaTab.model.BarSubElement.StandardNotationBarLines,
+              alphaTab.model.BarSubElement.GuitarTabsBarLines,
+              alphaTab.model.BarSubElement.SlashBarLines,
+              alphaTab.model.BarSubElement.NumberedBarLines,
+              alphaTab.model.BarSubElement.StandardNotationStaffLine,
+              alphaTab.model.BarSubElement.GuitarTabsStaffLine,
+              alphaTab.model.BarSubElement.SlashStaffLine,
+              alphaTab.model.BarSubElement.NumberedStaffLine,
+            ],
+            inkMuted
+          );
+
           for (const voice of bar.voices) {
+            voice.style = new alphaTab.model.VoiceStyle();
+            setColors(voice.style.colors, [alphaTab.model.VoiceSubElement.Glyphs], ink);
+
             for (const beat of voice.beats) {
-              if (beat.hasTuplet) {
-                beat.style = new alphaTab.model.BeatStyle();
-                const color = alphaTab.model.Color.fromJson("#00DD00");
-                beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationTuplet, color);
-                beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationBeams, color);
-              }
+              beat.style = new alphaTab.model.BeatStyle();
+              setColors(
+                beat.style.colors,
+                [
+                  alphaTab.model.BeatSubElement.Effects,
+                  alphaTab.model.BeatSubElement.StandardNotationStem,
+                  alphaTab.model.BeatSubElement.StandardNotationFlags,
+                  alphaTab.model.BeatSubElement.StandardNotationBeams,
+                  alphaTab.model.BeatSubElement.StandardNotationTuplet,
+                  alphaTab.model.BeatSubElement.StandardNotationEffects,
+                  alphaTab.model.BeatSubElement.StandardNotationRests,
+                  alphaTab.model.BeatSubElement.GuitarTabStem,
+                  alphaTab.model.BeatSubElement.GuitarTabFlags,
+                  alphaTab.model.BeatSubElement.GuitarTabBeams,
+                  alphaTab.model.BeatSubElement.GuitarTabTuplet,
+                  alphaTab.model.BeatSubElement.GuitarTabEffects,
+                  alphaTab.model.BeatSubElement.GuitarTabRests,
+                  alphaTab.model.BeatSubElement.SlashStem,
+                  alphaTab.model.BeatSubElement.SlashFlags,
+                  alphaTab.model.BeatSubElement.SlashBeams,
+                  alphaTab.model.BeatSubElement.SlashTuplet,
+                  alphaTab.model.BeatSubElement.SlashRests,
+                  alphaTab.model.BeatSubElement.SlashEffects,
+                  alphaTab.model.BeatSubElement.NumberedDuration,
+                  alphaTab.model.BeatSubElement.NumberedEffects,
+                  alphaTab.model.BeatSubElement.NumberedRests,
+                  alphaTab.model.BeatSubElement.NumberedTuplet,
+                ],
+                ink
+              );
 
               for (const note of beat.notes) {
                 note.style = new alphaTab.model.NoteStyle();
-                const color = fretColors[note.fret];
-                if (color) {
-                  note.style.colors.set(alphaTab.model.NoteSubElement.StandardNotationNoteHead, color);
-                  note.style.colors.set(alphaTab.model.NoteSubElement.GuitarTabFretNumber, color);
-                }
+                const noteColor = getNoteColor(note);
+                setColors(
+                  note.style.colors,
+                  [
+                    alphaTab.model.NoteSubElement.Effects,
+                    alphaTab.model.NoteSubElement.StandardNotationEffects,
+                    alphaTab.model.NoteSubElement.GuitarTabEffects,
+                    alphaTab.model.NoteSubElement.SlashEffects,
+                    alphaTab.model.NoteSubElement.NumberedEffects,
+                  ],
+                  ink
+                );
+                setColors(
+                  note.style.colors,
+                  [
+                    alphaTab.model.NoteSubElement.StandardNotationNoteHead,
+                    alphaTab.model.NoteSubElement.StandardNotationAccidentals,
+                    alphaTab.model.NoteSubElement.GuitarTabFretNumber,
+                    alphaTab.model.NoteSubElement.SlashNoteHead,
+                    alphaTab.model.NoteSubElement.NumberedNumber,
+                    alphaTab.model.NoteSubElement.NumberedAccidentals,
+                  ],
+                  noteColor
+                );
               }
             }
           }
