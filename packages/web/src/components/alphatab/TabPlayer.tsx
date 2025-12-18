@@ -7,6 +7,66 @@ interface TabPlayerProps {
   source: string | ArrayBuffer;
 }
 
+const applyColors = (score: alphaTab.model.Score) => {
+  // Create custom style on score level.
+  score.style = new alphaTab.model.ScoreStyle();
+  score.style.colors.set(
+    alphaTab.model.ScoreSubElement.Title,
+    alphaTab.model.Color.fromJson('#426d9d')
+  );
+  score.style.colors.set(
+    alphaTab.model.ScoreSubElement.Artist,
+    alphaTab.model.Color.fromJson('#4cb3d4')
+  );
+
+  const fretColors: Record<number, alphaTab.model.Color> = {
+    12: alphaTab.model.Color.fromJson('#bb4648'),
+    13: alphaTab.model.Color.fromJson('#ab519f'),
+    14: alphaTab.model.Color.fromJson('#3953a5'),
+    15: alphaTab.model.Color.fromJson('#70ccd6'),
+    16: alphaTab.model.Color.fromJson('#6abd45'),
+    17: alphaTab.model.Color.fromJson('#e1a90e'),
+  };
+
+  // Traverse hierarchy and apply colors as desired.
+  for (const track of score.tracks) {
+    for (const staff of track.staves) {
+      for (const bar of staff.bars) {
+        for (const voice of bar.voices) {
+          for (const beat of voice.beats) {
+            if (beat.hasTuplet) {
+              beat.style = new alphaTab.model.BeatStyle();
+              const color = alphaTab.model.Color.fromJson('#00DD00');
+              beat.style.colors.set(
+                alphaTab.model.BeatSubElement.StandardNotationTuplet,
+                color
+              );
+              beat.style.colors.set(
+                alphaTab.model.BeatSubElement.StandardNotationBeams,
+                color
+              );
+            }
+
+            for (const note of beat.notes) {
+              const color = fretColors[note.fret];
+              if (!color) continue;
+              note.style = new alphaTab.model.NoteStyle();
+              note.style.colors.set(
+                alphaTab.model.NoteSubElement.StandardNotationNoteHead,
+                color
+              );
+              note.style.colors.set(
+                alphaTab.model.NoteSubElement.GuitarTabFretNumber,
+                color
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
 const GM_INSTRUMENTS: Array<{ label: string; program: number }> = [
   { label: 'Distortion Guitar', program: 30 },
   { label: 'Overdriven Guitar', program: 29 },
@@ -92,6 +152,7 @@ export default function TabPlayer({ source }: TabPlayerProps) {
     };
 
     const handleScoreLoaded = (score: alphaTab.model.Score) => {
+      applyColors(score);
       setTracks(score.tracks ?? []);
       setIsLoadingScore(false);
       // In case playerReady didn't fire (e.g., player disabled), allow controls after load

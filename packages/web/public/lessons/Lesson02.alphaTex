@@ -1,0 +1,6 @@
+\title "Lesson 2 - Palm Mute Control + Accents"
+\subtitle "Punchy mutes + dynamic accents"
+\tempo 100
+.
+:8 0.6{pm ac} 0.6{pm} 0.6{pm ac} 0.6{pm} 0.6{pm ac} 0.6{pm} 0.6{pm ac} 0.6{pm} |
+:8 0.6{pm} 0.6{pm ac} 0.6{pm} 0.6{pm ac} 0.6{pm} 0.6{pm ac} 0.6{pm} 0.6{pm ac} |

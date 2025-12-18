@@ -26,6 +26,7 @@ function toUiStatus(playerState: alphaTab.synth.PlayerState): UiState["status"] 
 export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trackIndex = 0 }: Options) {
   const apiRef = useRef<alphaTab.AlphaTabApi | null>(null);
   const lastLoadedUrlRef = useRef<string | null>(null);
+  const loadAbortRef = useRef<AbortController | null>(null);
   const lastBarRef = useRef<number>(-1);
   const lastBeatIdRef = useRef<number | null>(null);
   const registerControls = useAlphaTabRegistrar();
@@ -55,9 +56,6 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
     score.style = new alphaTab.model.ScoreStyle();
     score.style.colors.set(alphaTab.model.ScoreSubElement.Title, alphaTab.model.Color.fromJson("#426d9d"));
     score.style.colors.set(alphaTab.model.ScoreSubElement.Artist, alphaTab.model.Color.fromJson("#4cb3d4"));
-    const defaultNoteColor = alphaTab.model.Color.fromJson("#e5e5e5");
-    const defaultBeatColor = alphaTab.model.Color.fromJson("#d6d6d6");
-    const transparent = alphaTab.model.Color.fromJson("#00000000");
 
     const fretColors: Record<number, alphaTab.model.Color> = {
       12: alphaTab.model.Color.fromJson("#bb4648"),
@@ -71,47 +69,22 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
     for (const track of score.tracks) {
       for (const staff of track.staves) {
         for (const bar of staff.bars) {
-          // Hide standard staff elements when notation is off
-          if (!state.showStandardNotation) {
-            bar.style = bar.style || new alphaTab.model.BarStyle();
-            bar.style.colors.set(alphaTab.model.BarSubElement.StandardNotationStaffLine, transparent);
-            bar.style.colors.set(alphaTab.model.BarSubElement.StandardNotationBarLines, transparent);
-            bar.style.colors.set(alphaTab.model.BarSubElement.StandardNotationClef, transparent);
-            bar.style.colors.set(alphaTab.model.BarSubElement.StandardNotationTimeSignature, transparent);
-            bar.style.colors.set(alphaTab.model.BarSubElement.StandardNotationKeySignature, transparent);
-            bar.style.colors.set(alphaTab.model.BarSubElement.StandardNotationBarNumber, transparent);
-          }
           for (const voice of bar.voices) {
             for (const beat of voice.beats) {
-              // brighten stems/flags by default
-              beat.style = beat.style || new alphaTab.model.BeatStyle();
-              beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationStem, defaultBeatColor);
-              beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationFlags, defaultBeatColor);
-              beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationBeams, defaultBeatColor);
-              beat.style.colors.set(alphaTab.model.BeatSubElement.GuitarTabStem, defaultBeatColor);
-              beat.style.colors.set(alphaTab.model.BeatSubElement.GuitarTabFlags, defaultBeatColor);
-              beat.style.colors.set(alphaTab.model.BeatSubElement.GuitarTabBeams, defaultBeatColor);
-
               if (beat.hasTuplet) {
                 beat.style = new alphaTab.model.BeatStyle();
                 const color = alphaTab.model.Color.fromJson("#00DD00");
                 beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationTuplet, color);
                 beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationBeams, color);
               }
+
               for (const note of beat.notes) {
-                const color = fretColors[note.fret] || defaultNoteColor;
-                if (!color) continue;
                 note.style = new alphaTab.model.NoteStyle();
-                if (!state.showStandardNotation) {
-                  // Hide standard notation when toggle is off
-                  note.style.colors.set(alphaTab.model.NoteSubElement.StandardNotationNoteHead, transparent);
-                  note.style.colors.set(alphaTab.model.NoteSubElement.StandardNotationAccidentals, transparent);
-                  beat.style?.colors?.set(alphaTab.model.BeatSubElement.StandardNotationStem, transparent);
-                  beat.style?.colors?.set(alphaTab.model.BeatSubElement.StandardNotationBeams, transparent);
-                } else {
+                const color = fretColors[note.fret];
+                if (color) {
                   note.style.colors.set(alphaTab.model.NoteSubElement.StandardNotationNoteHead, color);
+                  note.style.colors.set(alphaTab.model.NoteSubElement.GuitarTabFretNumber, color);
                 }
-                note.style.colors.set(alphaTab.model.NoteSubElement.GuitarTabFretNumber, color);
               }
             }
           }
@@ -123,8 +96,49 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
   const settings = useMemo(() => {
     const s = new alphaTab.Settings();
     s.fillFromJson(alphaTabSettingsJson as any);
+    s.core.tex = true;
     return s;
   }, []);
+
+  const sanitizeAlphaTex = (tex: string) => {
+    return tex.replace(/\{[^}\n]*\}/g, (block) => {
+      // Avoid touching metadata/strings; only clean simple effect blocks.
+      if (block.includes("\"") || block.includes(":") || block.includes("\\")) return block;
+      const inner = block.slice(1, -1).trim();
+      if (!inner) return block;
+      const parts = inner.split(/\s+/);
+      const filtered = parts.filter((part) => part.toLowerCase() !== "null");
+      if (filtered.length === parts.length) return block;
+      if (filtered.length === 0) return "";
+      return `{${filtered.join(" ")}}`;
+    });
+  };
+
+  const loadScore = async (api: alphaTab.AlphaTabApi, url: string, track: number) => {
+    if (/\.alphatex$/i.test(url)) {
+      loadAbortRef.current?.abort();
+      const controller = new AbortController();
+      loadAbortRef.current = controller;
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        const rawTex = await res.text();
+        if (controller.signal.aborted) return;
+        if (typeof (api as any).tex !== "function") {
+          throw new Error("AlphaTab AlphaTex API not available");
+        }
+        const tex = sanitizeAlphaTex(rawTex);
+        if (tex !== rawTex) {
+          console.warn("[AlphaTab] AlphaTex sanitized: removed null effect tokens");
+        }
+        (api as any).tex(tex, [track]);
+      } catch (err) {
+        if ((err as any)?.name === "AbortError") return;
+        console.error("[AlphaTab] AlphaTex load failed", err);
+      }
+      return;
+    }
+    api.load(url, [track]);
+  };
 
   // Create/destroy API
   useEffect(() => {
@@ -250,6 +264,7 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
         subState?.dispose?.();
         subFinished?.dispose?.();
       } catch {}
+      loadAbortRef.current?.abort();
       api.destroy();
       apiRef.current = null;
       registerControls(null);
@@ -263,7 +278,7 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
     if (lastLoadedUrlRef.current === scoreUrl) return;
     lastLoadedUrlRef.current = scoreUrl;
 
-    api.load(scoreUrl, [trackIndex]);
+    void loadScore(api, scoreUrl, trackIndex);
   }, [scoreUrl, trackIndex]);
 
   // Push runtime props
@@ -326,7 +341,7 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
         const api = apiRef.current;
         if (!api) return;
         dispatch({ type: "SET_ACTIVE_TRACK_INDEX", index });
-        api.load(scoreUrl, [index]);
+        void loadScore(api, scoreUrl, index);
         api.scrollToCursor(); // keeps view aligned after rerender :contentReference[oaicite:16]{index=16}
       },
       async enumerateOutputs() {

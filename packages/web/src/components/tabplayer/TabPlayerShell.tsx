@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useReducer, useState } from "react";
+import { demoFiles } from "@/app/tab-player/demoFiles.generated";
 import BottomRack from "./BottomRack";
 import CoachPanel from "./CoachPanel";
 import MainStage from "./MainStage";
@@ -58,6 +59,22 @@ type Action =
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
+
+type LessonOption = { label: string; url: string };
+
+function buildLessonOptions(files: typeof demoFiles): LessonOption[] {
+  const seen = new Set<string>();
+  return files
+    .filter((file) => file.path.startsWith("/lessons/"))
+    .map((file) => ({ label: file.label, url: file.path }))
+    .filter((file) => {
+      if (seen.has(file.url)) return false;
+      seen.add(file.url);
+      return true;
+    });
+}
+
+const lessonOptions = buildLessonOptions(demoFiles);
 
 function reducer(state: PlayerState, action: Action): PlayerState {
   switch (action.type) {
@@ -241,8 +258,12 @@ export default function TabPlayerShell() {
   );
 
   const [state, dispatch] = useReducer(reducer, initial);
-  const [scoreUrl, setScoreUrl] = useState<string>("/tabs/Lesson 3 Alternate Picking Drill.gp5");
-  const [label, setLabel] = useState<string>("Lesson 3 Alternate Picking Drill");
+  const [scoreUrl, setScoreUrl] = useState<string>(
+    lessonOptions[0]?.url ?? "/lessons/Lesson01.alphaTex"
+  );
+  const [label, setLabel] = useState<string>(
+    lessonOptions[0]?.label ?? "Lesson 1 - Precision Chugs"
+  );
   // Replace this with the real lesson UUID from your data.
   const sessionKey = "de305d54-75b4-431b-adb2-eb6b9e546014";
   const trackIndex = 0;
@@ -255,14 +276,7 @@ export default function TabPlayerShell() {
     dispatch,
   });
 
-  const demos = useMemo(
-    () => [
-      { label: "Lesson 1 Palm-Muted Chunk", url: "/tabs/Lesson 1_ Basic Palm-Muted Chunk.gp5" },
-      { label: "Lesson 2 Power Chords", url: "/tabs/Lesson 2_ Power Chords & Downpicking.gp5" },
-      { label: "Lesson 3 Alternate Picking Drill", url: "/tabs/Lesson 3 Alternate Picking Drill.gp5" },
-    ],
-    [],
-  );
+  const lessons = useMemo(() => lessonOptions, []);
 
   const handleFile = (file: File | null) => {
     if (!file) return;
@@ -280,19 +294,20 @@ export default function TabPlayerShell() {
       )}
       <div className="flex flex-wrap items-center gap-2 px-3 pb-1 text-sm text-zinc-200">
         <label className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2">
-          <span className="text-xs text-zinc-400">Demo</span>
+          <span className="text-xs text-zinc-400">Lesson</span>
           <select
             className="bg-transparent text-sm focus:outline-none"
             value={scoreUrl}
             onChange={(e) => {
-              const next = demos.find((d) => d.url === e.target.value);
+              const next = lessons.find((d) => d.url === e.target.value);
               if (next) {
                 setScoreUrl(next.url);
                 setLabel(next.label);
               }
             }}
+            disabled={lessons.length === 0}
           >
-            {demos.map((d) => (
+            {lessons.map((d) => (
               <option key={d.url} value={d.url}>
                 {d.label}
               </option>
@@ -304,7 +319,7 @@ export default function TabPlayerShell() {
           <span className="text-xs text-zinc-400">Upload GP</span>
           <input
             type="file"
-            accept=".gp3,.gp4,.gp5,.gpx"
+            accept=".gp3,.gp4,.gp5,.gpx,.alphatab,.alphatex"
             className="text-xs"
             onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
           />

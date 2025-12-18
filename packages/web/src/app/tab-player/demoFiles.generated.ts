@@ -3,118 +3,53 @@
 export type GeneratedDemoFile = { label: string; path: string; description?: string; backingUrl?: string; };
 export const demoFiles: GeneratedDemoFile[] = [
   {
-    "label": "Lesson 1 Basic Palm Muted Chunk (GP5)",
-    "path": "/tabs/Lesson 1_ Basic Palm-Muted Chunk.gp5",
+    "label": "Lesson 01 (ALPHATEX)",
+    "path": "/lessons/Lesson01.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 1 Basic Palm Muted Chunk (GP5)",
-    "path": "/lessons/Lesson 1_ Basic Palm-Muted Chunk.gp5",
+    "label": "Lesson 02 (ALPHATEX)",
+    "path": "/lessons/Lesson02.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 1 Palm Muted (GP5)",
-    "path": "/lessons/lesson-1-palm-muted.gp5",
+    "label": "Lesson 03 (ALPHATEX)",
+    "path": "/lessons/Lesson03.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 2 Power Chords & Downpicking (GP5)",
-    "path": "/tabs/Lesson 2_ Power Chords & Downpicking.gp5",
+    "label": "Lesson 04 (ALPHATEX)",
+    "path": "/lessons/Lesson04.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 2 Power Chords & Downpicking (GP5)",
-    "path": "/lessons/Lesson 2_ Power Chords & Downpicking.gp5",
+    "label": "Lesson 05 (ALPHATEX)",
+    "path": "/lessons/Lesson05.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 2 Power Chords Downpicking (GP5)",
-    "path": "/lessons/lesson-2-power-chords-downpicking.gp5",
+    "label": "Lesson 06 (ALPHATEX)",
+    "path": "/lessons/Lesson06.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 3 Alternate Picking (GP5)",
-    "path": "/lessons/lesson-3-alternate-picking.gp5",
+    "label": "Lesson 07 (ALPHATEX)",
+    "path": "/lessons/Lesson07.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 3 Alternate Picking Drill (GP5)",
-    "path": "/tabs/Lesson 3 Alternate Picking Drill.gp5",
+    "label": "Lesson 08 (ALPHATEX)",
+    "path": "/lessons/Lesson08.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 3 Alternate Picking Drill (GP5)",
-    "path": "/lessons/Lesson 3 Alternate Picking Drill.gp5",
+    "label": "Lesson 09 (ALPHATEX)",
+    "path": "/lessons/Lesson09.alphaTex",
     "description": ""
   },
   {
-    "label": "Lesson 4 Classic Gallup (GP5)",
-    "path": "/tabs/Lesson 4 Classic Gallup.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lesson 4 Classic Gallup (GP5)",
-    "path": "/lessons/Lesson 4 Classic Gallup.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lesson 4 Classic Gallup (GP5)",
-    "path": "/lessons/lesson-4-classic-gallup.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lesson 5 (GP5)",
-    "path": "/lessons/Lesson 5.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lesson 5 (GP5)",
-    "path": "/lessons/lesson-5.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lesson 6 (GP5)",
-    "path": "/lessons/Lesson 6 .gp5",
-    "description": ""
-  },
-  {
-    "label": "Lesson 6 (GP5)",
-    "path": "/lessons/lesson-6.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lesson 7 Fast Downpicking (GP5)",
-    "path": "/lessons/Lesson 7 Fast Downpicking.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lesson 7 Fast Downpicking (GP5)",
-    "path": "/lessons/lesson-7-fast-downpicking.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lessons Metal Exercises For Beginner (GP5)",
-    "path": "/tabs/lessons_metal-exercises_for_beginner.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lessons Metal Exercises For Beginner (GP5)",
-    "path": "/lessons/lessons_metal-exercises_for_beginner.gp5",
-    "description": ""
-  },
-  {
-    "label": "Lessons Metal Heavy Guitar Exercises (GP4)",
-    "path": "/tabs/lessons_metal-heavy_guitar_exercises.gp4",
-    "description": ""
-  },
-  {
-    "label": "Metallica Master Of Puppets (GP5)",
-    "path": "/tabs/metallica-master_of_puppets.gp5",
-    "description": ""
-  },
-  {
-    "label": "Metallica Mercyful Fate (GP3)",
-    "path": "/tabs/metallica-mercyful_fate.gp3",
+    "label": "Lesson 10 (ALPHATEX)",
+    "path": "/lessons/Lesson10.alphaTex",
     "description": ""
   }
 ];

@@ -10,6 +10,9 @@ function toLabel(fileName) {
   const base = path.basename(fileName, ext);
   const words = base
     .replace(/[-_]+/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/([A-Za-z])([0-9])/g, '$1 $2')
+    .replace(/([0-9])([A-Za-z])/g, '$1 $2')
     .replace(/\s+/g, ' ')
     .trim()
     .split(' ')
@@ -24,7 +27,7 @@ function collectFiles(relativeDir) {
   if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir)
-    .filter(file => /\.(gp3|gp4|gp5)$/i.test(file))
+    .filter(file => /\.(gp3|gp4|gp5|gpx|alphatab|alphatex)$/i.test(file))
     .map(file => ({
       label: toLabel(file),
       path: `/${relativeDir}/${file}`,
