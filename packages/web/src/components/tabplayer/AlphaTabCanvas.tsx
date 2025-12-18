@@ -25,33 +25,12 @@ export default function AlphaTabCanvas({ state, dispatch, scoreUrl = "/tabs/demo
   });
 
   return (
-    <div className="alpha-tab-light relative h-full w-full">
+    <div className="relative h-[520px] w-full">
       {/* This is the element AlphaTab will scroll */}
       <div id="mm-tab-scroll" className="h-full w-full overflow-auto rounded-2xl">
         {/* AlphaTab mounts here */}
         <div ref={setRef} className="min-h-full w-full" />
       </div>
-      <style jsx global>{`
-        .alpha-tab-light,
-        .alpha-tab-light #mm-tab-scroll {
-          background: #ffffff;
-          color: #111827;
-        }
-        .alpha-tab-light .at-selection div {
-          background: rgba(29, 78, 216, 0.16);
-        }
-        .alpha-tab-light .at-cursor-bar {
-          background: rgba(15, 118, 110, 0.18);
-        }
-        .alpha-tab-light .at-cursor-beat {
-          background: rgba(15, 118, 110, 0.75);
-          width: 3px;
-        }
-        .alpha-tab-light .at-highlight * {
-          fill: #0f766e;
-          stroke: #0f766e;
-        }
-      `}</style>
     </div>
   );
 }

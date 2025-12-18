@@ -21,7 +21,6 @@ export default function TopBar({ state, dispatch }: Props) {
   const [outputs, setOutputs] = useState<Array<{ id: string; name: string }>>([]);
   const [outputId, setOutputId] = useState<string | "">("");
   const [outputsLoading, setOutputsLoading] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleTimelineClick = (e: MouseEvent<HTMLDivElement>) => {
     if (!state.durationSeconds) return;
@@ -71,28 +70,8 @@ export default function TopBar({ state, dispatch }: Props) {
     void loadOutputs();
   }, [loadOutputs]);
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
-    };
-    handleFullscreenChange();
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
-
-  const handleFullscreenToggle = async () => {
-    if (document.fullscreenElement) {
-      await document.exitFullscreen();
-      return;
-    }
-    const target = document.getElementById("tab-player-fullscreen");
-    if (target?.requestFullscreen) {
-      await target.requestFullscreen();
-    }
-  };
-
   return (
-    <header className="sticky bottom-0 z-30 mt-auto border-t border-zinc-800 bg-zinc-950/90 backdrop-blur">
+    <header className="sticky bottom-0 z-30 border-t border-zinc-800 bg-zinc-950/90 backdrop-blur">
       <div className="flex h-[72px] items-center gap-3 px-3">
         {/* Left: Song info */}
         <div className="min-w-[260px] max-w-[420px]">
@@ -214,13 +193,6 @@ export default function TopBar({ state, dispatch }: Props) {
               <span className="font-semibold text-zinc-100">+{state.xpPreview}</span>{" "}
               <span className="text-zinc-500">🔥{state.streak}</span>
             </div>
-
-            <button
-              className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800"
-              onClick={() => void handleFullscreenToggle()}
-            >
-              {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-            </button>
 
             <button
               className="hidden rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800 lg:block"

@@ -12,10 +12,10 @@ type Props = {
 
 export default function MainStage({ state, dispatch, scoreUrl }: Props) {
   return (
-    <section className="tab-player-stage flex min-h-[420px] flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-sm">
+    <section className="flex min-h-[420px] flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-sm">
       <SectionMap state={state} dispatch={dispatch} />
 
-      <div className="tab-player-notation relative h-[520px] min-h-[340px] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+      <div className="relative min-h-[340px] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
         <AlphaTabCanvas state={state} dispatch={dispatch} scoreUrl={scoreUrl} />
       </div>
 

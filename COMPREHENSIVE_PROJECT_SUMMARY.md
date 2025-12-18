@@ -25,8 +25,8 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Alternate player: `MetalMasterTabPlayer` provides a high-contrast AlphaTab experience with metal theming, track selection, zoom/layout toggles, and colored fret/tuplet styling via `metalTheme.ts`.
 - Assets & demos: AlphaTab assets live under `packages/web/public/alphatab`; demo GP files live under `public/tabs` and `public/lessons` (new `lessons_metal-heavy_guitar_exercises.gp4`). `generate:tab-demos` builds `src/app/tab-player/demoFiles.generated.ts` from those folders.
 - Profile page pulls `/api/user-stats` + `/api/user-stats/summary` + achievements/stats hooks for level/XP/streak/heatmap cards. `TopUserBadge` shows auth + subscription state; `useSubscription` now hits `/api/user-stats` with the stored token and offers upgrade/portal helpers.
-- Styling: monochrome AlphaTab skin in `src/app/alphaTab.css`; global metal theme via `globals.css` + Geist fonts; Tab Lab now forces a white/ink AlphaTab surface with scoped cursor/selection/highlight CSS in `AlphaTabCanvas`.
-- Tab Lab UI tweaks: transport bar is bottom-sticky; section bar adds PM/Accents/Fingering/Rhythm/Strings toggles plus a Std Notation toggle; MIDI Out dropdown enumerates AlphaTab output devices when available; AlphaTab scrolling centers the playhead; score colors are normalized to readable ink with per-string note palette for tab/notation in `useAlphaTab`.
+- Styling: monochrome AlphaTab skin in `src/app/alphaTab.css`; global metal theme via `globals.css` + Geist fonts.
+- Tab Lab UI tweaks: transport bar is bottom-sticky; section bar adds PM/Accents/Fingering/Rhythm/Strings toggles plus a Std Notation toggle; MIDI Out dropdown enumerates AlphaTab output devices when available; AlphaTab scrolling centers the playhead; custom per-fret note coloring with default fallbacks keeps notation visible.
 
 ## API & Data
 - Express routes (high level): auth (login/signup/logout/refresh), tone-settings (OpenAI), speed-trainer, daily-riff, achievements, user-stats (+summary), practice-sessions, XP awards (`/api/xp/award`, `/api/xp/tick`), tabs/riffs/lessons/jam-tracks, billing (`/billing/create-checkout-session`, `/billing/create-portal-session`, Stripe webhook).
@@ -40,11 +40,10 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - RLS remains enabled on speed_trainer_sessions, daily_riff_completions, user_achievements, user_stats, user_practice_heatmap, practice_sessions (with the new user RW policy).
 
 ## Tab Player Stack (AlphaTab)
-- `useAlphaTab` wires AlphaTabApi with scroll snapping, loop/playback speed syncing, bar-to-section mapping, and context-registered controls (play/pause/stop, seek, bar jump, track load). It also applies full-score coloring (ink for staff/metadata/effects, per-string palette for noteheads + tab numbers) on `scoreLoaded` and re-renders. `AlphaTabContext` exposes controls to UI components.
+- `useAlphaTab` wires AlphaTabApi with scroll snapping, loop/playback speed syncing, bar-to-section mapping, and context-registered controls (play/pause/stop, seek, bar jump, track load). `AlphaTabContext` exposes controls to UI components.
 - UI shell pieces: `TopBar` (transport, BPM/speed sliders, loop), `SectionMap` (bar-accurate jumps), `MainStage` (AlphaTabCanvas + overlay toggles), `BottomRack` tabs (Practice: loop setters/speed slider; Tone: preset/amp stubs; Mixer: track select/mute/solo/transpose; Tools: tuning/util stubs), `CoachPanel` (stub metrics/notes).
 - Persistence expectations: `usePracticeSession` upserts/loads `practice_sessions` columns (`session_key`, `track_index`, `session_type`, `position_seconds`, `speed`, `bpm`, `loop_enabled`, `loop_in_seconds`, `loop_out_seconds`, `active_section_id`, `current_bar_number`, `rack_tab`, `coach_open`, `ui jsonb`) with a unique key on `(user_id, session_key, track_index)`; migration `003_practice_sessions_autosave.sql` provisions these columns and constraints.
 - Supporting pieces: `AlphaTabWrapper` ensures assets (alphaTab.js, fonts, soundfont) load and surfaces readiness events; `/alphatab-test` exercises it. `alphaTab.css` supplies a monochrome skin; `metalTheme.ts` provides a colored "metal" theme for custom renderers.
-- Color tuning: edit `ink`/`inkMuted` and `stringPalette` in `packages/web/src/components/tabplayer/useAlphaTab.ts` (and `packages/web/src/components/alphatab/TabPlayer.tsx` for the standalone player); selection/cursor/highlight overlays live in `packages/web/src/components/tabplayer/AlphaTabCanvas.tsx`.
 
 ## Tooling & Config
 - Next.js config now offered in TS (`next.config.ts`) using `@coderline/alphatab-webpack` with `assetOutputDir: public/alphatab` to ensure fonts/soundfonts are emitted.

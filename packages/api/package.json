@@ -11,8 +11,8 @@
     "seed": "tsx src/scripts/seed.ts"
   },
   "dependencies": {
-    "@metalmaster/shared-types": "1.0.0",
-    "@metalmaster/shared-validation": "1.0.0",
+    "@metalmaster/shared-types": "workspace:*",
+    "@metalmaster/shared-validation": "workspace:*",
     "@supabase/supabase-js": "^2.84.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
