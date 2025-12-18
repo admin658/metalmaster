@@ -3,6 +3,20 @@
 **Date:** December 2025  
 **Status:** ✅ Complete & Production-Ready
 
+## Status Update (Dec 2025)
+
+This summary covers the **legacy ImprovedTabPlayer/VexFlow** implementation. The current Tab Lab UI now lives in the TabPlayerShell stack:
+
+- `packages/web/src/components/tabplayer/TabPlayerShell.tsx`
+- `packages/web/src/components/tabplayer/MainStage.tsx`
+- `packages/web/src/components/tabplayer/AlphaTabCanvas.tsx`
+- `packages/web/src/components/tabplayer/useAlphaTab.ts`
+- `packages/web/src/app/tab-player/demoFiles.generated.ts` (regenerated from `/public/lessons`)
+
+Recent changes in the current UI:
+- Fullscreen expands the lesson canvas while keeping the bottom transport visible.
+- Lesson dropdown is synced by running `yarn workspace @metalmaster/web run generate:tab-demos`.
+
 ## What Was Built
 
 A **professional-grade interactive tab player** for the MetalMaster web app (`/tab-player` route) that provides synchronized visual feedback, precise playback control, and real-time metronome assistance.

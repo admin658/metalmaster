@@ -12,12 +12,17 @@
     "packages/shared-schemas",
     "packages/web/src/components/alphatab"
   ],
+  "resolutions": {
+    "camera-controls": "3.0.0"
+  },
   "scripts": {
     "dev": "concurrently \"yarn workspace @metalmaster/web dev\" \"yarn workspace @metalmaster/mobile start\"",
     "build": "yarn workspace @metalmaster/shared-types build && yarn workspace @metalmaster/shared-validation build && yarn workspace @metalmaster/api build && yarn workspace @metalmaster/web build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "type-check": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "test:ci": "jest --runInBand --ci",
+    "vercel:build": "yarn test:ci && yarn build"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",

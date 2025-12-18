@@ -51,5 +51,15 @@ export const demoFiles: GeneratedDemoFile[] = [
     "label": "Lesson 10 (ALPHATEX)",
     "path": "/lessons/Lesson10.alphaTex",
     "description": ""
+  },
+  {
+    "label": "Lessons Metal Exercises For Beginner (GP5)",
+    "path": "/lessons/lessons_metal-exercises_for_beginner.gp5",
+    "description": ""
+  },
+  {
+    "label": "Lessons Metal Heavy Guitar Exercises (GP4)",
+    "path": "/lessons/lessons_metal-heavy_guitar_exercises.gp4",
+    "description": ""
   }
 ];

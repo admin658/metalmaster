@@ -16,8 +16,17 @@ import {
   PricingIcon,
 } from '../components/icons';
 import SplashVideo from '../components/SplashVideo';
+import WhatsNewStack from '../components/WhatsNewStack';
 
 const whatsNew = [
+  {
+    title: 'Fullscreen tab player + bottom bar',
+    description:
+      'Fullscreen now expands the lesson canvas while keeping the transport bar pinned for quick play, loop, and MIDI output.',
+    tag: 'Update',
+    date: 'Dec 2025',
+    href: '/tab-player',
+  },
   {
     title: 'Tab Lab: lesson demos + WebMIDI',
     description:
@@ -192,40 +201,7 @@ export default function HomePage() {
       </div>
 
       <section className="max-w-6xl mx-auto px-4 pt-10 pb-6">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-gray-400">What&apos;s New</p>
-            <h2 className="font-display text-xl sm:text-2xl text-white">Fresh drops you can try now</h2>
-          </div>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-metal-accent">
-            Dec 2025
-          </span>
-        </div>
-        <div className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-1">
-          {whatsNew.map((item) => (
-            <Link
-              key={item.title}
-              href={item.href}
-              className="group relative min-w-[240px] sm:min-w-[260px] lg:min-w-[280px] flex-1 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-black/80 p-4 transition hover:-translate-y-1 hover:border-metal-accent/50"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-metal-accent/10 via-transparent to-purple-700/10 opacity-70" />
-              <div className="relative flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-200">
-                    {item.tag}
-                  </span>
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-gray-400">{item.date}</span>
-                </div>
-                <h3 className="font-display text-lg text-white">{item.title}</h3>
-                <p className="text-gray-200 leading-relaxed text-sm flex-1">{item.description}</p>
-                <div className="inline-flex items-center gap-2 text-sm font-semibold text-metal-accent transition group-hover:translate-x-1">
-                  View update
-                  <span aria-hidden>-&gt;</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <WhatsNewStack items={whatsNew} />
       </section>
 
       <section className="max-w-6xl mx-auto px-4 pt-2 pb-10">

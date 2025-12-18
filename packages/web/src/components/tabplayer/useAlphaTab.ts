@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import * as alphaTab from "@coderline/alphatab";
 import type { PlayerState as UiState } from "./types";
 import { alphaTabSettingsJson } from "./alphatabTheme";
+import { applyMetalContainerStyles, applyMetalTheme } from "../alphatab/metalTheme";
 import { useAlphaTabRegistrar } from "./AlphaTabContext";
 import { sectionForBar } from "./sectionUtils";
 
@@ -51,46 +52,8 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
     return `${numerator}/${denominator}`;
   };
 
-  // Apply custom score/note colors once a score is loaded
   const applyColors = (score: alphaTab.model.Score) => {
-    score.style = new alphaTab.model.ScoreStyle();
-    score.style.colors.set(alphaTab.model.ScoreSubElement.Title, alphaTab.model.Color.fromJson("#426d9d"));
-    score.style.colors.set(alphaTab.model.ScoreSubElement.Artist, alphaTab.model.Color.fromJson("#4cb3d4"));
-
-    const fretColors: Record<number, alphaTab.model.Color> = {
-      12: alphaTab.model.Color.fromJson("#bb4648"),
-      13: alphaTab.model.Color.fromJson("#ab519f"),
-      14: alphaTab.model.Color.fromJson("#3953a5"),
-      15: alphaTab.model.Color.fromJson("#70ccd6"),
-      16: alphaTab.model.Color.fromJson("#6abd45"),
-      17: alphaTab.model.Color.fromJson("#e1a90e"),
-    };
-
-    for (const track of score.tracks) {
-      for (const staff of track.staves) {
-        for (const bar of staff.bars) {
-          for (const voice of bar.voices) {
-            for (const beat of voice.beats) {
-              if (beat.hasTuplet) {
-                beat.style = new alphaTab.model.BeatStyle();
-                const color = alphaTab.model.Color.fromJson("#00DD00");
-                beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationTuplet, color);
-                beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationBeams, color);
-              }
-
-              for (const note of beat.notes) {
-                note.style = new alphaTab.model.NoteStyle();
-                const color = fretColors[note.fret];
-                if (color) {
-                  note.style.colors.set(alphaTab.model.NoteSubElement.StandardNotationNoteHead, color);
-                  note.style.colors.set(alphaTab.model.NoteSubElement.GuitarTabFretNumber, color);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    applyMetalTheme(score, alphaTab);
   };
 
   const settings = useMemo(() => {
@@ -146,6 +109,7 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
 
     const api = new alphaTab.AlphaTabApi(mountEl, settings);
     apiRef.current = api;
+    applyMetalContainerStyles(mountEl);
 
     // Ensure workers stay disabled and script points to the public asset
     if (typeof window !== "undefined") {

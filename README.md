@@ -9,7 +9,7 @@ Metal guitar learning platform spanning API, web, and mobile clients. Built with
 - Achievements and XP/Stats (heatmap, skill scores)
 - Jam Tracks page with bundled MP3s in `packages/web/public/jam` (uses Supabase jam tracks when present)
 - Animated flame backdrop + hover flames on nav links
-- Tab Player (AlphaTab) with demo/local upload, transport, track selection, and auto-scroll
+- Tab Player (AlphaTab) with demo/local upload, transport, track selection, auto-scroll, and fullscreen mode with pinned bottom bar
 - Home page splash video on load (served from `packages/web/public/splash.mp4`)
 - Route-change splash overlay (see `packages/web/src/app/components/RouteSplash.jsx`)
 - Web (Next.js) and Mobile (Expo) clients
@@ -87,10 +87,11 @@ yarn workspace @metalmaster/web dev      # http://localhost:3000 (serves API at 
 ## Tab Player (Web)
 - Page: `/tab-player`
 - Demo tabs: `/public/tabs/*.gp3/.gp5`
+- Demo lessons: `/public/lessons` (regenerate list with `yarn workspace @metalmaster/web run generate:tab-demos`)
 - Local upload supported
 - AlphaTab assets (fonts, scripts, soundfont) served from `/alphatab/` (see `packages/web/public/alphatab/`); soundfont used: `/alphatab/soundfont/sonivox.sf2`
- - Transport controls under the viewport; tracks below (with per-track view/solo/mute/volume); settings include render engine/scale/layout options.
- - Viewer scrolls inside its pane and stays on the active bar during playback. If playback is silent or tabs fail to render, ensure the `/alphatab` assets (alphaTab.js/mjs/worker/worklet, font/, soundfont/) are served and hard-refresh.
+- Fullscreen expands the lesson canvas while keeping the bottom transport bar visible.
+- Viewer scrolls inside its pane and stays on the active bar during playback. If playback is silent or tabs fail to render, ensure the `/alphatab` assets (alphaTab.js/mjs/worker/worklet, font/, soundfont/) are served and hard-refresh.
 
 ## Auth
 - Pages: `/auth/login`, `/auth/signup`

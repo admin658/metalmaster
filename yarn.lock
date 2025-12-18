@@ -6105,12 +6105,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"camera-controls@npm:^3.1.0":
-  version: 3.1.2
-  resolution: "camera-controls@npm:3.1.2"
+"camera-controls@npm:3.0.0":
+  version: 3.0.0
+  resolution: "camera-controls@npm:3.0.0"
   peerDependencies:
     three: ">=0.126.1"
-  checksum: 10c0/2d42162efd6789e713332a72212819fb04b261f7babc45b5794cd902997e4a4826c9401b672ffab2e09f9808fc2b615d9154d67c57f38a7c90487d4cf5429655
+  checksum: 10c0/607ef093ee3c662b21e2cd617a1e504127f4a959da3c25a84bc0facad16a0e499b299dd39e72716fc51fd2052175d20ab5c75915d25f0241b1e55e9bb93ec7f1
   languageName: node
   linkType: hard
 

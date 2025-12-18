@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { demoFiles } from "@/app/tab-player/demoFiles.generated";
 import BottomRack from "./BottomRack";
 import CoachPanel from "./CoachPanel";
@@ -194,6 +194,27 @@ function reducer(state: PlayerState, action: Action): PlayerState {
 }
 
 export default function TabPlayerShell() {
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleChange = () => {
+      setIsFullscreen(document.fullscreenElement === shellRef.current);
+    };
+    document.addEventListener("fullscreenchange", handleChange);
+    return () => document.removeEventListener("fullscreenchange", handleChange);
+  }, []);
+
+  const handleFullscreenToggle = async () => {
+    const el = shellRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      return;
+    }
+    await el.requestFullscreen();
+  };
+
   const initial: PlayerState = useMemo(
     () => ({
       title: "Metal Master Lesson",
@@ -286,7 +307,13 @@ export default function TabPlayerShell() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col">
+    <div
+      ref={shellRef}
+      className={[
+        "mm-tabplayer-shell flex min-h-screen flex-col",
+        isFullscreen ? "mm-tabplayer-shell--fullscreen" : "mx-auto max-w-[1600px]",
+      ].join(" ")}
+    >
       {disabledReason && (
         <div className="mx-3 mb-2 rounded-xl border border-amber-500/60 bg-amber-950/40 px-3 py-2 text-xs text-amber-100">
           Autosave is disabled: {disabledReason}
@@ -330,7 +357,13 @@ export default function TabPlayerShell() {
 
       <div className="flex flex-1 gap-3 px-3 pb-3">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
-          <MainStage state={state} dispatch={dispatch} scoreUrl={scoreUrl} />
+          <MainStage
+            state={state}
+            dispatch={dispatch}
+            scoreUrl={scoreUrl}
+            isFullscreen={isFullscreen}
+            onToggleFullscreen={handleFullscreenToggle}
+          />
           <BottomRack state={state} dispatch={dispatch} />
         </div>
 

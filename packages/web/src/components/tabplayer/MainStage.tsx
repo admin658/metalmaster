@@ -8,15 +8,38 @@ type Props = {
   state: PlayerState;
   dispatch: (a: any) => void;
   scoreUrl: string;
+  isFullscreen: boolean;
+  onToggleFullscreen: () => void;
 };
 
-export default function MainStage({ state, dispatch, scoreUrl }: Props) {
+export default function MainStage({
+  state,
+  dispatch,
+  scoreUrl,
+  isFullscreen,
+  onToggleFullscreen,
+}: Props) {
   return (
     <section className="flex min-h-[420px] flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-sm">
       <SectionMap state={state} dispatch={dispatch} />
 
+      <div className="flex items-center justify-end">
+        <button
+          type="button"
+          onClick={onToggleFullscreen}
+          className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 hover:bg-zinc-800"
+        >
+          {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+        </button>
+      </div>
+
       <div className="relative min-h-[340px] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
-        <AlphaTabCanvas state={state} dispatch={dispatch} scoreUrl={scoreUrl} />
+        <AlphaTabCanvas
+          state={state}
+          dispatch={dispatch}
+          scoreUrl={scoreUrl}
+          isFullscreen={isFullscreen}
+        />
       </div>
 
       <div className="flex flex-wrap gap-2 text-xs text-zinc-400">

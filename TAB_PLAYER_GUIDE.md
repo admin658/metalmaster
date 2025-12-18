@@ -6,6 +6,32 @@ The **MetalMaster Tab Player** is an interactive guitar tab learning tool built 
 
 Located at: `/tab-player` route in the web app.
 
+## Current Tab Player (Dec 2025)
+
+The current UI is the new Tab Lab experience (`TabPlayerShell`) built on AlphaTab with a dedicated control bar, section chips, and a fullscreen mode that keeps the bottom transport visible.
+
+### What's New (Recent)
+
+- **Fullscreen mode** now expands the lesson canvas while keeping the bottom transport bar available.
+- **Lesson dropdown** is generated from `packages/web/public/lessons`.
+  - Regenerate after adding/removing lessons:
+    ```powershell
+    yarn workspace @metalmaster/web run generate:tab-demos
+    ```
+
+### Current File Locations
+
+| File                                                   | Purpose                                                                 |
+| ------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `packages/web/src/app/tab-player/page.tsx`             | Tab Player page entry (Tab Lab).                                        |
+| `packages/web/src/components/tabplayer/TabPlayerShell.tsx` | Main shell with lesson dropdown, layout, and bottom bar.            |
+| `packages/web/src/components/tabplayer/MainStage.tsx`  | Section chips + fullscreen button + AlphaTab canvas.                    |
+| `packages/web/src/components/tabplayer/AlphaTabCanvas.tsx` | AlphaTab mount + scroll container sizing.                           |
+| `packages/web/src/components/tabplayer/useAlphaTab.ts` | AlphaTab setup, track sync, cursor scroll, and theming.                 |
+| `packages/web/src/app/tab-player/demoFiles.generated.ts` | Auto-generated demo list from `/public/lessons` + `/public/tabs`.   |
+
+> Note: The sections below document the legacy ImprovedTabPlayer/VexFlow implementation. Keep them for reference, but the current Tab Lab uses the files above.
+
 ## Features
 
 ### Playback Controls
