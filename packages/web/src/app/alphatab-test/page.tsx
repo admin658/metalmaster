@@ -9,10 +9,16 @@ type EventLogEntry = {
   at: number;
 };
 
+type AlphaTabApiInstance = {
+  audioContext?: AudioContext;
+  playPause?: () => boolean;
+  play?: () => void;
+};
+
 const demoTab = '/tabs/metallica-mercyful_fate.gp3';
 
 export default function AlphaTabTestPage() {
-  const [api, setApi] = useState<any | null>(null);
+  const [api, setApi] = useState<AlphaTabApiInstance | null>(null);
   const [status, setStatus] = useState<{ scoreLoaded: boolean; playbackReady: boolean; error: string | null }>({
     scoreLoaded: false,
     playbackReady: false,
@@ -81,7 +87,7 @@ export default function AlphaTabTestPage() {
           />
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-black/80 shadow-xl p-4 space-y-3">
+        <div className="rounded-2xl border border-white/10 bg-linear-to-br from-gray-900/80 via-gray-900/60 to-black/80 shadow-xl p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-semibold">Playback</p>

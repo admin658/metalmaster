@@ -1,0 +1,261 @@
+diff --git a/build/file-store.js b/build/file-store.js
+index 6beb69851f2157cb9ea545e460e7bf1134e58bbb..b0a36e0fbcab37997279dd528abd42f3c7f57ce1 100644
+--- a/build/file-store.js
++++ b/build/file-store.js
+@@ -4,9 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.FileStore = void 0;
+-const FileStore_1 = __importDefault(require("metro-cache/src/stores/FileStore"));
++// metro 0.83 restricts exports; import from the public entrypoint instead of the private path.
++const { FileStore: MetroFileStore } = require("metro-cache");
+ const debug = require('debug')('expo:metro:cache');
+-class FileStore extends FileStore_1.default {
++class FileStore extends MetroFileStore {
+     async set(key, value) {
+         // Prevent caching of CSS files that have the skipCache flag set.
+         if (value?.output?.[0]?.data?.css?.skipCache) {
+diff --git a/build/serializer/environmentVariableSerializerPlugin.js b/build/serializer/environmentVariableSerializerPlugin.js
+index 5ad9341734a66c5d66b56c5fcd618645f0bd6f4e..1ae06120648a790d13517277d49b6116c3c09aae 100644
+--- a/build/serializer/environmentVariableSerializerPlugin.js
++++ b/build/serializer/environmentVariableSerializerPlugin.js
+@@ -5,7 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.environmentVariableSerializerPlugin = exports.serverPreludeSerializerPlugin = exports.getTransformEnvironment = void 0;
+ const CountingSet_1 = __importDefault(require("metro/src/lib/CountingSet"));
+-const countLines_1 = __importDefault(require("metro/src/lib/countLines"));
++// metro 0.83 tightened package exports and no longer exposes countLines;
++// inline a tiny equivalent helper to avoid relying on the private path.
++const countLines = (string) => (string.match(/\r\n?|\n|\u2028|\u2029/g) || []).length + 1;
+ const debug = require('debug')('expo:metro-config:serializer:env-var');
+ function getTransformEnvironment(url) {
+     const match = url.match(/[&?]transform\.environment=([^&]+)/);
+@@ -87,7 +89,7 @@ exports.environmentVariableSerializerPlugin = environmentVariableSerializerPlugi
+ function getEnvPrelude(contents) {
+     const code = '// HMR env vars from Expo CLI (dev-only)\n' + contents;
+     const name = '__env__';
+-    const lineCount = (0, countLines_1.default)(code);
++    const lineCount = countLines(code);
+     return {
+         dependencies: new Map(),
+         getSource: () => Buffer.from(code),
+diff --git a/build/serializer/fork/baseJSBundle.js b/build/serializer/fork/baseJSBundle.js
+index 89c3bbd8b95350c38704fdb45f049254f45aefb8..6b351a230454a0a2a38ea6a1d48ac36e55e59e2c 100644
+--- a/build/serializer/fork/baseJSBundle.js
++++ b/build/serializer/fork/baseJSBundle.js
+@@ -16,9 +16,89 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.baseJSBundleWithDependencies = exports.baseJSBundle = exports.getBaseUrlOption = exports.getSplitChunksOption = exports.getPlatformOption = void 0;
+ const jsc_safe_url_1 = require("jsc-safe-url");
+ const CountingSet_1 = __importDefault(require("metro/src/lib/CountingSet"));
+-const countLines_1 = __importDefault(require("metro/src/lib/countLines"));
+-const getAppendScripts_1 = __importDefault(require("metro/src/lib/getAppendScripts"));
++// metro 0.83 tightened exports; avoid private countLines path and inline a helper.
++const countLines = (string) => (string.match(/\r\n?|\n|\u2028|\u2029/g) || []).length + 1;
++const sourceMapString_1 = require("metro/src/DeltaBundler/Serializers/sourceMapString");
++const nullthrows_1 = __importDefault(require("nullthrows"));
+ const processModules_1 = require("./processModules");
++function getInlineSourceMappingURL(sourceMap) {
++    const base64 = Buffer.from(sourceMap).toString('base64');
++    return `data:application/json;charset=utf-8;base64,${base64}`;
++}
++function getAppendScripts(entryPoint, modules, options) {
++    const output = [];
++    if (options.runModule) {
++        const paths = [...options.runBeforeMainModule, entryPoint];
++        for (const path of paths) {
++            if (modules.some((module) => module.path === path)) {
++                const code = options.getRunModuleStatement(options.createModuleId(path), options.globalPrefix);
++                output.push({
++                    path: `require-${path}`,
++                    dependencies: new Map(),
++                    getSource: () => Buffer.from(''),
++                    inverseDependencies: new CountingSet_1.default(),
++                    output: [
++                        {
++                            type: 'js/script/virtual',
++                            data: {
++                                code,
++                                lineCount: countLines(code),
++                                map: [],
++                            },
++                        },
++                    ],
++                });
++            }
++        }
++    }
++    if (options.inlineSourceMap || options.sourceMapUrl) {
++        const sourceMappingURL = options.inlineSourceMap
++            ? getInlineSourceMappingURL((0, sourceMapString_1.sourceMapString)(modules, {
++                processModuleFilter: () => true,
++                excludeSource: false,
++                shouldAddToIgnoreList: options.shouldAddToIgnoreList,
++                getSourceUrl: options.getSourceUrl,
++            }))
++            : (0, nullthrows_1.default)(options.sourceMapUrl);
++        const code = `//# sourceMappingURL=${sourceMappingURL}`;
++        output.push({
++            path: 'source-map',
++            dependencies: new Map(),
++            getSource: () => Buffer.from(''),
++            inverseDependencies: new CountingSet_1.default(),
++            output: [
++                {
++                    type: 'js/script/virtual',
++                    data: {
++                        code,
++                        lineCount: countLines(code),
++                        map: [],
++                    },
++                },
++            ],
++        });
++    }
++    if (options.sourceUrl) {
++        const code = `//# sourceURL=${options.sourceUrl}`;
++        output.push({
++            path: 'source-url',
++            dependencies: new Map(),
++            getSource: () => Buffer.from(''),
++            inverseDependencies: new CountingSet_1.default(),
++            output: [
++                {
++                    type: 'js/script/virtual',
++                    data: {
++                        code,
++                        lineCount: countLines(code),
++                        map: [],
++                    },
++                },
++            ],
++        });
++    }
++    return output;
++}
+ function getPlatformOption(graph, options) {
+     if (graph.transformOptions?.platform != null) {
+         return graph.transformOptions.platform;
+@@ -91,7 +171,7 @@ function baseJSBundleWithDependencies(entryPoint, preModules, dependencies, opti
+         .join('\n');
+     const modules = [...dependencies].sort((a, b) => options.createModuleId(a.path) - options.createModuleId(b.path));
+     const sourceMapUrl = options.serializerOptions?.includeSourceMaps === false ? undefined : options.sourceMapUrl;
+-    const modulesWithAnnotations = (0, getAppendScripts_1.default)(entryPoint, [...preModules, ...modules], {
++    const modulesWithAnnotations = getAppendScripts(entryPoint, [...preModules, ...modules], {
+         asyncRequireModulePath: options.asyncRequireModulePath,
+         createModuleId: options.createModuleId,
+         getRunModuleStatement: options.getRunModuleStatement,
+@@ -120,7 +200,7 @@ function baseJSBundleWithDependencies(entryPoint, preModules, dependencies, opti
+                     type: 'js/script/virtual',
+                     data: {
+                         code,
+-                        lineCount: (0, countLines_1.default)(code),
++                        lineCount: countLines(code),
+                         map: [],
+                     },
+                 },
+diff --git a/build/serializer/getCssDeps.js b/build/serializer/getCssDeps.js
+index 6a4087f279c0a358569cb9c378a863382f4341b2..1a9977e0fa5f766cf58e701bf32e1001e09d02b3 100644
+--- a/build/serializer/getCssDeps.js
++++ b/build/serializer/getCssDeps.js
+@@ -4,7 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.getFileName = exports.fileNameFromContents = exports.getCssSerialAssets = exports.filterJsModules = void 0;
+-const js_1 = require("metro/src/DeltaBundler/Serializers/helpers/js");
++// metro 0.83 restricts exports; inline minimal JS module helpers instead of importing a private path.
++const isJsModule = (module) => module.output?.some((output) => typeof output.type === 'string' && output.type.startsWith('js/'));
++const getJsOutput = (module) => {
++    const jsModules = module.output?.filter((output) => typeof output.type === 'string' && output.type.startsWith('js/')) ?? [];
++    if (jsModules.length !== 1) {
++        throw new Error(`Expected exactly one JS output for ${module.path ?? 'unknown module'}, found ${jsModules.length}`);
++    }
++    return jsModules[0];
++};
+ const path_1 = __importDefault(require("path"));
+ const css_1 = require("../transform-worker/css");
+ const hash_1 = require("../utils/hash");
+@@ -13,9 +21,9 @@ const STATIC_EXPORT_DIRECTORY = '_expo/static/css';
+ function filterJsModules(dependencies, type, { processModuleFilter, projectRoot }) {
+     const assets = [];
+     for (const module of dependencies.values()) {
+-        if ((0, js_1.isJsModule)(module) &&
++        if (isJsModule(module) &&
+             processModuleFilter(module) &&
+-            (0, js_1.getJsOutput)(module).type === type &&
++            getJsOutput(module).type === type &&
+             path_1.default.relative(projectRoot, module.path) !== 'package.json') {
+             assets.push(module);
+         }
+diff --git a/build/serializer/serializeChunks.js b/build/serializer/serializeChunks.js
+index 61ab86d33bbd2f23e3cf7a60f40739e17999134c..a83fb10931d9eecd058420f01b9d85cef83ced6b 100644
+--- a/build/serializer/serializeChunks.js
++++ b/build/serializer/serializeChunks.js
+@@ -11,7 +11,7 @@ exports.getSortedModules = exports.Chunk = exports.graphToSerialAssetsAsync = vo
+  * LICENSE file in the root directory of this source tree.
+  */
+ const assert_1 = __importDefault(require("assert"));
+-const sourceMapString_1 = __importDefault(require("metro/src/DeltaBundler/Serializers/sourceMapString"));
++const sourceMapStringModule = require("metro/src/DeltaBundler/Serializers/sourceMapString");
+ const bundleToString_1 = __importDefault(require("metro/src/lib/bundleToString"));
+ const path_1 = __importDefault(require("path"));
+ const debugId_1 = require("./debugId");
+@@ -29,9 +29,9 @@ function pathToRegex(path) {
+     // Create a RegExp object with the modified string
+     return new RegExp('^' + regexSafePath + '$');
+ }
+-const sourceMapString = typeof sourceMapString_1.default !== 'function'
+-    ? sourceMapString_1.default.sourceMapString
+-    : sourceMapString_1.default;
++const sourceMapString = typeof sourceMapStringModule === 'function'
++    ? sourceMapStringModule
++    : sourceMapStringModule.sourceMapString;
+ async function graphToSerialAssetsAsync(config, serializeChunkOptions, ...props) {
+     const [entryFile, preModules, graph, options] = props;
+     const cssDeps = (0, getCssDeps_1.getCssSerialAssets)(graph.dependencies, {
+diff --git a/build/serializer/withExpoSerializers.js b/build/serializer/withExpoSerializers.js
+index 5d4635bc3cf8fc85442e902aadc249fbc21a9bae..03add0aa2a4f3a43d2f33b024d789d6259c0594f 100644
+--- a/build/serializer/withExpoSerializers.js
++++ b/build/serializer/withExpoSerializers.js
+@@ -11,16 +11,16 @@ exports.createSerializerFromSerialProcessors = exports.createDefaultExportCustom
+  * LICENSE file in the root directory of this source tree.
+  */
+ const jsc_safe_url_1 = require("jsc-safe-url");
+-const sourceMapString_1 = __importDefault(require("metro/src/DeltaBundler/Serializers/sourceMapString"));
++const sourceMapStringModule = require("metro/src/DeltaBundler/Serializers/sourceMapString");
+ const bundleToString_1 = __importDefault(require("metro/src/lib/bundleToString"));
+ const debugId_1 = require("./debugId");
+ const environmentVariableSerializerPlugin_1 = require("./environmentVariableSerializerPlugin");
+ const baseJSBundle_1 = require("./fork/baseJSBundle");
+ const serializeChunks_1 = require("./serializeChunks");
+ const env_1 = require("../env");
+-const sourceMapString = typeof sourceMapString_1.default !== 'function'
+-    ? sourceMapString_1.default.sourceMapString
+-    : sourceMapString_1.default;
++const sourceMapString = typeof sourceMapStringModule === 'function'
++    ? sourceMapStringModule
++    : sourceMapStringModule.sourceMapString;
+ function withExpoSerializers(config, options = {}) {
+     const processors = [];
+     processors.push(environmentVariableSerializerPlugin_1.serverPreludeSerializerPlugin);
+diff --git a/build/transform-worker/metro-transform-worker.js b/build/transform-worker/metro-transform-worker.js
+index 5e7d7c3a42fca57a3725dcef89386fec2fc3833a..ba45f70b80e6fee69c7d544aaa417fd51c548509 100644
+--- a/build/transform-worker/metro-transform-worker.js
++++ b/build/transform-worker/metro-transform-worker.js
+@@ -46,7 +46,7 @@ const collectDependencies_1 = __importStar(require("metro/src/ModuleGraph/worker
+ const generateImportNames_1 = __importDefault(require("metro/src/ModuleGraph/worker/generateImportNames"));
+ const countLines_1 = __importDefault(require("metro/src/lib/countLines"));
+ const metro_cache_1 = require("metro-cache");
+-const metro_cache_key_1 = __importDefault(require("metro-cache-key"));
++const metro_cache_key_1 = require("metro-cache-key");
+ const metro_source_map_1 = require("metro-source-map");
+ const metro_transform_plugins_1 = __importDefault(require("metro-transform-plugins"));
+ const getMinifier_1 = __importDefault(require("metro-transform-worker/src/utils/getMinifier"));
+@@ -409,7 +409,7 @@ async function transform(config, projectRoot, filename, data, options) {
+ exports.transform = transform;
+ function getCacheKey(config) {
+     const { babelTransformerPath, minifierPath, ...remainingConfig } = config;
+-    const filesKey = (0, metro_cache_key_1.default)([
++    const filesKey = (0, metro_cache_key_1.getCacheKey)([
+         require.resolve(babelTransformerPath),
+         require.resolve(minifierPath),
+         require.resolve('metro-transform-worker/src/utils/getMinifier'),

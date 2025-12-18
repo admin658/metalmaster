@@ -15,6 +15,7 @@ import {
   TabIcon,
   PricingIcon,
 } from '../components/icons';
+import SplashVideo from '../components/SplashVideo';
 
 const whatsNew = [
   {
@@ -179,6 +180,7 @@ const accountLinks = [
 export default function HomePage() {
   return (
     <div className="relative overflow-hidden">
+      <SplashVideo src="/splash.mp4" />
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-gradient-to-br from-metal-accent/30 via-orange-500/20 to-amber-300/10 blur-3xl animate-pulse-glow" />
         <div className="absolute right-0 bottom-0 h-80 w-80 rounded-full bg-gradient-to-tr from-purple-800/30 via-slate-800/60 to-black/60 blur-3xl animate-pulse-glow delay-150" />

@@ -3,13 +3,7 @@
 import { useEffect, useRef } from 'react';
 import * as alphaTab from '@coderline/alphatab';
 
-export interface AlphaTabScore {
-  duration?: number;
-  playbackDuration?: number;
-  tempo?: number;
-  playbackInfo?: { tempo: number };
-  tracks?: unknown[];
-}
+export type AlphaTabScore = alphaTab.model.Score;
 
 type AlphaTabWrapperProps = {
   fileSource: ArrayBuffer | string | null;

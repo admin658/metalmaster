@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireUser } from '../../_lib/auth';
 import { handleRouteError, success, failure } from '../../_lib/responses';
+import { getLevelForTotalXp } from '@metalmaster/shared-validation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -42,19 +43,9 @@ export async function PATCH(req: NextRequest) {
 
     const newLongestStreak = Math.max(currentStats.longest_streak_days || 0, newStreak);
     const newTotalXp = currentStats.total_xp + (xp_earned || 0);
-    const newLevel = Math.floor(newTotalXp / 1000) + 1;
-
-    const tiers = [
-      'Novice',
-      'Acolyte',
-      'Hammerhand',
-      'Thrash Apprentice',
-      'Riff Adept',
-      'Blackened Knight',
-      'Djent Architect',
-      'Shred Overlord',
-    ];
-    const newTier = tiers[Math.min(newLevel - 1, tiers.length - 1)];
+    const levelEntry = getLevelForTotalXp(newTotalXp);
+    const newLevel = levelEntry.level;
+    const newTier = levelEntry.title;
 
     const { data: updatedStats, error } = await supabase
       .from('user_stats')

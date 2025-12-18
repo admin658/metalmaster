@@ -1,5 +1,5 @@
 import type { ApiResponse, SubscriptionStatus, UserStats } from '@metalmaster/shared-types';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
 
 export interface UseSubscriptionReturn {
@@ -31,59 +31,80 @@ export const useSubscription = (): UseSubscriptionReturn => {
     }
     return `/${env}`.replace(/\/{2,}/g, '/');
   }, []);
-  const withBase = (path: string) => `${apiBase}${path}`;
+  const withBase = useCallback((path: string) => `${apiBase}${path}`, [apiBase]);
   const [upgradePending, setUpgradePending] = useState(false);
   const [portalPending, setPortalPending] = useState(false);
 
-  useEffect(() => {
-    const fetchSubscriptionStatus = async () => {
-      if (authLoading) return;
+  const fetchSubscriptionStatus = useCallback(async () => {
+    if (authLoading) return;
 
-      if (!user) {
+    if (!user) {
+      setStatus('free');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('auth_token');
+
+      if (!token) {
         setStatus('free');
         setIsLoading(false);
         return;
       }
 
-      try {
-        setIsLoading(true);
-        const token = localStorage.getItem('auth_token');
+      const url = withBase('/user-stats');
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (!token) {
-          setStatus('free');
-          setIsLoading(false);
-          return;
-        }
-
-        const url = withBase('/user-stats');
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          const message = `Subscription status request failed (${res.status})`;
-          setError(message);
-          setStatus('free');
-          setIsLoading(false);
-          return;
-        }
-
-        const data = (await res.json()) as ApiResponse<UserStats>;
-        const subscriptionStatus = data.data?.subscription_status || 'free';
-        setStatus(subscriptionStatus);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+      if (!res.ok) {
+        const message = `Subscription status request failed (${res.status})`;
+        setError(message);
         setStatus('free');
-      } finally {
         setIsLoading(false);
+        return;
       }
+
+      const data = (await res.json()) as ApiResponse<UserStats>;
+      const subscriptionStatus = data.data?.subscription_status || 'free';
+      setStatus(subscriptionStatus);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setStatus('free');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [authLoading, user, withBase]);
+
+  useEffect(() => {
+    fetchSubscriptionStatus();
+  }, [fetchSubscriptionStatus]);
+
+  // Refresh on window focus or periodically while not pro
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const onFocus = () => {
+      void fetchSubscriptionStatus();
     };
 
-    fetchSubscriptionStatus();
-  }, [user, authLoading]);
+    window.addEventListener('focus', onFocus);
+
+    // Poll modestly to keep status fresh without hammering
+    const interval = status === 'pro' || status === 'lifetime'
+      ? null
+      : window.setInterval(() => void fetchSubscriptionStatus(), 300000);
+
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      if (interval) window.clearInterval(interval);
+    };
+  }, [fetchSubscriptionStatus, status]);
 
   const upgradeToPro = async () => {
     try {

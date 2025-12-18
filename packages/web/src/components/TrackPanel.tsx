@@ -1,16 +1,11 @@
 'use client';
 
+import * as alphaTab from '@coderline/alphatab';
 import { useState } from 'react';
 
-interface Track {
-  name: string;
-  isActive?: boolean;
-}
-
 interface TrackPanelProps {
-  tracks: any[];
-  api: any;
-  score: any;
+  tracks: alphaTab.model.Track[];
+  api: alphaTab.AlphaTabApi | null;
   selectedTrackIndex?: number | null;
   viewOnlyTrackIndex?: number | null;
   onSelectTrack?: (index: number) => void;
@@ -19,7 +14,6 @@ interface TrackPanelProps {
 export default function TrackPanel({
   tracks,
   api,
-  score,
   selectedTrackIndex,
   viewOnlyTrackIndex,
   onSelectTrack,
@@ -29,7 +23,7 @@ export default function TrackPanel({
   const [trackVolumes, setTrackVolumes] = useState<Record<number, number>>({});
 
   const getTrack = (trackIndex: number) => {
-    return score?.tracks?.[trackIndex];
+    return tracks?.[trackIndex];
   };
 
   const handleSolo = (trackIndex: number) => {
@@ -72,7 +66,7 @@ export default function TrackPanel({
   const handleTranspose = (trackIndex: number, semitones: number) => {
     const track = getTrack(trackIndex);
     if (!api || !track) return;
-    api.changeTrackTranspose([track], semitones);
+    api.changeTrackTranspositionPitch([track], semitones);
   };
 
   const handleSelectTrack = (trackIndex: number) => {
@@ -86,7 +80,7 @@ export default function TrackPanel({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {tracks.map((track: any, idx: number) => (
+        {tracks.map((track, idx) => (
           <div key={idx} className="px-3 py-3 border-b border-zinc-800/40 hover:bg-zinc-900/50">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex-1 min-w-0">

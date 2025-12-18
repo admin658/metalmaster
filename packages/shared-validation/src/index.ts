@@ -12,3 +12,7 @@ export * from './practice-session.schemas';
 export * from './tone.schemas';
 export * from './tone.schema';
 export * from './api.schemas';
+export * from './xpBadgesConfig';
+export * from './xpEngine';
+export * from './xpLevelsConfig';
+export { z } from 'zod';

@@ -1,0 +1,17 @@
+diff --git a/package.json b/package.json
+index a5f72d3cc40d05d1f58e135f3b5f8a2c88a7cc4d..42b23ba13c9ccdc9589e97802669f42179474228 100644
+--- a/package.json
++++ b/package.json
+@@ -7,7 +7,11 @@
+   "exports": {
+     ".": "./src/index.js",
+     "./package.json": "./package.json",
+-    "./private/*": "./src/*.js"
++    "./private/*": "./src/*.js",
++    "./src/DeltaBundler/Serializers/sourceMapString": "./src/DeltaBundler/Serializers/sourceMapString.js",
++    "./src/lib/bundleToString": "./src/lib/bundleToString.js",
++    "./src/lib/CountingSet": "./src/lib/CountingSet.js",
++    "./src/*": "./src/*.js"
+   },
+   "repository": {
+     "type": "git",

@@ -10,6 +10,8 @@ Metal guitar learning platform spanning API, web, and mobile clients. Built with
 - Jam Tracks page with bundled MP3s in `packages/web/public/jam` (uses Supabase jam tracks when present)
 - Animated flame backdrop + hover flames on nav links
 - Tab Player (AlphaTab) with demo/local upload, transport, track selection, and auto-scroll
+- Home page splash video on load (served from `packages/web/public/splash.mp4`)
+- Route-change splash overlay (see `packages/web/src/app/components/RouteSplash.jsx`)
 - Web (Next.js) and Mobile (Expo) clients
 - Learn page ships two bundled video lessons (public/IMG_4520.MOV and IMG_4521.MOV) so you always have starter content even if Supabase is empty.
 
@@ -36,6 +38,9 @@ metal-master/
 - AlphaTab player at `/tab-player`, auth pages at `/auth/login` and `/auth/signup`.
 - Jam page `/jam` includes built-in MP3s from `public/jam` plus any Supabase jam tracks, with inline audio controls.
 - Animated flames across the site background and flickering hover flames on navigation links.
+- Route-change splash overlay mounted in `packages/web/src/app/layout.tsx` using `packages/web/src/app/components/RouteSplash.jsx`.
+- Splash config: `logoSrc`, `durationMs`, `fadeMs`, `minIntervalMs`.
+- Brand assets: logo at `/assets/metalmaster-logo.png`, favicon at `/favicon.ico` (served from `packages/web/public`).
 - Default dev port: **3000** (API is served from the same Next instance at `/api`).
  - Tab Player extras: backing track preload for demo tabs, count-in control, learn-mode auto-slowdown on loop wrap, track selection, and synced 2D/3D highways (3D instanced, mobile-disabled).
 

@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Next.js web application for Metal Master",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate:tab-demos": "node scripts/generate-tab-demos.js"
   },
   "dependencies": {
     "@coderline/alphatab": "1.6.3",
@@ -27,7 +28,7 @@
     "three": "^0.181.2",
     "tone": "15.1.22",
     "vexflow": "^5.0.0",
-    "zod": "^3.22.0"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",

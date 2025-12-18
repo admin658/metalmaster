@@ -53,7 +53,7 @@ Zod schemas for all types ensuring runtime validation:
 - **`user-stats.schemas.ts`** - UserStats, UserPracticeHeatmap, SkillCategoryStats
 - **`practice-session.schemas.ts`** - PracticeSession, CreatePracticeSession, PracticeSessionStats
 
-### 3. Database Schema (`packages/api/db/migrations/005_features.sql`)
+### 3. Database Schema (`packages/api/db/migrations/001_base_schema.sql` + `002_feature_tables.sql`)
 Comprehensive migration with 6 new tables and proper indexing:
 
 - **`speed_trainer_sessions`** - Tracks all speed/tempo practice sessions
@@ -228,7 +228,8 @@ All routes:
 - `packages/shared-validation/src/achievement.schemas.ts`
 - `packages/shared-validation/src/user-stats.schemas.ts`
 - `packages/shared-validation/src/practice-session.schemas.ts`
-- `packages/api/db/migrations/005_features.sql`
+- `packages/api/db/migrations/001_base_schema.sql`
+- `packages/api/db/migrations/002_feature_tables.sql`
 - `packages/api/src/routes/speed-trainer.routes.ts`
 - `packages/api/src/routes/achievement.routes.ts`
 - `packages/api/src/routes/user-stats.routes.ts`

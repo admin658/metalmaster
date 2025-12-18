@@ -1,0 +1,131 @@
+{
+  "version": "1.0.0",
+  "difficulty": "B_aggressive",
+  "xp_rules": {
+    "base": {
+      "xp_per_10_seconds": 2,
+      "session_base_cap": 120,
+      "min_active_ratio": 0.35,
+      "activity_gap_seconds": 20
+    },
+    "tempo_bonuses": {
+      "clean_tempo_bonus": 25,
+      "aggro_tempo_bonus": 50,
+      "aggro_bonus_one_time_per_lesson": true
+    },
+    "consistency_bonuses": [
+      { "perfect_loop_streak": 3, "xp": 10 },
+      { "perfect_loop_streak": 5, "xp": 20 },
+      { "perfect_loop_streak": 8, "xp": 35 }
+    ],
+    "streak_bonuses": [
+      { "days": 1, "xp": 10 },
+      { "days": 3, "xp": 25 },
+      { "days": 7, "xp": 75 },
+      { "days": 14, "xp": 150 }
+    ],
+    "diminishing_returns": [
+      { "minutes_on_same_lesson": 20, "multiplier": 0.5 },
+      { "minutes_on_same_lesson": 45, "multiplier": 0.2 }
+    ],
+    "anti_cheese": {
+      "disable_base_xp_if_inactive": true,
+      "micro_loop_seconds_min": 10,
+      "micro_loop_penalty_multiplier": 0.2,
+      "seek_penalty_threshold": 6,
+      "seek_penalty_multiplier": 0.5
+    }
+  },
+  "lessons": [
+    {
+      "lesson_id": "L01",
+      "title": "Precision Chugs",
+      "min_active_seconds": 240,
+      "min_loops": 12,
+      "clean_tempo": 90,
+      "aggro_tempo": 110,
+      "completion_xp": 150
+    },
+    {
+      "lesson_id": "L02",
+      "title": "Palm Mute Control",
+      "min_active_seconds": 240,
+      "min_loops": 12,
+      "clean_tempo": 100,
+      "aggro_tempo": 120,
+      "completion_xp": 160
+    },
+    {
+      "lesson_id": "L03",
+      "title": "Downpicking Endurance",
+      "min_active_seconds": 300,
+      "min_loops": 14,
+      "clean_tempo": 120,
+      "aggro_tempo": 140,
+      "completion_xp": 190
+    },
+    {
+      "lesson_id": "L04",
+      "title": "Power Chord Switches",
+      "min_active_seconds": 360,
+      "min_loops": 12,
+      "clean_tempo": 110,
+      "aggro_tempo": 130,
+      "completion_xp": 200
+    },
+    {
+      "lesson_id": "L05",
+      "title": "Gallop Engine",
+      "min_active_seconds": 360,
+      "min_loops": 12,
+      "clean_tempo": 120,
+      "aggro_tempo": 140,
+      "completion_xp": 220
+    },
+    {
+      "lesson_id": "L06",
+      "title": "Alternate Picking Run",
+      "min_active_seconds": 420,
+      "min_loops": 14,
+      "clean_tempo": 130,
+      "aggro_tempo": 150,
+      "completion_xp": 240
+    },
+    {
+      "lesson_id": "L07",
+      "title": "String Crossing Riff",
+      "min_active_seconds": 420,
+      "min_loops": 14,
+      "clean_tempo": 120,
+      "aggro_tempo": 140,
+      "completion_xp": 240
+    },
+    {
+      "lesson_id": "L08",
+      "title": "Stops & Chokes",
+      "min_active_seconds": 360,
+      "min_loops": 12,
+      "clean_tempo": 110,
+      "aggro_tempo": 130,
+      "completion_xp": 220
+    },
+    {
+      "lesson_id": "L09",
+      "title": "Speed Bursts",
+      "min_active_seconds": 360,
+      "min_loops": 10,
+      "clean_tempo": 160,
+      "aggro_tempo": 180,
+      "completion_xp": 240
+    },
+    {
+      "lesson_id": "L10",
+      "title": "First Real Metal Riff",
+      "min_active_seconds": 480,
+      "min_loops": 12,
+      "clean_tempo": 140,
+      "aggro_tempo": 160,
+      "completion_xp": 300
+    }
+  ]
+}

@@ -4,6 +4,8 @@ module.exports = {
   testEnvironment: 'jsdom',
   // Sweep all workspaces so tests can live anywhere under /packages.
   roots: ['<rootDir>/packages'],
+  // Skip compiled outputs so we only run source tests.
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).[tj]s?(x)'],
   transform: {
     '^.+\\.[tj]sx?$': 'ts-jest',

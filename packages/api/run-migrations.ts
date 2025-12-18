@@ -17,10 +17,9 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function runMigrations() {
   const migrations = [
-    'db/migrations/001_init.sql',
-    'db/migrations/002_metal_master_schema.sql',
-    'db/migrations/003_ai_feedback_results.sql',
-    'db/migrations/004_daily_riff.sql',
+    'db/migrations/001_base_schema.sql',
+    'db/migrations/002_feature_tables.sql',
+    'db/migrations/003_practice_sessions_autosave.sql',
   ];
 
   for (const migration of migrations) {
@@ -30,11 +29,11 @@ async function runMigrations() {
     try {
       const sql = fs.readFileSync(filePath, 'utf-8');
       const { error } = await supabase.rpc('exec', { sql });
-      
+
       if (error) {
         console.error(`Error in ${migration}:`, error.message);
       } else {
-        console.log(`✓ ${migration} completed`);
+        console.log(`✅ ${migration} completed`);
       }
     } catch (err) {
       console.error(`Error reading ${migration}:`, err instanceof Error ? err.message : err);

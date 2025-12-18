@@ -18,6 +18,7 @@ import { speedTrainerRoutes } from './routes/speed-trainer.routes';
 import { achievementRoutes } from './routes/achievement.routes';
 import { userStatsRoutes } from './routes/user-stats.routes';
 import { practiceSessionRoutes } from './routes/practice-session.routes';
+import { xpRoutes } from './routes/xp.routes';
 import { errorHandler } from './middleware/error-handler';
 import { requestLogger } from './middleware/request-logger';
 import billingRoutes from './routes/billing.routes';
@@ -80,6 +81,7 @@ app.use('/api/speed-trainer', speedTrainerRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('/api/user-stats', userStatsRoutes);
 app.use('/api/practice-sessions', practiceSessionRoutes);
+app.use('/api/xp', xpRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/tone-settings', toneRoutes);
 

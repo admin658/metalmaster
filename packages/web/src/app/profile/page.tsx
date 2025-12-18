@@ -18,7 +18,7 @@ export default function ProfilePage() {
     setLoggingOut(true);
     try {
       await logout();
-      router.push('/login');
+      router.push('/auth/login');
     } catch (err) {
       console.error('Logout failed:', err);
     } finally {
@@ -116,11 +116,11 @@ export default function ProfilePage() {
       ) : (
         <div className="text-gray-400 bg-white/5 border border-white/10 rounded-2xl p-6">
           Not logged in.{' '}
-          <a href="/login" className="text-metal-accent hover:underline">
+          <a href="/auth/login" className="text-metal-accent hover:underline">
             Log in here
           </a>{' '}
           or{' '}
-          <a href="/signup" className="text-metal-accent hover:underline">
+          <a href="/auth/signup" className="text-metal-accent hover:underline">
             sign up
           </a>
           .

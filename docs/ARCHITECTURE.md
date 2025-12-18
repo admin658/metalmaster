@@ -30,6 +30,8 @@ Metal Master is a TypeScript monorepo for teaching metal guitar. It includes an 
   - `POST /api/speed-trainer/sessions`, `GET /api/speed-trainer/sessions`, `GET /api/speed-trainer/progress`
 - **Achievements**
   - `GET /api/achievements/library`, `GET /api/achievements/user`, `GET /api/achievements/progress`
+- **XP Awards**
+  - `POST /api/xp/award`, `POST /api/xp/tick`
 - **User Stats**
   - `GET /api/user-stats`, `GET /api/user-stats/summary`, `GET /api/user-stats/heatmap`, `GET /api/user-stats/skills`
 - **Practice Sessions**
@@ -53,6 +55,7 @@ Metal Master is a TypeScript monorepo for teaching metal guitar. It includes an 
 - `user_stats`: user_id, xp, level, tier, skill_scores (json), last_updated
 - `user_practice_heatmap`: user_id, date, seconds_practiced (or intensity)
 - `practice_sessions`: id, user_id, session_type, duration, details(json), created_at
+- `lesson_completions`: user_id, lesson_id, completed_at, best_clean_tempo, best_aggro_tempo
 
 ### Access control
 
@@ -76,6 +79,11 @@ Row-Level Security (RLS) is enabled for user-owned tables; policies check `auth.
   - Accepts structured tab data and displays measures, notes, and fret/string positions visually.
   - Requires `vexflow` package (installed in web workspace).
 
+## Tab Lab (AlphaTab)
+- Route: `packages/web/src/app/tab-player/page.tsx` backed by `useAlphaTab` for transport, bar tracking, section map, and track switching.
+- Shell pieces: `TopBar` (transport, BPM/speed sliders, loop), `SectionMap` (bar-accurate jumps), `MainStage` (AlphaTab canvas + overlay toggles), `BottomRack` tabs (Practice, Tone, Mixer, Tools), optional `CoachPanel`.
+- Stubs to flesh out: metronome toggle/audio click hookup, tone strip/amp chain wiring, utilities tab actions, and coach metrics driven by AlphaTab/audio events.
+
 ## Conventions & Runtime
 
 - Standard API response: `{ success, data?, error?, meta: { timestamp, version } }` (see `packages/shared-types/src/api.types.ts`).
@@ -90,6 +98,21 @@ Row-Level Security (RLS) is enabled for user-owned tables; policies check `auth.
 - Dev: `yarn dev` runs API, web, and mobile concurrently
 - Run rotation script: `yarn workspace @metalmaster/api ts-node src/scripts/rotateDailyRiff.ts`
 - Apply DB migrations: run SQL files in `packages/api/db/migrations/` in order or use the project's migration tooling.
+- XP/lesson rules live in `packages/shared-validation/src/xpRules.seed.json` and are validated by `xpBadgesConfig.ts` (Zod).
+- Level curve is configured in `packages/shared-validation/src/xpLevels.seed.json` (validated by `xpLevelsConfig.ts`).
+- XP anti-cheese: base XP is zeroed for inactivity (activity gap > 20s or active ratio < 0.35); micro-loop and seek penalties apply; diminishing returns after 20/45 min per lesson apply to base XP only.
+
+## Lesson 1-10 Badges
+- B01 Iron Wrist I: complete L03 at clean tempo.
+- B02 Mute Surgeon: L02 with perfectLoopStreakMax >= 5 and clean tempo.
+- B03 Chord Executioner: complete L04 with pauses == 0 and seeks == 0.
+- B04 Gallop Engine: L05 at aggro tempo (one-time).
+- B05 Alternate Assassin: L06 with perfectLoopStreakMax >= 8.
+- B06 Crossing Clean: L07 with perfectLoopStreakMax >= 5.
+- B07 Silence Controller: L08 with perfectLoopStreakMax >= 6.
+- B08 Burst Certified: L09 at aggro tempo (one-time).
+- B09 First Riff Forged: complete L10 at clean tempo.
+- B10 Foundations: Steel: complete lessons L01-L10.
 
 ## Operational Notes & Recommendations
 

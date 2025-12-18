@@ -44,7 +44,7 @@ export default function SignupForm() {
 
     try {
       await signup(email, password, safeUsername, confirmPassword);
-      router.push('/login?message=Check your email to confirm your account');
+      router.push('/auth/login?message=Check your email to confirm your account');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -94,7 +94,7 @@ export default function SignupForm() {
         {loading ? 'Creating account...' : 'Sign Up'}
       </button>
       <p className="text-gray-400 text-sm text-center">
-        Already have an account? <a href="/login" className="text-metal-accent hover:underline">Log in</a>
+        Already have an account? <a href="/auth/login" className="text-metal-accent hover:underline">Log in</a>
       </p>
     </form>
   );

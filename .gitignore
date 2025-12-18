@@ -35,10 +35,10 @@ android/
 # Next.js
 out/
 .vercel/
-
+ldocs/
 # Mobile
 node_modules/
-docs/
+
 lending docs/
 # IDE
 .prettierignore

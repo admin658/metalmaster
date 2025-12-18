@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-11-17' as any })
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })
   : null;
 
 const PRICE_PRO_MONTHLY = process.env.STRIPE_PRICE_PRO_MONTHLY;
@@ -26,14 +26,16 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
-      customer_creation: 'always',
       customer_email: user.email,
       line_items: [{ price: PRICE_PRO_MONTHLY, quantity: 1 }],
+      subscription_data: {
+        metadata: { userId: user.id },
+      },
       success_url: `${DOMAIN}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${DOMAIN}/billing/cancel`,
       metadata: { userId: user.id },
       billing_address_collection: 'auto',
-    } as any);
+    });
 
     return success({ url: session.url });
   } catch (err) {

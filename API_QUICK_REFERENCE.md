@@ -29,6 +29,18 @@ POST   /:achievementId/award  # Award achievement to user
 GET    /stats/summary         # Get cumulative XP multiplier
 ```
 
+## XP Awards API (`/api/xp`)
+```
+POST   /award                 # Award XP + badges for a lesson session
+POST   /tick                  # Optional periodic XP tick (base XP chunks)
+```
+
+### Anti-Cheese Rules (XP)
+- If `hadActivityGapOver20s` is true OR `activeSeconds/totalSeconds < 0.35`, base XP is set to 0 for that award call.
+- If `loopSeconds < 10` and `loopsCompleted > 8`, base XP is reduced by 80% (micro-loop farming).
+- If `seeks >= 6` in a short session, base XP is reduced by 50%.
+- Diminishing returns (per day per lesson) applies to base XP only: after 20 min -> 0.5x, after 45 min -> 0.2x.
+
 ## User Stats API (`/api/user-stats`)
 ```
 GET    /                      # Get user stats (auto-creates)
@@ -66,15 +78,8 @@ GET    /stats/summary         # Statistics (total, average duration, XP this wee
 ### Skill Categories
 - `accuracy` | `speed` | `rhythm_consistency` | `tone_knowledge`
 
-### Level Tiers (8 total)
-1. Novice (0-1000 XP)
-2. Acolyte (1000-2000 XP)
-3. Hammerhand (2000-3000 XP)
-4. Thrash Apprentice (3000-4000 XP)
-5. Riff Adept (4000-5000 XP)
-6. Blackened Knight (5000-6000 XP)
-7. Djent Architect (6000-7000 XP)
-8. Shred Overlord (7000+ XP)
+### Level Tiers
+- XP levels/tiers are defined by the level curve config (`packages/shared-validation/src/xpLevels.seed.json`).
 
 ### Daily Riff Frequency
 - `free_weekly` | `subscriber_daily`
@@ -163,6 +168,32 @@ curl -X POST http://localhost:3000/api/practice-sessions \
   }'
 ```
 
+### Award XP for Lesson Session
+```bash
+curl -X POST http://localhost:3000/api/xp/award \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "lessonId": "L01",
+    "sessionKey": "<UUID>",
+    "trackIndex": 0,
+    "metrics": {
+      "activeSeconds": 300,
+      "totalSeconds": 360,
+      "loopsCompleted": 14,
+      "perfectLoops": 10,
+      "perfectLoopStreakMax": 5,
+      "avgTempoBpm": 92,
+      "maxTempoBpm": 95,
+      "pauses": 0,
+      "seeks": 0,
+      "loopSeconds": 15,
+      "lessonMinutesToday": 5,
+      "hadActivityGapOver20s": false
+    }
+  }'
+```
+
 ### Generate Tone Settings
 ```bash
 curl -X POST http://localhost:3000/api/tone-settings \
@@ -179,7 +210,7 @@ Run migration after deploying:
 ```bash
 cd packages/api
 npx tsx run-migrations.ts
-# or apply SQL from db/migrations/005_features.sql manually
+# or apply SQL from db/all-migrations.sql manually
 ```
 
 ## Seed Data (Achievements)
@@ -190,11 +221,25 @@ INSERT INTO achievements_library (badge_id, name, description, icon_url, type, x
 ('sweep_sorcerer', 'Sweep Sorcerer', 'Perfect 50 sweep picking riffs', 'https://...', 'badge', 1.75),
 -- ... more achievements
 ```
+Lesson 1–10 badge seeds are included in `packages/api/db/migrations/004_xp_badges.sql`.
+
+### Lesson 1-10 Badges
+- B01 Iron Wrist I: complete L03 at clean tempo.
+- B02 Mute Surgeon: L02 with perfectLoopStreakMax >= 5 and clean tempo.
+- B03 Chord Executioner: complete L04 with pauses == 0 and seeks == 0.
+- B04 Gallop Engine: L05 at aggro tempo (one-time).
+- B05 Alternate Assassin: L06 with perfectLoopStreakMax >= 8.
+- B06 Crossing Clean: L07 with perfectLoopStreakMax >= 5.
+- B07 Silence Controller: L08 with perfectLoopStreakMax >= 6.
+- B08 Burst Certified: L09 at aggro tempo (one-time).
+- B09 First Riff Forged: complete L10 at clean tempo.
+- B10 Foundations: Steel: complete lessons L01-L10.
 
 ## Development Notes
 - All routes are fully typed with Zod validation
 - User isolation handled via `req.user.id` from auth middleware
 - Timestamps are UTC (TIMESTAMP WITH TIME ZONE)
 - XP calculations are server-side only
+- XP rules and lesson requirements are configurable via `packages/shared-validation/src/xpRules.seed.json`
 - Streak logic counts consecutive calendar days
 - Heatmap requires explicit date range (no default range)
