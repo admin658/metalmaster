@@ -3,6 +3,7 @@
   publish = "packages/web/.next"
   targetPort = 3003
 [build.environment]
+  NODE_ENV = "production"
   NODE_VERSION = "20"
 
 [[plugins]]
