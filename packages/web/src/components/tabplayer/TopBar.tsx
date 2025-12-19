@@ -150,7 +150,7 @@ export default function TopBar({ state, dispatch }: Props) {
                 onChange={(e) => {
                   const next = e.target.value;
                   setOutputId(next);
-                  alpha.setOutput(next || null);
+                  alpha?.setOutput?.(next || null);
                 }}
               >
                 <option value="">Default (Browser Synth)</option>

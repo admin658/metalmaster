@@ -8,14 +8,14 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await requireUser(req);
     if ('error' in auth) return auth.error;
     const { supabase, user } = auth;
 
-    const { id } = params;
+    const { id } = await params;
     const parsed = CreateDailyRiffCompletionSchema.parse({ daily_riff_id: id });
 
     const { data: dailyRiff, error: riffError } = await supabase

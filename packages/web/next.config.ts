@@ -1,4 +1,4 @@
-import { AlphaTabWebPackPlugin } from '@coderline/alphatab-webpack';
+import { AlphaTabWebPackPlugin } from '@coderline/alphatab/webpack';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {

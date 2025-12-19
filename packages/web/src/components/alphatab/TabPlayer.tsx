@@ -7,25 +7,27 @@ interface TabPlayerProps {
   source: string | ArrayBuffer;
 }
 
+const requiredColor = (hex: string) => alphaTab.model.Color.fromJson(hex) ?? new alphaTab.model.Color(0, 0, 0, 255);
+
 const applyColors = (score: alphaTab.model.Score) => {
   // Create custom style on score level.
   score.style = new alphaTab.model.ScoreStyle();
   score.style.colors.set(
     alphaTab.model.ScoreSubElement.Title,
-    alphaTab.model.Color.fromJson('#426d9d')
+    requiredColor('#426d9d')
   );
   score.style.colors.set(
     alphaTab.model.ScoreSubElement.Artist,
-    alphaTab.model.Color.fromJson('#4cb3d4')
+    requiredColor('#4cb3d4')
   );
 
   const fretColors: Record<number, alphaTab.model.Color> = {
-    12: alphaTab.model.Color.fromJson('#bb4648'),
-    13: alphaTab.model.Color.fromJson('#ab519f'),
-    14: alphaTab.model.Color.fromJson('#3953a5'),
-    15: alphaTab.model.Color.fromJson('#70ccd6'),
-    16: alphaTab.model.Color.fromJson('#6abd45'),
-    17: alphaTab.model.Color.fromJson('#e1a90e'),
+    12: requiredColor('#bb4648'),
+    13: requiredColor('#ab519f'),
+    14: requiredColor('#3953a5'),
+    15: requiredColor('#70ccd6'),
+    16: requiredColor('#6abd45'),
+    17: requiredColor('#e1a90e'),
   };
 
   // Traverse hierarchy and apply colors as desired.
@@ -36,7 +38,7 @@ const applyColors = (score: alphaTab.model.Score) => {
           for (const beat of voice.beats) {
             if (beat.hasTuplet) {
               beat.style = new alphaTab.model.BeatStyle();
-              const color = alphaTab.model.Color.fromJson('#00DD00');
+              const color = requiredColor('#00DD00');
               beat.style.colors.set(
                 alphaTab.model.BeatSubElement.StandardNotationTuplet,
                 color
@@ -130,7 +132,6 @@ export default function TabPlayer({ source }: TabPlayerProps) {
     // Core paths
     settings.core.useWorkers = false;
     settings.core.scriptFile = '/alphatab/alphaTab.js';
-    settings.core.workerFile = '/alphatab/alphaTab.worker.min.mjs';
     settings.core.fontDirectory = '/alphatab/font/';
     const smuflFontSources =
       (alphaTab as any)?.model?.CoreSettings?.buildDefaultSmuflFontSources?.('/alphatab/font/');
@@ -138,7 +139,7 @@ export default function TabPlayer({ source }: TabPlayerProps) {
 
     // Player
     settings.player.enablePlayer = true;
-    settings.player.playerMode = alphaTab.PlayerMode.Enabled;
+    settings.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
     settings.player.soundFont = '/alphatab/soundfont/sonivox.sf2';
 
     const alpha = new alphaTab.AlphaTabApi(containerRef.current, settings);

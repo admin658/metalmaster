@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import type { AlphaTabApi } from '@coderline/alphatab';
 import AlphaTabWrapper from '@/components/AlphaTabWrapper';
 
 type EventLogEntry = {
@@ -9,16 +10,10 @@ type EventLogEntry = {
   at: number;
 };
 
-type AlphaTabApiInstance = {
-  audioContext?: AudioContext;
-  playPause?: () => boolean;
-  play?: () => void;
-};
-
 const demoTab = '/tabs/metallica-mercyful_fate.gp3';
 
 export default function AlphaTabTestPage() {
-  const [api, setApi] = useState<AlphaTabApiInstance | null>(null);
+  const [api, setApi] = useState<AlphaTabApi | null>(null);
   const [status, setStatus] = useState<{ scoreLoaded: boolean; playbackReady: boolean; error: string | null }>({
     scoreLoaded: false,
     playbackReady: false,
@@ -33,9 +28,10 @@ export default function AlphaTabTestPage() {
 
   const handlePlay = () => {
     if (!api) return;
+    const audioContext = (api as any).audioContext as AudioContext | undefined;
     try {
-      if (api.audioContext?.state === 'suspended') {
-        void api.audioContext.resume();
+      if (audioContext?.state === 'suspended') {
+        void audioContext.resume();
       }
     } catch {
       // ignore resume errors

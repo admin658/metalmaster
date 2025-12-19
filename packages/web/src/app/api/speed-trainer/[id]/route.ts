@@ -8,14 +8,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await requireUser(req);
     if ('error' in auth) return auth.error;
     const { supabase, user } = auth;
 
-    const { id } = params;
+    const { id } = await params;
     const { data, error } = await supabase
       .from('speed_trainer_sessions')
       .select('*')
@@ -35,14 +35,14 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await requireUser(req);
     if ('error' in auth) return auth.error;
     const { supabase, user } = auth;
 
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const parsed = UpdateSpeedTrainerSessionSchema.parse(body);
 
@@ -66,13 +66,13 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await requireUser(req);
     if ('error' in auth) return auth.error;
     const { supabase, user } = auth;
-    const { id } = params;
+    const { id } = await params;
 
     const { error } = await supabase
       .from('speed_trainer_sessions')

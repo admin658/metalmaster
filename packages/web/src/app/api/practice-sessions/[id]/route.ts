@@ -7,13 +7,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await requireUser(_req);
     if ('error' in auth) return auth.error;
     const { supabase, user } = auth;
-    const { id } = params;
+    const { id } = await params;
 
     const { data, error } = await supabase
       .from('practice_sessions')
@@ -34,13 +34,13 @@ export async function GET(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await requireUser(_req);
     if ('error' in auth) return auth.error;
     const { supabase, user } = auth;
-    const { id } = params;
+    const { id } = await params;
 
     const { error } = await supabase
       .from('practice_sessions')

@@ -7,14 +7,14 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { achievementId: string } },
+  { params }: { params: Promise<{ achievementId: string }> },
 ) {
   try {
     const auth = await requireUser(req);
     if ('error' in auth) return auth.error;
     const { supabase, user } = auth;
 
-    const achievementId = params.achievementId;
+    const { achievementId } = await params;
 
     const { data: existing } = await supabase
       .from('user_achievements')

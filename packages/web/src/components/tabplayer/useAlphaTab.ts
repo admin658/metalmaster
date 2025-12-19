@@ -115,8 +115,9 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
     if (typeof window !== "undefined") {
       api.settings.core.useWorkers = false;
       api.settings.core.scriptFile = new URL("/alphatab/alphaTab.js", window.location.origin).toString();
-      api.settings.player.soundFont = "/alphatab/soundfont/sonivox.sf2";
-      api.settings.player.percussionSoundFont = "/alphatab/soundfont/sonivox.sf2";
+      const playerSettings = api.settings.player as any;
+      playerSettings.soundFont = "/alphatab/soundfont/sonivox.sf2";
+      playerSettings.percussionSoundFont = "/alphatab/soundfont/sonivox.sf2";
       api.updateSettings();
     }
 
@@ -220,13 +221,21 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
       dispatch({ type: "SET_STATUS", status: "paused" });
     });
 
+    const cleanupSub = (sub: any) => {
+      if (typeof sub === "function") {
+        sub();
+        return;
+      }
+      sub?.dispose?.();
+    };
+
     return () => {
       try {
-        subError?.dispose?.();
-        subScoreColors?.dispose?.();
-        subPos?.dispose?.();
-        subState?.dispose?.();
-        subFinished?.dispose?.();
+        cleanupSub(subError);
+        cleanupSub(subScoreColors);
+        cleanupSub(subPos);
+        cleanupSub(subState);
+        cleanupSub(subFinished);
       } catch {}
       loadAbortRef.current?.abort();
       api.destroy();

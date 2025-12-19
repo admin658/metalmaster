@@ -21,19 +21,21 @@ const formatDuration = (milliseconds: number) => {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
+const requiredColor = (hex: string) => alphaTab.model.Color.fromJson(hex) ?? new alphaTab.model.Color(0, 0, 0, 255);
+
 const applyScoreColors = (score: alphaTab.model.Score) => {
   const fretColors: Record<number, alphaTab.model.Color> = {
-    12: alphaTab.model.Color.fromJson('#bb4648'),
-    13: alphaTab.model.Color.fromJson('#ab519f'),
-    14: alphaTab.model.Color.fromJson('#3953a5'),
-    15: alphaTab.model.Color.fromJson('#70ccd6'),
-    16: alphaTab.model.Color.fromJson('#6abd45'),
-    17: alphaTab.model.Color.fromJson('#e1a90e'),
+    12: requiredColor('#bb4648'),
+    13: requiredColor('#ab519f'),
+    14: requiredColor('#3953a5'),
+    15: requiredColor('#70ccd6'),
+    16: requiredColor('#6abd45'),
+    17: requiredColor('#e1a90e'),
   };
 
   score.style = new alphaTab.model.ScoreStyle();
-  score.style.colors.set(alphaTab.model.ScoreSubElement.Title, alphaTab.model.Color.fromJson('#426d9d'));
-  score.style.colors.set(alphaTab.model.ScoreSubElement.Artist, alphaTab.model.Color.fromJson('#4cb3d4'));
+  score.style.colors.set(alphaTab.model.ScoreSubElement.Title, requiredColor('#426d9d'));
+  score.style.colors.set(alphaTab.model.ScoreSubElement.Artist, requiredColor('#4cb3d4'));
 
   for (const track of score.tracks) {
     for (const staff of track.staves) {
@@ -42,7 +44,7 @@ const applyScoreColors = (score: alphaTab.model.Score) => {
           for (const beat of voice.beats) {
             if (beat.hasTuplet) {
               beat.style = new alphaTab.model.BeatStyle();
-              const color = alphaTab.model.Color.fromJson('#00DD00');
+              const color = requiredColor('#00DD00');
               beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationTuplet, color);
               beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationBeams, color);
             }
@@ -128,20 +130,20 @@ export function MetalMasterTabPlayer({
       score.style = new alphaTab.model.ScoreStyle();
       score.style.colors.set(
         alphaTab.model.ScoreSubElement.Title,
-        alphaTab.model.Color.fromJson('#426d9d')
+        requiredColor('#426d9d')
       );
       score.style.colors.set(
         alphaTab.model.ScoreSubElement.Artist,
-        alphaTab.model.Color.fromJson('#4cb3d4')
+        requiredColor('#4cb3d4')
       );
 
       const fretColors: Record<number, alphaTab.model.Color> = {
-        12: alphaTab.model.Color.fromJson('#bb4648'),
-        13: alphaTab.model.Color.fromJson('#ab519f'),
-        14: alphaTab.model.Color.fromJson('#3953a5'),
-        15: alphaTab.model.Color.fromJson('#70ccd6'),
-        16: alphaTab.model.Color.fromJson('#6abd45'),
-        17: alphaTab.model.Color.fromJson('#e1a90e'),
+        12: requiredColor('#bb4648'),
+        13: requiredColor('#ab519f'),
+        14: requiredColor('#3953a5'),
+        15: requiredColor('#70ccd6'),
+        16: requiredColor('#6abd45'),
+        17: requiredColor('#e1a90e'),
       };
 
       for (const track of score.tracks) {
@@ -151,7 +153,7 @@ export function MetalMasterTabPlayer({
               for (const beat of voice.beats) {
                 if (beat.hasTuplet) {
                   beat.style = new alphaTab.model.BeatStyle();
-                  const color = alphaTab.model.Color.fromJson('#00DD00');
+                  const color = requiredColor('#00DD00');
                   beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationTuplet, color);
                   beat.style.colors.set(alphaTab.model.BeatSubElement.StandardNotationBeams, color);
                 }
@@ -198,7 +200,7 @@ export function MetalMasterTabPlayer({
     const onPositionChanged = (e: alphaTab.synth.PositionChangedEventArgs) => {
       setPosition({ current: e.currentTime, end: e.endTime });
     };
-    const onSoundFontLoad = (e: alphaTab.SoundFontLoadEventArgs) => {
+    const onSoundFontLoad = (e: { loaded: number; total: number }) => {
       const pct = Math.floor((e.loaded / e.total) * 100);
       setSoundFontProgress(pct);
     };
