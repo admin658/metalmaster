@@ -150,6 +150,12 @@ export function usePracticeSession({
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
 
     saveTimer.current = window.setTimeout(async () => {
+      if (!supabase) {
+        // Should be prevented by disabledReason, but guard for SSR/build time safety.
+        console.warn("Supabase client not available; skipping practice session autosave.");
+        return;
+      }
+
       const { data: auth } = await supabase.auth.getUser();
       const userId = auth?.user?.id;
       const userEmail = auth?.user?.email;
