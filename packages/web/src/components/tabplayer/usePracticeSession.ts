@@ -42,7 +42,9 @@ export function usePracticeSession({
 
   // Guard: missing Supabase env should just skip autosave
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (!supabase) {
+      setDisabledReason("Supabase client not configured; autosave disabled");
+    } else if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setDisabledReason("Supabase env vars missing; autosave disabled");
     }
   }, []);
@@ -54,15 +56,15 @@ export function usePracticeSession({
     (async () => {
       setReady(false);
 
-      const { data: auth } = await supabase.auth.getUser();
-      const userId = auth?.user?.id;
-
-      if (requireAuth && !userId) {
+      if (!supabase || disabledReason) {
         setReady(true);
         return;
       }
 
-      if (disabledReason) {
+      const { data: auth } = await supabase.auth.getUser();
+      const userId = auth?.user?.id;
+
+      if (requireAuth && !userId) {
         setReady(true);
         return;
       }
@@ -116,6 +118,7 @@ export function usePracticeSession({
   // 2) Debounced autosave whenever relevant state changes
   useEffect(() => {
     if (!ready) return;
+    if (!supabase) return;
     if (restoring.current) return;
     if (disabledReason) return;
 

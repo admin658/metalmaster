@@ -1,6 +1,5 @@
-'use client';
-
-'use client';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 import TabPlayerShell from '@/components/tabplayer/TabPlayerShell';
 import { AlphaTabProvider } from '@/components/tabplayer/AlphaTabContext';
