@@ -60,6 +60,7 @@ export default function SignupForm() {
         value={email}
         onChange={e => setEmail(e.target.value)}
         className="p-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:border-metal-accent focus:outline-none"
+        autoComplete="email"
         required
       />
       <input
@@ -68,6 +69,7 @@ export default function SignupForm() {
         value={username}
         onChange={e => setUsername(e.target.value)}
         className="p-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:border-metal-accent focus:outline-none"
+        autoComplete="username"
       />
       <input
         type="password"
@@ -75,6 +77,7 @@ export default function SignupForm() {
         value={password}
         onChange={e => setPassword(e.target.value)}
         className="p-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:border-metal-accent focus:outline-none"
+        autoComplete="new-password"
         required
       />
       <input
@@ -83,6 +86,7 @@ export default function SignupForm() {
         value={confirmPassword}
         onChange={e => setConfirmPassword(e.target.value)}
         className="p-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:border-metal-accent focus:outline-none"
+        autoComplete="new-password"
         required
       />
       {error && <div className="text-red-400 text-sm">{error}</div>}

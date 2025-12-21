@@ -34,6 +34,7 @@ export default function LoginForm() {
         value={email}
         onChange={e => setEmail(e.target.value)}
         className="p-2 rounded bg-metal-900 text-gray-100 border border-metal-700"
+        autoComplete="email"
         required
       />
       <input
@@ -42,6 +43,7 @@ export default function LoginForm() {
         value={password}
         onChange={e => setPassword(e.target.value)}
         className="p-2 rounded bg-metal-900 text-gray-100 border border-metal-700"
+        autoComplete="current-password"
         required
       />
       {error && <div className="text-red-400 text-sm">{error}</div>}
