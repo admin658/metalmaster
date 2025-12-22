@@ -7,7 +7,7 @@ import { GuitarAmpSimulator, GuitarAmpPreset } from '../../audio/GuitarAmpSimula
 import NoteHighway2D from '../visual/NoteHighway2d';
 import NoteHighway3D from '../visual/NoteHighway3d';
 import TonePresetPanel from '../amp/TonePresetPanel';
-import { createFeedbackEngine, ExpectedNote } from '../../audio/GuitarFeedbackEngine';
+import { createFeedbackEngine, ExpectedNote, type GradeSummary } from '../../audio/GuitarFeedbackEngine';
 import RiffEvaluationResult from '../feedback/RiffEvaluationResult';
 import { completeRiffXP } from '../../lib/CompleteRiffXP';
 
@@ -88,6 +88,7 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
   const [finalAccuracy, setFinalAccuracy] = useState(0);
   const [finalXP, setFinalXP] = useState(0);
   const [finalAchievements, setFinalAchievements] = useState<string[]>([]);
+  const [gradeSummary, setGradeSummary] = useState<GradeSummary | null>(null);
   const [baselineAchievements, setBaselineAchievements] = useState<Set<string>>(new Set());
 
   const ampRef = useRef<GuitarAmpSimulator | null>(null);
@@ -201,6 +202,7 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
 
     try {
       setShowResult(false);
+      setGradeSummary(null);
       setEvalCount(0);
       setHitCount(0);
 
@@ -259,11 +261,14 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
     // In playback-only mode, just stop playback.
     if (playMode !== 'rate') {
       setShowResult(false);
+      setGradeSummary(null);
       return;
     }
 
-    // Compute accuracy
-    const accuracy = evalCount > 0 ? (hitCount / Math.max(evalCount, 1)) * 100 : 0;
+    // Compute accuracy using captured grading summary (fallback to simple ratio)
+    const summary = feedbackRef.current ? feedbackRef.current.summarize() : null;
+    setGradeSummary(summary);
+    const accuracy = summary?.gradePercent ?? (evalCount > 0 ? (hitCount / Math.max(evalCount, 1)) * 100 : 0);
     setFinalAccuracy(accuracy);
 
     // Send XP to Supabase
@@ -549,6 +554,7 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
               accuracy={finalAccuracy}
               xp={finalXP}
               achievements={finalAchievements}
+              summary={gradeSummary}
             />
           )}
 

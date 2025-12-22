@@ -3,6 +3,12 @@
 ## Overview
 Full-stack metal guitar learning platform spanning shared types/schemas, an Express + Supabase API, a Next.js web app, and an Expo mobile app. Core features: riffs/lessons, AlphaTab-based tab playback, speed trainer, daily riffs, achievements, user stats/XP, practice sessions, and AI-driven tone presets.
 
+## Recent Updates (Dec 2025)
+- Netlify Functions API layer added (`netlify/functions/health.ts`, `secure-example.ts`) with Supabase-admin auth verification; `netlify.toml` wired for dev/prod and `apiClient` now targets `/.netlify/functions/*`.
+- New homepage, top navigation, and login page with industrial/amber theme, session console, and refreshed CTAs.
+- Typed API client rewritten (`packages/web/src/lib/apiClient.ts`) to throw on non-2xx, build function URLs, and support bearer tokens; example component `ApiClientExample` shows Supabase JWT usage.
+- Guitar grading engine added: `packages/web/src/audio/grading.ts` aligns expected vs played notes with timing/pitch tolerances, coverage, jitter, bias, and overall grade; `GuitarFeedbackEngine` now captures played notes and returns a `GradeSummary`, and `RiffEvaluationResult` surfaces grade/pitch/timing metrics plus miss/extra counts.
+
 ## Architecture & Workspaces
 - `packages/shared-types` / `shared-validation` / `shared-schemas` - Shared TypeScript models + Zod schemas.
 - `packages/api` - Express API using Supabase auth/RLS + Stripe billing hooks; migrations in `db/migrations`.
@@ -14,7 +20,7 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 ## Feature Highlights
 - Learning: lessons/riffs/tabs/jam tracks with progress tracking and practice sessions.
 - Progression: XP/level tiers, streaks, achievements, skill scores, practice heatmap, and stats summary endpoints.
-- Gameplay: AlphaTab tab player (demo + GP upload), 2D/3D highways, track mixer, loop/count-in, learn mode, and AI feedback hooks.
+- Gameplay: AlphaTab tab player (demo + GP upload), 2D/3D highways, track mixer, loop/count-in, learn mode, and mic-driven grading with pitch/timing scoring.
 - Monetization: Stripe checkout/portal routes; subscription status surfaced via `/api/user-stats` and `useSubscription`.
 - AI: `/api/tone-settings` uses OpenAI to generate tone presets validated against shared schemas.
 
@@ -27,6 +33,7 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Profile page pulls `/api/user-stats` + `/api/user-stats/summary` + achievements/stats hooks for level/XP/streak/heatmap cards. `TopUserBadge` shows auth + subscription state; `useSubscription` now hits `/api/user-stats` with the stored token and offers upgrade/portal helpers.
 - Styling: monochrome AlphaTab skin in `src/app/alphaTab.css`; global metal theme via `globals.css` + Geist fonts.
 - Tab Lab UI tweaks: transport bar is bottom-sticky; section bar adds PM/Accents/Fingering/Rhythm/Strings toggles plus a Std Notation toggle; MIDI Out dropdown enumerates AlphaTab output devices when available; AlphaTab scrolling centers the playhead; custom per-fret note coloring with default fallbacks keeps notation visible.
+- Grading UX: `GuitarFeedbackEngine` captures mic input and aligns against expected notes; `grading.ts` scores pitch/timing with jitter/coverage/bias; `RiffEvaluationResult` now displays grade, pitch vs timing accuracy, avg/median offsets, jitter, and miss/extra counts.
 
 ## API & Data
 - Express routes (high level): auth (login/signup/logout/refresh), tone-settings (OpenAI), speed-trainer, daily-riff, achievements, user-stats (+summary), practice-sessions, XP awards (`/api/xp/award`, `/api/xp/tick`), tabs/riffs/lessons/jam-tracks, billing (`/billing/create-checkout-session`, `/billing/create-portal-session`, Stripe webhook).
