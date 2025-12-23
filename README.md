@@ -1,19 +1,16 @@
 # Metal Master - Full-Stack Music Learning Platform
 
-Metal guitar learning platform spanning API, web, and mobile clients. Built with TypeScript, Next.js (App Router + API routes), Expo, and Supabase.
+Metal guitar learning platform spanning API, web, and mobile clients. Built with TypeScript, Next.js (App Router), Supabase, and Netlify Functions for serverless endpoints, plus Expo for mobile.
 
 ## Features
-- Lessons & Riffs library
-- Speed Trainer with BPM progression
-- Daily Riff challenges
-- Achievements and XP/Stats (heatmap, skill scores)
-- Jam Tracks page with bundled MP3s in `packages/web/public/jam` (uses Supabase jam tracks when present)
-- Animated flame backdrop + hover flames on nav links
-- Tab Player (AlphaTab) with demo/local upload, transport, track selection, auto-scroll, and fullscreen mode with pinned bottom bar
-- Home page splash video on load (served from `packages/web/public/splash.mp4`)
+- Lessons & Riffs library, guided path, and jam decks
+- Speed Trainer with BPM progression and practice logging
+- Daily Riff challenges, achievements, XP/Stats (heatmap, skill scores)
+- Tab Lab (AlphaTab) with demo/local upload, transport, track selection, auto-scroll, and fullscreen mode with pinned bottom bar
+- Netlify Functions API layer (Supabase-secured) for thin serverless endpoints
+- Modern homepage, header, and login experience aligned to the metal/industrial theme
 - Route-change splash overlay (see `packages/web/src/app/components/RouteSplash.jsx`)
 - Web (Next.js) and Mobile (Expo) clients
-- Learn page ships two bundled video lessons (public/IMG_4520.MOV and IMG_4521.MOV) so you always have starter content even if Supabase is empty.
 
 ## Project Structure
 ```
@@ -22,7 +19,7 @@ metal-master/
     shared-types/       # TypeScript models
     shared-validation/  # Zod schemas
     shared-schemas/     # Buildable schema bundle
-    web/                # Next.js app (App Router + API routes under /api)
+    web/                # Next.js app (App Router + API routes under /api + Netlify functions)
     mobile/             # Expo app
   package.json          # Workspaces
   .env                  # Root env (NEXT_PUBLIC_API_URL, Supabase, Stripe)
@@ -80,9 +77,10 @@ yarn workspace @metalmaster/web dev      # http://localhost:3000 (serves API at 
 ## Environment Variables
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (for billing webhook/service ops)
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_API_URL` (defaults to `/api` for co-located API)
+- `NEXT_PUBLIC_API_URL` (defaults to `/api` locally; set to your Netlify site origin in prod)
 - Stripe: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO_MONTHLY`, `STRIPE_PRICE_PRO_YEARLY`
 - `APP_URL` (used for billing return URLs)
+- Netlify Functions: `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `STRIPE_SECRET_KEY` (server-only)
 
 ## Tab Player (Web)
 - Page: `/tab-player`
@@ -94,9 +92,15 @@ yarn workspace @metalmaster/web dev      # http://localhost:3000 (serves API at 
 - Viewer scrolls inside its pane and stays on the active bar during playback. If playback is silent or tabs fail to render, ensure the `/alphatab` assets (alphaTab.js/mjs/worker/worklet, font/, soundfont/) are served and hard-refresh.
 
 ## Auth
-- Pages: `/auth/login`, `/auth/signup`
+- Pages: `/auth/login`, `/auth/signup` (new two-panel layout with session snapshot + refreshed form)
 - API: `/api/auth/login`, `/api/auth/signup`
 - Tokens stored in `localStorage` by `useAuth`.
+
+## Netlify Functions (Web)
+- Functions live in `/netlify/functions` (TypeScript). Examples: `health` (status) and `secure-example` (Supabase auth verify + profile fetch).
+- Config: `netlify.toml` sets `functions = "netlify/functions"` and dev proxy for `netlify dev`.
+- Client helper: `packages/web/src/lib/apiClient.ts` builds `functionUrl('health')` -> `/.netlify/functions/health`, throws on non-2xx, and supports bearer tokens.
+- Local dev: `netlify dev` proxies Next + functions at http://localhost:8888 (set `NEXT_PUBLIC_API_URL` accordingly).
 
 ## Testing
 ```bash
@@ -125,3 +129,8 @@ END $$;
 
 ## License
 MIT
+
+## What's New (Dec 2025)
+- New industrial homepage, hero console, and navigation/header matching the metal theme.
+- Redesigned login page with two-panel session snapshot and upgraded form styling.
+- Netlify Functions API layer added (`health`, `secure-example`) plus typed `apiClient` for function calls.

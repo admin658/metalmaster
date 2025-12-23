@@ -75,6 +75,14 @@ export const SignupIcon = (props: SVGProps) => (
   </svg>
 );
 
+export const LeaderboardIcon = (props: SVGProps) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden {...props}>
+    <path d="M6 15v5m6-8v8m6-12v12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    <path d="M4 20h16" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M6 9.5a3 3 0 1 1 4.8-3.6l.2.3.2-.3A3 3 0 1 1 16 9.5c0 1.8-2.2 3-5 6-2.8-3-5-4.2-5-6z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
 export const TabIcon = (props: SVGProps) => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden {...props}>
     <rect x="4" y="5" width="16" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.1"/>

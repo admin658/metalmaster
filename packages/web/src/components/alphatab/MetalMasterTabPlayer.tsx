@@ -115,8 +115,9 @@ export function MetalMasterTabPlayer({
         fontDirectory: '/alphatab/font/',
       },
       player: {
-        enablePlayer: false, // Temporarily disable to test rendering
+        enablePlayer: true,
         soundFont: soundFontUrl,
+        percussionSoundFont: soundFontUrl,
         scrollElement: hostRef.current,
       },
       display: {

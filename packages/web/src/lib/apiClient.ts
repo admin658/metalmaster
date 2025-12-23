@@ -1,37 +1,46 @@
-import type { ApiResponse } from '@metalmaster/shared-types';
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
-
-export type ApiError = {
-  code?: string;
-  message: string;
+export class ApiClientError extends Error {
   status?: number;
+  code?: string;
   details?: unknown;
-};
+
+  constructor(message: string, options: { status?: number; code?: string; details?: unknown } = {}) {
+    super(message);
+    this.name = 'ApiClientError';
+    this.status = options.status;
+    this.code = options.code;
+    this.details = options.details;
+  }
+}
 
 export type ApiClientOptions = {
   token?: string | null;
   headers?: Record<string, string>;
-  timeoutMs?: number; // not implemented (placeholder)
+  body?: unknown;
 };
 
-function getTokenFromStorage(): string | null {
-  try {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
-  } catch (e) {
-    return null;
-  }
-}
+const resolveUrl = (path: string) => {
+  if (/^https?:\/\//i.test(path)) return path;
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `${API_BASE}${normalized}`;
+};
 
-function buildHeaders(options?: ApiClientOptions) {
-  const token = options?.token ?? getTokenFromStorage();
+export const functionUrl = (name: string) => `${API_BASE}/.netlify/functions/${name}`;
+
+function buildHeaders(options?: ApiClientOptions): Record<string, string> {
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...options?.headers,
+    ...(options?.headers ?? {}),
   };
 
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (options?.body !== undefined && !(options.body instanceof FormData)) {
+    headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+  }
+
+  if (options?.token) {
+    headers['Authorization'] = `Bearer ${options.token}`;
+  }
+
   return headers;
 }
 
@@ -39,88 +48,70 @@ async function parseJsonSafe(res: Response) {
   const text = await res.text();
   try {
     return JSON.parse(text);
-  } catch (err) {
+  } catch {
     return text;
   }
 }
 
-export async function apiRequest<T = unknown>(
-  endpoint: string,
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
-  body?: unknown,
-  options?: ApiClientOptions
-): Promise<{ data?: T; error?: ApiError }> {
-  const url = endpoint.startsWith('http') ? endpoint : `${API_URL}${endpoint}`;
+async function handleResponse<T>(res: Response): Promise<T> {
+  const parsed = await parseJsonSafe(res);
 
-  const init: RequestInit = {
-    method,
-    headers: buildHeaders(options),
-    body: body !== undefined && body !== null ? JSON.stringify(body) : undefined,
-  };
+  if (!res.ok) {
+    const message =
+      (parsed as any)?.message ||
+      (parsed as any)?.error?.message ||
+      res.statusText ||
+      'Request failed';
+    throw new ApiClientError(message, {
+      status: res.status,
+      code: (parsed as any)?.error?.code,
+      details: parsed,
+    });
+  }
+
+  if (parsed && typeof parsed === 'object' && 'success' in (parsed as Record<string, unknown>)) {
+    const data = parsed as { success: boolean; data?: T; error?: { code?: string; message?: string } };
+    if (!data.success) {
+      throw new ApiClientError(data.error?.message || 'API returned an error', {
+        code: data.error?.code,
+        details: parsed,
+      });
+    }
+    return data.data as T;
+  }
+
+  return parsed as T;
+}
+
+export async function apiFetch<T = unknown>(
+  path: string,
+  init: ApiClientOptions & RequestInit = {}
+): Promise<T> {
+  const url = resolveUrl(path);
 
   try {
-    const res = await fetch(url, init);
+    const response = await fetch(url, {
+      ...init,
+      method: init.method ?? 'GET',
+      headers: buildHeaders(init as ApiClientOptions),
+      body:
+        init.body !== undefined && !(init.body instanceof FormData)
+          ? JSON.stringify(init.body)
+          : (init.body as BodyInit | null | undefined),
+    });
 
-    const parsed = await parseJsonSafe(res);
-
-    if (!res.ok) {
-      // HTTP error
-      const err: ApiError = {
-        message: parsed?.error?.message || parsed?.message || res.statusText || 'HTTP error',
-        status: res.status,
-        code: parsed?.error?.code || undefined,
-        details: parsed,
-      };
-      return { error: err };
-    }
-
-    // If API returns standardized ApiResponse<T>
-    if (parsed && typeof parsed === 'object' && 'success' in parsed) {
-      const apiResp = parsed as ApiResponse<T>;
-      if (!apiResp.success) {
-        return {
-          error: {
-            message: apiResp.error?.message || 'API returned error',
-            code: apiResp.error?.code,
-            details: apiResp.error,
-          },
-        };
-      }
-
-      return { data: apiResp.data as T };
-    }
-
-    // Fallback: return parsed body as the data
-    return { data: parsed as T };
-  } catch (err: unknown) {
-    // Network or parse error
-    return {
-      error: {
-        message: err instanceof Error ? err.message : 'Network error',
-        details: err,
-      },
-    };
+    return await handleResponse<T>(response);
+  } catch (err) {
+    if (err instanceof ApiClientError) throw err;
+    throw new ApiClientError(err instanceof Error ? err.message : 'Network error', { details: err });
   }
 }
 
-export const apiGet = <T = unknown>(endpoint: string, options?: ApiClientOptions) =>
-  apiRequest<T>(endpoint, 'GET', undefined, options);
-export const apiPost = <T = unknown>(endpoint: string, body?: unknown, options?: ApiClientOptions) =>
-  apiRequest<T>(endpoint, 'POST', body, options);
-export const apiPatch = <T = unknown>(endpoint: string, body?: unknown, options?: ApiClientOptions) =>
-  apiRequest<T>(endpoint, 'PATCH', body, options);
-export const apiDelete = <T = unknown>(endpoint: string, body?: unknown, options?: ApiClientOptions) =>
-  apiRequest<T>(endpoint, 'DELETE', body, options);
-
-// Usage example (in comments):
-// const { data, error } = await apiGet<UserStats>('/user-stats');
-// if (error) { console.error('API Error:', error); return }
-// console.log('stats', data);
-
-export default {
-  request: apiRequest,
-  get: apiGet,
-  post: apiPost,
-  patch: apiPatch,
-  delete: apiDelete,
-};
+export const apiGet = <T = unknown>(path: string, options?: ApiClientOptions) =>
+  apiFetch<T>(path, { ...options, method: 'GET' });
+export const apiPost = <T = unknown>(path: string, body?: unknown, options?: ApiClientOptions) =>
+  apiFetch<T>(path, { ...options, method: 'POST', body });
+export const apiPatch = <T = unknown>(path: string, body?: unknown, options?: ApiClientOptions) =>
+  apiFetch<T>(path, { ...options, method: 'PATCH', body });
+export const apiDelete = <T = unknown>(path: string, body?: unknown, options?: ApiClientOptions) =>
+  apiFetch<T>(path, { ...options, method: 'DELETE', body });

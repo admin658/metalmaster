@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '../apiClient';
+import { ApiClientError, apiGet, apiPost } from '../apiClient';
 
 describe('apiClient', () => {
   beforeEach(() => {
@@ -13,8 +13,7 @@ describe('apiClient', () => {
     });
 
     const res = await apiGet<{ hello: string }>('/test');
-    expect(res.error).toBeUndefined();
-    expect(res.data).toEqual({ hello: 'world' });
+    expect(res).toEqual({ hello: 'world' });
   });
 
   test('returns API-level error when success=false', async () => {
@@ -24,11 +23,10 @@ describe('apiClient', () => {
       text: async () => JSON.stringify({ success: false, error: { code: 'BAD', message: 'bad' } }),
     });
 
-    const res = await apiGet('/test');
-    expect(res.data).toBeUndefined();
-    expect(res.error).toBeDefined();
-    expect(res.error?.code).toBe('BAD');
-    expect(res.error?.message).toBe('bad');
+    await apiGet('/test').catch((err) => {
+      expect(err).toBeInstanceOf(ApiClientError);
+      expect(err).toMatchObject({ code: 'BAD', message: 'bad' });
+    });
   });
 
   test('returns HTTP error for non-OK responses', async () => {
@@ -39,17 +37,18 @@ describe('apiClient', () => {
       text: async () => 'Internal Server Error',
     });
 
-    const res = await apiGet('/test');
-    expect(res.error).toBeDefined();
-    expect(res.error?.status).toBe(500);
-    expect(res.error?.message).toBeDefined();
+    await apiGet('/test').catch((err) => {
+      expect(err).toBeInstanceOf(ApiClientError);
+      expect(err).toMatchObject({ status: 500 });
+    });
   });
 
   test('returns network error on fetch rejection', async () => {
     (global as any).fetch = jest.fn().mockRejectedValue(new Error('Network down'));
 
-    const res = await apiGet('/test');
-    expect(res.error).toBeDefined();
-    expect(res.error?.message).toMatch(/Network/);
+    await apiGet('/test').catch((err) => {
+      expect(err).toBeInstanceOf(ApiClientError);
+      expect(err.message).toMatch(/Network down/);
+    });
   });
 });

@@ -1,5 +1,6 @@
 [build]
   command = "yarn install --frozen-lockfile && yarn build"
+  functions = "netlify/functions"
   publish = "packages/web/.next"
   targetPort = 3003
 [build.environment]
@@ -8,3 +9,8 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[dev]
+  command = "yarn workspace @metalmaster/web dev"
+  targetPort = 3000
+  functions = "netlify/functions"

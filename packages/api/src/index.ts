@@ -24,6 +24,7 @@ import { requestLogger } from './middleware/request-logger';
 import billingRoutes from './routes/billing.routes';
 import billingWebhook from './routes/billing.webhook';
 import { toneRoutes } from './routes/tone.routes';
+import { leaderboardRoutes } from './routes/leaderboard.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -84,6 +85,7 @@ app.use('/api/practice-sessions', practiceSessionRoutes);
 app.use('/api/xp', xpRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/tone-settings', toneRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

@@ -8,6 +8,7 @@ build/
 # Folders to ignore
 New folder/
 -p/
+metalmaster-video-pipeline/
 venv/
 .env
 .env.local
@@ -31,7 +32,7 @@ coverage/
 .env.production
 ios/
 android/
-
+.env.local
 # Next.js
 out/
 .vercel/

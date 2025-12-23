@@ -70,6 +70,7 @@ const applyColors = (score: alphaTab.model.Score) => {
 };
 
 const GM_INSTRUMENTS: Array<{ label: string; program: number }> = [
+  { label: 'Shred (Program 0)', program: 0 },
   { label: 'Distortion Guitar', program: 30 },
   { label: 'Overdriven Guitar', program: 29 },
   { label: 'Electric Guitar (clean)', program: 27 },
@@ -98,7 +99,7 @@ export default function TabPlayer({ source }: TabPlayerProps) {
   const [looping, setLooping] = useState(false);
   const [midiAccess, setMidiAccess] = useState<MIDIAccess | null>(null);
   const [midiOutput, setMidiOutput] = useState<MIDIOutput | null>(null);
-  const [midiProgram, setMidiProgram] = useState<number>(30); // Distortion Guitar
+  const [midiProgram, setMidiProgram] = useState<number>(0); // Program 0
 
   useEffect(() => {
     midiOutputRef.current = midiOutput;
