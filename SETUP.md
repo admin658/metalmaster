@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Node.js** 18.0.0 or higher
-- **Yarn** 4.0+ (npm is not recommended; this project uses Yarn workspaces with PnP)
+- **Yarn** 4.0+ (npm is not recommended; this project uses Yarn workspaces with node-modules linker)
 - **Supabase** account and project
 - **Git**
 
@@ -14,6 +14,8 @@ This project uses **Yarn with `node-modules` linker** for maximum Node.js compat
 ```yaml
 nodeLinker: node-modules
 ```
+
+This repo does not use Yarn Zero-Installs; `.yarn/cache` is intentionally not committed. Run `yarn install` after cloning to populate `node_modules`.
 
 If you have issues with dependencies after a fresh clone:
 ```bash
