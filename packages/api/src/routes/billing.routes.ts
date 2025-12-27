@@ -5,10 +5,19 @@ import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
-console.log('📋 Billing Routes - Checking environment variables:');
-console.log('   STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY);
-console.log('   STRIPE_PRICE_PRO_MONTHLY:', process.env.STRIPE_PRICE_PRO_MONTHLY);
-console.log('   STRIPE_WEBHOOK_SECRET exists:', !!process.env.STRIPE_WEBHOOK_SECRET);
+const requiredBillingEnv = {
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  STRIPE_PRICE_PRO_MONTHLY: process.env.STRIPE_PRICE_PRO_MONTHLY,
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+};
+
+const missingBillingEnv = Object.entries(requiredBillingEnv)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missingBillingEnv.length) {
+  console.error('Billing env missing:', missingBillingEnv.join(', '));
+}
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-11-17' as any
@@ -23,7 +32,7 @@ const supabaseService = supabaseUrl && supabaseServiceRoleKey ? createClient(sup
 console.log('✅ Supabase service initialized:', !!supabaseService);
 
 // price IDs you get from Stripe Dashboard
-const PRICE_PRO_MONTHLY = process.env.STRIPE_PRICE_PRO_MONTHLY!;
+const PRICE_PRO_MONTHLY = process.env.STRIPE_PRICE_PRO_MONTHLY;
 const DOMAIN = process.env.APP_URL || 'http://localhost:3000';
 
 
@@ -36,6 +45,20 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
         error: {
           code: 'SERVICE_UNAVAILABLE',
           message: 'Billing service not configured',
+        },
+        meta: {
+          timestamp: new Date().toISOString(),
+          version: '1.0.0',
+        },
+      });
+    }
+
+    if (!PRICE_PRO_MONTHLY) {
+      return res.status(503).json({
+        success: false,
+        error: {
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'Stripe price not configured',
         },
         meta: {
           timestamp: new Date().toISOString(),

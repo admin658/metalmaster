@@ -1,6 +1,6 @@
 -- ============================================================
 -- Metal Master - Combined Migrations
--- (001_base_schema.sql + 002_feature_tables.sql + 003_practice_sessions_autosave.sql + 004_xp_badges.sql + 005_level_curve_seed.sql)
+-- (001_base_schema.sql + 002_feature_tables.sql + 003_practice_sessions_autosave.sql + 004_xp_badges.sql + 005_level_curve_seed.sql + 006_stripe_webhook_events.sql + 007_practice_session_summary.sql)
 -- Run this entire script in Supabase SQL Editor if you need
 -- to bootstrap a fresh database in one pass.
 -- NOTE: Admin clients must include JWT claim "role":"admin" to satisfy admin-bypass RLS policies you configure.
@@ -441,4 +441,60 @@ VALUES (
   '{"version": "1.0.0", "curve_name": "SteelRamp_50", "max_level": 50, "xp_definition": "total_xp_required_is_cumulative", "notes": "Early levels are fast for dopamine; mid levels steady; late levels require consistent practice + streaks.", "levels": [{"level": 1, "total_xp_required": 0, "title": "Rust", "rewards": []}, {"level": 2, "total_xp_required": 250, "title": "Spark", "rewards": ["unlock:practice_heatmap"]}, {"level": 3, "total_xp_required": 550, "title": "Forgehand", "rewards": ["unlock:speed_slider"]}, {"level": 4, "total_xp_required": 900, "title": "Iron Nerves", "rewards": ["cosmetic:pick_color_1"]}, {"level": 5, "total_xp_required": 1300, "title": "Chug Apprentice", "rewards": ["unlock:loop_presets"]}, {"level": 6, "total_xp_required": 1750, "title": "Mute Adept", "rewards": []}, {"level": 7, "total_xp_required": 2250, "title": "Riff Squire", "rewards": ["cosmetic:badge_frame_1"]}, {"level": 8, "total_xp_required": 2800, "title": "Tempo Tamer", "rewards": []}, {"level": 9, "total_xp_required": 3400, "title": "Downpick Disciple", "rewards": ["unlock:metronome_modes"]}, {"level": 10, "total_xp_required": 4100, "title": "Iron Wrist", "rewards": ["title_equipped:Iron Wrist"]}, {"level": 11, "total_xp_required": 4900, "title": "Palm-Mute Surgeon", "rewards": []}, {"level": 12, "total_xp_required": 5800, "title": "Chord Cleaver", "rewards": ["cosmetic:theme_accent_1"]}, {"level": 13, "total_xp_required": 6800, "title": "Gallop Runner", "rewards": []}, {"level": 14, "total_xp_required": 7950, "title": "Alternate Assassin", "rewards": ["unlock:practice_goals"]}, {"level": 15, "total_xp_required": 9250, "title": "Crossing Clean", "rewards": ["cosmetic:badge_frame_2"]}, {"level": 16, "total_xp_required": 10700, "title": "Silence Controller", "rewards": []}, {"level": 17, "total_xp_required": 12300, "title": "Burst Certified", "rewards": ["unlock:burst_drills"]}, {"level": 18, "total_xp_required": 14100, "title": "Riffsmith", "rewards": []}, {"level": 19, "total_xp_required": 16100, "title": "Section Jumper", "rewards": ["unlock:section_challenges"]}, {"level": 20, "total_xp_required": 18300, "title": "Foundations: Steel", "rewards": ["unlock:intermediate_path"]}, {"level": 21, "total_xp_required": 20750, "title": "Tempo Hunter", "rewards": []}, {"level": 22, "total_xp_required": 23450, "title": "Precision Fiend", "rewards": ["cosmetic:theme_accent_2"]}, {"level": 23, "total_xp_required": 26400, "title": "Tightness Cultist", "rewards": []}, {"level": 24, "total_xp_required": 29650, "title": "Palm-Mute Warden", "rewards": ["unlock:advanced_loop_tools"]}, {"level": 25, "total_xp_required": 33200, "title": "Riff Enforcer", "rewards": ["cosmetic:badge_frame_3"]}, {"level": 26, "total_xp_required": 37100, "title": "Metronome Marauder", "rewards": []}, {"level": 27, "total_xp_required": 41350, "title": "Streak Reaper", "rewards": ["unlock:streak_challenges"]}, {"level": 28, "total_xp_required": 46000, "title": "Rhythm Executioner", "rewards": []}, {"level": 29, "total_xp_required": 51050, "title": "Fretboard Butcher", "rewards": ["cosmetic:theme_accent_3"]}, {"level": 30, "total_xp_required": 56600, "title": "War Machine", "rewards": ["unlock:pro_riff_trials"]}, {"level": 31, "total_xp_required": 62650, "title": "Precision Warlord", "rewards": []}, {"level": 32, "total_xp_required": 69250, "title": "Tremolo Initiate", "rewards": ["unlock:tremolo_drills"]}, {"level": 33, "total_xp_required": 76450, "title": "Gallop Overlord", "rewards": []}, {"level": 34, "total_xp_required": 84300, "title": "Alternate Blade", "rewards": ["cosmetic:badge_frame_4"]}, {"level": 35, "total_xp_required": 92850, "title": "String Slayer", "rewards": []}, {"level": 36, "total_xp_required": 102150, "title": "Mute Tyrant", "rewards": ["unlock:mute_mastery_tests"]}, {"level": 37, "total_xp_required": 112300, "title": "Timing Necromancer", "rewards": []}, {"level": 38, "total_xp_required": 123350, "title": "Riff Architect", "rewards": ["unlock:riff_builder_beta"]}, {"level": 39, "total_xp_required": 135400, "title": "Practice Juggernaut", "rewards": []}, {"level": 40, "total_xp_required": 148550, "title": "Steel Titan", "rewards": ["cosmetic:theme_accent_4"]}, {"level": 41, "total_xp_required": 162900, "title": "Blackened Commander", "rewards": []}, {"level": 42, "total_xp_required": 178550, "title": "Chromatic Predator", "rewards": ["unlock:chromatic_trials"]}, {"level": 43, "total_xp_required": 195600, "title": "Metronome Killer", "rewards": []}, {"level": 44, "total_xp_required": 214200, "title": "Tempo Demon", "rewards": ["cosmetic:badge_frame_5"]}, {"level": 45, "total_xp_required": 234500, "title": "Riff Wraith", "rewards": []}, {"level": 46, "total_xp_required": 256650, "title": "The Unflinching", "rewards": ["unlock:elite_badges"]}, {"level": 47, "total_xp_required": 280800, "title": "Iron Prophet", "rewards": []}, {"level": 48, "total_xp_required": 307150, "title": "Shred Revenant", "rewards": ["unlock:shred_path"]}, {"level": 49, "total_xp_required": 335900, "title": "Steel Godling", "rewards": []}, {"level": 50, "total_xp_required": 367250, "title": "Steel God", "rewards": ["title_equipped:Steel God", "cosmetic:legend_frame"]}]}'::jsonb,
   now()
 );
+
+-- ===========================
+-- 006_stripe_webhook_events.sql
+-- ===========================
+CREATE TABLE stripe_webhook_events (
+  event_id text PRIMARY KEY,
+  event_type text NOT NULL,
+  received_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ===========================
+-- 007_practice_session_summary.sql
+-- ===========================
+CREATE OR REPLACE FUNCTION practice_session_summary(p_user_id uuid)
+RETURNS TABLE (
+  total_sessions bigint,
+  total_duration_seconds bigint,
+  total_xp bigint,
+  most_common_session_type text,
+  xp_earned_this_week bigint,
+  xp_earned_today bigint
+)
+LANGUAGE sql
+STABLE
+AS $$
+  WITH user_sessions AS (
+    SELECT session_type, duration_seconds, xp_earned, started_at
+    FROM practice_sessions
+    WHERE user_id = p_user_id
+  ),
+  totals AS (
+    SELECT
+      COUNT(*)::bigint AS total_sessions,
+      COALESCE(SUM(duration_seconds), 0)::bigint AS total_duration_seconds,
+      COALESCE(SUM(xp_earned), 0)::bigint AS total_xp,
+      COALESCE(SUM(xp_earned) FILTER (WHERE started_at >= now() - interval '7 days'), 0)::bigint AS xp_earned_this_week,
+      COALESCE(SUM(xp_earned) FILTER (WHERE started_at::date = current_date), 0)::bigint AS xp_earned_today
+    FROM user_sessions
+  ),
+  common_type AS (
+    SELECT session_type
+    FROM user_sessions
+    GROUP BY session_type
+    ORDER BY COUNT(*) DESC, session_type ASC
+    LIMIT 1
+  )
+  SELECT
+    totals.total_sessions,
+    totals.total_duration_seconds,
+    totals.total_xp,
+    COALESCE(common_type.session_type, 'lesson') AS most_common_session_type,
+    totals.xp_earned_this_week,
+    totals.xp_earned_today
+  FROM totals
+  LEFT JOIN common_type ON TRUE;
+$$;
 

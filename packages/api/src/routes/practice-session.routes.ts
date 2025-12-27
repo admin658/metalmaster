@@ -2,7 +2,6 @@ import express from 'express';
 import { supabase } from '../index';
 import { authenticate } from '../middleware/auth';
 import { CreatePracticeSessionSchema } from '@metalmaster/shared-validation';
-import type { PracticeSession } from '@metalmaster/shared-validation';
 
 export const practiceSessionRoutes = express.Router();
 
@@ -50,34 +49,26 @@ practiceSessionRoutes.get('/', authenticate, async (req, res, next) => {
 // Get practice session stats (summary)
 practiceSessionRoutes.get('/stats/summary', authenticate, async (req, res, next) => {
   try {
-    const { data, error } = await supabase
-      .from('practice_sessions')
-      .select('session_type, duration_seconds, xp_earned, started_at')
-      .eq('user_id', req.user!.id);
+    const { data, error } = await supabase.rpc('practice_session_summary', {
+      p_user_id: req.user!.id,
+    });
 
     if (error) throw error;
 
-    const sessions = (data || []) as PracticeSession[];
-    const totalSessions = sessions.length;
-    const totalDurationSeconds = sessions.reduce((sum, s) => sum + s.duration_seconds, 0);
-    const totalXp = sessions.reduce((sum, s) => sum + s.xp_earned, 0);
+    const summary = (data?.[0] || {}) as {
+      total_sessions?: number | string | null;
+      total_duration_seconds?: number | string | null;
+      total_xp?: number | string | null;
+      most_common_session_type?: string | null;
+      xp_earned_this_week?: number | string | null;
+      xp_earned_today?: number | string | null;
+    };
 
-    // Calculate most common session type
-    const typeCount = sessions.reduce<Record<string, number>>((acc, s) => {
-      acc[s.session_type] = (acc[s.session_type] || 0) + 1;
-      return acc;
-    }, {});
-    const mostCommonType = Object.entries(typeCount).sort((a, b) => b[1] - a[1])[0]?.[0] || 'lesson';
-
-    // Get this week's stats
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const weekSessions = sessions.filter((s) => new Date(s.started_at) > new Date(weekAgo));
-    const weekXp = weekSessions.reduce((sum, s) => sum + s.xp_earned, 0);
-
-    // Get today's stats
-    const today = new Date().toISOString().split('T')[0];
-    const todaySessions = sessions.filter((s) => s.started_at.split('T')[0] === today);
-    const todayXp = todaySessions.reduce((sum, s) => sum + s.xp_earned, 0);
+    const totalSessions = Number(summary.total_sessions || 0);
+    const totalDurationSeconds = Number(summary.total_duration_seconds || 0);
+    const mostCommonType = summary.most_common_session_type || 'lesson';
+    const weekXp = Number(summary.xp_earned_this_week || 0);
+    const todayXp = Number(summary.xp_earned_today || 0);
 
     res.json({
       success: true,

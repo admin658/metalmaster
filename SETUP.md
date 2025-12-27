@@ -35,6 +35,8 @@ yarn install
 
 Execute these SQL queries in your Supabase SQL editor:
 
+Tip: for a full schema bootstrap (including Stripe webhook idempotency), run `packages/api/db/all-migrations-idempotent.sql`.
+
 ### Users table (auto-created by Supabase Auth)
 Already handled by Supabase authentication
 
@@ -367,6 +369,18 @@ VALUES (
   '00000000-0000-0000-0000-000000000000'
 );
 ```
+
+## Stripe Webhook Event Cleanup (Optional)
+
+The webhook idempotency table can grow over time. You can periodically remove old rows by running:
+
+```sql
+DELETE FROM stripe_webhook_events
+WHERE received_at < now() - interval '90 days';
+```
+
+For a ready-to-run script (and optional pg_cron schedule), see:
+`packages/api/db/maintenance/stripe_webhook_events_cleanup.sql`
 
 ## Production Build
 

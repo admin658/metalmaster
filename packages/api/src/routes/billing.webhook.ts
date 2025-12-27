@@ -135,6 +135,20 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
   }
 
   try {
+    const { error: eventInsertError } = await supabaseService
+      .from('stripe_webhook_events')
+      .insert({ event_id: event.id, event_type: event.type });
+
+    if (eventInsertError) {
+      if (eventInsertError.code === '23505') {
+        console.warn('Duplicate Stripe event received, skipping:', event.id);
+        return res.json({ received: true, duplicate: true });
+      }
+
+      console.error('Failed to persist Stripe event for idempotency:', eventInsertError);
+      return res.status(500).json({ error: 'Webhook persistence failed' });
+    }
+
     // Handle checkout completion (Stripe Buy Button / Checkout)
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;

@@ -84,7 +84,7 @@ yarn workspace @metalmaster/web dev      # http://localhost:3000 (serves API at 
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (for billing webhook/service ops)
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `NEXT_PUBLIC_API_URL` (defaults to `/api` locally; set to your Netlify site origin in prod)
-- Stripe: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO_MONTHLY`, `STRIPE_PRICE_PRO_YEARLY`
+- Stripe (billing): `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO_MONTHLY` (add `STRIPE_PRICE_PRO_YEARLY` if you enable yearly plans)
 - `APP_URL` (used for billing return URLs)
 - Netlify Functions: `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `STRIPE_SECRET_KEY` (server-only)
 
