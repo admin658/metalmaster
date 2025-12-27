@@ -4,11 +4,30 @@ import { authenticate } from '../middleware/auth';
 import { CreateJamTrackSchema, UpdateJamTrackSchema, CreateJamSessionSchema } from '@metalmaster/shared-validation';
 
 export const jamTrackRoutes = express.Router();
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 100;
+
+const parsePage = (value?: string) => {
+  const parsed = Number.parseInt(value ?? '', 10);
+  if (Number.isNaN(parsed) || parsed < 1) {
+    return DEFAULT_PAGE;
+  }
+  return parsed;
+};
+
+const parseLimit = (value?: string) => {
+  const parsed = Number.parseInt(value ?? '', 10);
+  if (Number.isNaN(parsed) || parsed < 1) {
+    return DEFAULT_LIMIT;
+  }
+  return Math.min(parsed, MAX_LIMIT);
+};
 
 jamTrackRoutes.get('/', async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const page = parsePage(req.query.page as string | undefined);
+    const limit = parseLimit(req.query.limit as string | undefined);
     const difficulty = req.query.difficulty as string;
 
     let query = supabase
@@ -114,15 +133,37 @@ jamTrackRoutes.patch('/:id', authenticate, async (req, res, next) => {
   try {
     const validated = UpdateJamTrackSchema.parse(req.body);
     const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required',
+        },
+      });
+    }
 
     const { data, error } = await supabase
       .from('jam_tracks')
       .update(validated)
       .eq('id', id)
+      .eq('created_by', userId)
       .select()
       .single();
 
     if (error) {
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Jam track not found',
+          },
+        });
+      }
+
       throw error;
     }
 
@@ -142,13 +183,37 @@ jamTrackRoutes.patch('/:id', authenticate, async (req, res, next) => {
 jamTrackRoutes.delete('/:id', authenticate, async (req, res, next) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required',
+        },
+      });
+    }
 
     const { error } = await supabase
       .from('jam_tracks')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('created_by', userId)
+      .select()
+      .single();
 
     if (error) {
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Jam track not found',
+          },
+        });
+      }
+
       throw error;
     }
 

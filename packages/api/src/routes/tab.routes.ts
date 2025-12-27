@@ -12,7 +12,8 @@ tabRoutes.get('/riff/:riffId', async (req, res, next) => {
     const { data, error } = await supabase
       .from('tabs')
       .select('*')
-      .eq('riff_id', riffId);
+      .eq('riff_id', riffId)
+      .order('created_at', { ascending: true });
 
     if (error) {
       throw error;
@@ -99,15 +100,37 @@ tabRoutes.patch('/:id', authenticate, async (req, res, next) => {
   try {
     const validated = UpdateTabSchema.parse(req.body);
     const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required',
+        },
+      });
+    }
 
     const { data, error } = await supabase
       .from('tabs')
       .update(validated)
       .eq('id', id)
+      .eq('created_by', userId)
       .select()
       .single();
 
     if (error) {
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Tab not found',
+          },
+        });
+      }
+
       throw error;
     }
 
@@ -127,13 +150,37 @@ tabRoutes.patch('/:id', authenticate, async (req, res, next) => {
 tabRoutes.delete('/:id', authenticate, async (req, res, next) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required',
+        },
+      });
+    }
 
     const { error } = await supabase
       .from('tabs')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('created_by', userId)
+      .select()
+      .single();
 
     if (error) {
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Tab not found',
+          },
+        });
+      }
+
       throw error;
     }
 

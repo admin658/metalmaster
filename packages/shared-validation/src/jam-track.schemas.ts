@@ -55,7 +55,6 @@ export const JamSessionSchema = z.object({
 });
 
 export const CreateJamSessionSchema = z.object({
-  jam_track_id: z.string().uuid(),
   recording_url: z.string().url().optional(),
   duration_seconds: z.number().int().positive(),
   notes: z.string().max(2000).optional(),
