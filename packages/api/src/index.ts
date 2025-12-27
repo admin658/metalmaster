@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
-import path from 'path';
-
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+import './env';
 
 import express, { Request, Response } from 'express';
 import cors from 'cors';
@@ -59,8 +56,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Register Stripe webhook with raw body parser (must be before JSON parser)
-app.use('/api/billing/webhook', express.raw({ type: 'application/json' }), billingWebhook);
+// Register Stripe webhook route.
+app.use('/api/billing/webhook', billingWebhook);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));

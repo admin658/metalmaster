@@ -61,6 +61,7 @@ yarn install
 ```bash
 cp .env.local.example .env.local # update SUPABASE_URL, SUPABASE_ANON_KEY, NEXT_PUBLIC_API_URL=<your_api_url>
 ```
+`packages/api` prefers the repo-root `.env.local` (then `packages/api/.env.local`, then `packages/api/.env`).
 
 3) Build shared packages (when types/schemas change)
 ```bash

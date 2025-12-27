@@ -1,19 +1,31 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 import Stripe from 'stripe';
+import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const router = Router();
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-11-17' as any })
-  : null;
+let stripe: Stripe | null | undefined;
+let supabaseService: ReturnType<typeof createClient> | null | undefined;
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-// Service-role client to perform RLS-protected updates from the webhook path.
-const supabaseService =
-  supabaseUrl && supabaseServiceRoleKey
-    ? createClient(supabaseUrl, supabaseServiceRoleKey)
+function getStripe(): Stripe | null {
+  if (stripe !== undefined) return stripe;
+  stripe = process.env.STRIPE_SECRET_KEY
+    ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-11-17' as any })
     : null;
+  return stripe;
+}
+
+function getSupabaseService() {
+  if (supabaseService !== undefined) return supabaseService;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Service-role client to perform RLS-protected updates from the webhook path.
+  supabaseService =
+    supabaseUrl && supabaseServiceRoleKey
+      ? createClient(supabaseUrl, supabaseServiceRoleKey)
+      : null;
+  return supabaseService;
+}
 
 type SubscriptionStatus = 'free' | 'pro' | 'trial' | 'lifetime';
 
@@ -26,6 +38,7 @@ async function resolveUserId({
   customerId?: string | null;
   customerEmail?: string | null;
 }): Promise<{ userId: string | null; email: string | null }> {
+  const supabaseService = getSupabaseService();
   if (!supabaseService) return { userId: null, email: customerEmail ?? null };
 
   if (metadataUserId) {
@@ -46,6 +59,7 @@ async function resolveUserId({
 
   // Try resolving email from Stripe if we only have the customer id
   let email = customerEmail ?? null;
+  const stripe = getStripe();
   if (!email && customerId && stripe) {
     try {
       const customer = (await stripe.customers.retrieve(customerId)) as Stripe.Customer;
@@ -70,12 +84,14 @@ function subscriptionStatusFromStripe(status: Stripe.Subscription.Status): Subsc
   return 'free';
 }
 
-router.post('/webhook', async (req, res) => {
+router.post('/', express.raw({ type: 'application/json' }), async (req, res) => {
+  const stripe = getStripe();
   if (!stripe) {
     console.warn('Stripe webhook received but Stripe is not configured');
     return res.status(503).json({ error: 'Billing service not configured' });
   }
 
+  const supabaseService = getSupabaseService();
   if (!supabaseService) {
     console.error('Stripe webhook cannot run: missing SUPABASE_SERVICE_ROLE_KEY or SUPABASE_URL');
     return res.status(503).json({ error: 'Billing service misconfigured' });
@@ -90,14 +106,30 @@ router.post('/webhook', async (req, res) => {
   let event;
 
   try {
-    const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-    event = stripe.webhooks.constructEvent(
-      requestBody,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    // Stripe requires the raw request payload for signature verification.
+    const requestBody = Buffer.isBuffer(req.body)
+      ? req.body
+      : req.body instanceof Uint8Array
+      ? Buffer.from(req.body)
+      : typeof req.body === 'string'
+      ? req.body
+      : JSON.stringify(req.body);
+    event = stripe.webhooks.constructEvent(requestBody, sig, process.env.STRIPE_WEBHOOK_SECRET!);
     console.log(`✓ Webhook signature verified: ${event.type}`);
   } catch (err: any) {
+    if (process.env.NODE_ENV !== 'production') {
+      const bodyBuffer = Buffer.isBuffer(req.body)
+        ? req.body
+        : req.body instanceof Uint8Array
+        ? Buffer.from(req.body)
+        : Buffer.from(typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
+      const bodyHash = crypto.createHash('sha256').update(bodyBuffer).digest('hex');
+      console.error('Webhook signature debug:', {
+        bodyType: req.body?.constructor?.name ?? typeof req.body,
+        bodyLength: bodyBuffer.length,
+        bodyHash,
+      });
+    }
     console.error('Webhook signature error:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
