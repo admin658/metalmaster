@@ -1,6 +1,7 @@
 import express from 'express';
 import { supabase } from '../index';
 import { AuthRequestSchema, SignUpRequestSchema } from '@metalmaster/shared-validation';
+import { buildApiError } from '../middleware/error-handler';
 
 export const authRoutes = express.Router();
 
@@ -14,13 +15,7 @@ authRoutes.post('/login', async (req, res, next) => {
     });
 
     if (error) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'AUTH_ERROR',
-          message: error.message,
-        },
-      });
+      throw buildApiError(401, 'AUTH_ERROR', error.message);
     }
 
     res.json({
@@ -62,13 +57,7 @@ authRoutes.post('/signup', async (req, res, next) => {
     });
 
     if (error) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'SIGNUP_ERROR',
-          message: error.message,
-        },
-      });
+      throw buildApiError(400, 'SIGNUP_ERROR', error.message);
     }
 
     res.status(201).json({
@@ -94,13 +83,7 @@ authRoutes.post('/logout', async (req, res, next) => {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'LOGOUT_ERROR',
-          message: error.message,
-        },
-      });
+      throw buildApiError(400, 'LOGOUT_ERROR', error.message);
     }
 
     res.json({
@@ -124,13 +107,7 @@ authRoutes.post('/refresh', async (req, res, next) => {
     });
 
     if (error) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'REFRESH_ERROR',
-          message: error.message,
-        },
-      });
+      throw buildApiError(401, 'REFRESH_ERROR', error.message);
     }
 
     res.json({

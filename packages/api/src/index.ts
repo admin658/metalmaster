@@ -35,7 +35,13 @@ const envAllowedOrigins = (process.env.CORS_ORIGIN || '')
   .map(origin => origin.trim())
   .filter(Boolean);
 const allowAllOrigins = envAllowedOrigins.includes('*');
-const allowedOrigins = [...defaultAllowedOrigins, ...envAllowedOrigins];
+const allowedOriginSuffixes = envAllowedOrigins
+  .filter(origin => origin.startsWith('*.') || origin.startsWith('.'))
+  .map(origin => (origin.startsWith('*.') ? origin.slice(1) : origin));
+const allowedOrigins = [
+  ...defaultAllowedOrigins,
+  ...envAllowedOrigins.filter(origin => !origin.startsWith('*.') && !origin.startsWith('.') && origin !== '*'),
+];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -44,7 +50,7 @@ app.use(cors({
     const isAllowed =
       allowAllOrigins ||
       allowedOrigins.includes(origin) ||
-      origin.endsWith('.netlify.app');
+      allowedOriginSuffixes.some(suffix => origin.endsWith(suffix));
 
     return callback(null, isAllowed);
   },

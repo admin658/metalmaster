@@ -6,6 +6,13 @@ export interface ApiError extends Error {
   code?: string;
 }
 
+export const buildApiError = (statusCode: number, code: string, message: string) => {
+  const error = new Error(message) as ApiError;
+  error.statusCode = statusCode;
+  error.code = code;
+  return error;
+};
+
 export const errorHandler = (err: ApiError, req: Request, res: Response, next: NextFunction) => {
   const statusCode = err.statusCode || 500;
   const code = err.code || 'INTERNAL_SERVER_ERROR';

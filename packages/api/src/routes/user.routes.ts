@@ -2,6 +2,7 @@ import express from 'express';
 import { supabase } from '../index';
 import { authenticate } from '../middleware/auth';
 import { UpdateUserProfileSchema } from '@metalmaster/shared-validation';
+import { buildApiError } from '../middleware/error-handler';
 
 export const userRoutes = express.Router();
 
@@ -16,13 +17,7 @@ userRoutes.get('/profile', authenticate, async (req, res, next) => {
       .single();
 
     if (error) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'NOT_FOUND',
-          message: 'User not found',
-        },
-      });
+      throw buildApiError(404, 'NOT_FOUND', 'User not found');
     }
 
     res.json({
@@ -51,13 +46,7 @@ userRoutes.patch('/profile', authenticate, async (req, res, next) => {
       .single();
 
     if (error) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'UPDATE_ERROR',
-          message: error.message,
-        },
-      });
+      throw buildApiError(400, 'UPDATE_ERROR', error.message);
     }
 
     res.json({
@@ -84,13 +73,7 @@ userRoutes.get('/:id', async (req, res, next) => {
       .single();
 
     if (error) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'NOT_FOUND',
-          message: 'User not found',
-        },
-      });
+      throw buildApiError(404, 'NOT_FOUND', 'User not found');
     }
 
     res.json({

@@ -2,11 +2,11 @@ import express, { Request, Response, NextFunction } from 'express';
 import { supabase } from '../index';
 import { authenticate } from '../middleware/auth';
 import { z } from 'zod';
+import { buildApiError } from '../middleware/error-handler';
 
 export const progressRoutes = express.Router();
 
 const ProgressUpdateSchema = z.object({
-  user_id: z.string().uuid(),
   lesson_id: z.string().uuid().optional(),
   riff_id: z.string().uuid().optional(),
   progress: z.number().min(0).max(100),
@@ -16,13 +16,14 @@ const ProgressUpdateSchema = z.object({
 progressRoutes.post('/update', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = ProgressUpdateSchema.parse(req.body);
+    const userId = req.user!.id;
     let result;
     if (validated.lesson_id) {
       // Update lesson progress
       const { data, error } = await supabase
         .from('lesson_progress')
         .upsert({
-          user_id: validated.user_id,
+          user_id: userId,
           lesson_id: validated.lesson_id,
           progress: validated.progress,
           completed: validated.completed,
@@ -37,7 +38,7 @@ progressRoutes.post('/update', authenticate, async (req: Request, res: Response,
       const { data, error } = await supabase
         .from('riff_progress')
         .upsert({
-          user_id: validated.user_id,
+          user_id: userId,
           riff_id: validated.riff_id,
           progress: validated.progress,
           completed: validated.completed,
@@ -48,13 +49,7 @@ progressRoutes.post('/update', authenticate, async (req: Request, res: Response,
       if (error) throw error;
       result = data;
     } else {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_REQUEST',
-          message: 'Must provide lesson_id or riff_id',
-        },
-      });
+      throw buildApiError(400, 'INVALID_REQUEST', 'Must provide lesson_id or riff_id');
     }
     res.json({
       success: true,

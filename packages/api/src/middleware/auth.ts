@@ -14,7 +14,9 @@ declare global {
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.headers.authorization?.split('Bearer ')[1];
+    const authHeader = req.headers.authorization;
+    const tokenMatch = authHeader?.match(/^Bearer\s+(.+)$/i);
+    const token = tokenMatch?.[1]?.trim();
     
     if (!token) {
       return res.status(401).json({

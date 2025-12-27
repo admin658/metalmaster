@@ -153,6 +153,11 @@ SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 CORS_ORIGIN=http://localhost:3000
+#
+# Comma-separated list. Supports exact origins and optional suffix patterns.
+# Examples:
+# CORS_ORIGIN=http://localhost:3000,https://app.example.com
+# CORS_ORIGIN=*.netlify.app,https://staging.example.com
 
 JWT_SECRET=your-jwt-secret-key
 SESSION_SECRET=your-session-secret-key
