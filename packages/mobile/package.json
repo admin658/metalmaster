@@ -8,7 +8,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build": "expo build"
+    "build": "expo build",
+    "type-check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@babel/core": "^7.28.5",

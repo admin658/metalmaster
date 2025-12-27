@@ -2,8 +2,6 @@
 -- Metal Master: Seed level curve config as JSONB
 -- Generated: 2025-12-18
 
-begin;
-
 -- Create a simple config table if you don't already have one.
 -- If you already have system_config/config tables, migrate accordingly.
 create table if not exists system_config (
@@ -22,5 +20,3 @@ values (
 on conflict (key) do update set
   value = excluded.value,
   updated_at = excluded.updated_at;
-
-commit;

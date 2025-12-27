@@ -6,6 +6,7 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
+    "type-check": "tsc -p tsconfig.json --noEmit",
     "lint": "next lint",
     "generate:tab-demos": "node scripts/generate-tab-demos.js"
   },

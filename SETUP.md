@@ -122,17 +122,19 @@ CREATE TABLE jam_sessions (
 
 ## Step 3: Environment Configuration
 
-### Root .env
-Create `.env` in the project root:
+### Root .env.local
+Copy `.env.local.example` to `.env.local` in the project root, then add any additional keys you need:
 ```
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
+# Base template
+NEXT_PUBLIC_API_URL=/api
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
+# Server-only (optional)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Mobile (optional)
 REACT_APP_API_URL=http://localhost:3000/api
 REACT_APP_SUPABASE_URL=https://your-project.supabase.co
 REACT_APP_SUPABASE_ANON_KEY=your-anon-key

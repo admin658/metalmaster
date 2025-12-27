@@ -330,11 +330,11 @@ export function useAlphaTab({ mountEl, scrollEl, state, dispatch, scoreUrl, trac
           return [];
         }
       },
-      setOutput(id: string | null) {
+      async setOutput(device: alphaTab.synth.ISynthOutputDevice | null) {
         const api = apiRef.current as any;
         if (!api || typeof api.setOutputDevice !== "function") return;
         try {
-          api.setOutputDevice(id);
+          await api.setOutputDevice(device ?? null);
         } catch (err) {
           console.error("[AlphaTab] setOutputDevice error", err);
         }

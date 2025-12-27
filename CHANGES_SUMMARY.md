@@ -1,2 +1,3 @@
-# Consolidated
-This file is now consolidated into `KNOWLEDGE_BASE.md`. Please update that single source of truth instead.
+# Deprecated
+
+This summary is deprecated. Use `KNOWLEDGE_BASE.md` as the single source of truth.

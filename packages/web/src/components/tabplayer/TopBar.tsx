@@ -1,6 +1,7 @@
 "use client";
 
 import { type MouseEvent, useCallback, useEffect, useState } from "react";
+import type * as alphaTab from "@coderline/alphatab";
 import { useAlphaTabControllerOptional } from "./AlphaTabContext";
 import type { PlayerState } from "./types";
 
@@ -18,7 +19,9 @@ function formatTime(sec: number) {
 export default function TopBar({ state, dispatch }: Props) {
   const progress = state.durationSeconds > 0 ? state.positionSeconds / state.durationSeconds : 0;
   const alpha = useAlphaTabControllerOptional();
-  const [outputs, setOutputs] = useState<Array<{ id: string; name: string }>>([]);
+  const [outputs, setOutputs] = useState<
+    Array<{ id: string; name: string; device: alphaTab.synth.ISynthOutputDevice }>
+  >([]);
   const [outputId, setOutputId] = useState<string | "">("");
   const [outputsLoading, setOutputsLoading] = useState(false);
 
@@ -32,14 +35,14 @@ export default function TopBar({ state, dispatch }: Props) {
     else dispatch({ type: "SEEK", seconds: target });
   };
 
-  const normalizeOutputs = (list: any[]) => {
+  const normalizeOutputs = (list: alphaTab.synth.ISynthOutputDevice[]) => {
     const seen = new Set<string>();
     return (list || [])
       .map((o) => {
-        const rawId = o?.id ?? o?.identifier ?? o?.outputId ?? "";
+        const rawId = o?.deviceId ?? (o as any)?.id ?? (o as any)?.identifier ?? (o as any)?.outputId ?? "";
         const id = rawId ? String(rawId) : "";
-        const name = o?.name || o?.description || o?.label || "MIDI Device";
-        return { id, name };
+        const name = o?.label || (o as any)?.name || (o as any)?.description || "MIDI Device";
+        return { id, name, device: o };
       })
       .filter((o) => {
         if (!o.id) return false; // ignore devices that don't report an id
@@ -150,7 +153,8 @@ export default function TopBar({ state, dispatch }: Props) {
                 onChange={(e) => {
                   const next = e.target.value;
                   setOutputId(next);
-                  alpha?.setOutput?.(next || null);
+                  const selected = outputs.find((o) => o.id === next)?.device ?? null;
+                  alpha?.setOutput?.(selected);
                 }}
               >
                 <option value="">Default (Browser Synth)</option>

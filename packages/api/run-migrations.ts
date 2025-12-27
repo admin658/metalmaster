@@ -16,16 +16,21 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function runMigrations() {
-  const migrations = [
-    'db/migrations/001_base_schema.sql',
-    'db/migrations/002_feature_tables.sql',
-    'db/migrations/003_practice_sessions_autosave.sql',
-  ];
+  const migrationsDir = path.resolve(process.cwd(), 'db/migrations');
+  const migrations = fs
+    .readdirSync(migrationsDir)
+    .filter((file) => file.endsWith('.sql'))
+    .sort();
+
+  if (migrations.length === 0) {
+    console.error(`No migrations found in ${migrationsDir}`);
+    process.exit(1);
+  }
 
   for (const migration of migrations) {
-    const filePath = path.join(__dirname, migration);
+    const filePath = path.join(migrationsDir, migration);
     console.log(`Running migration: ${migration}`);
-    
+
     try {
       const sql = fs.readFileSync(filePath, 'utf-8');
       const { error } = await supabase.rpc('exec', { sql });
@@ -33,7 +38,7 @@ async function runMigrations() {
       if (error) {
         console.error(`Error in ${migration}:`, error.message);
       } else {
-        console.log(`✅ ${migration} completed`);
+        console.log(`OK: ${migration} completed`);
       }
     } catch (err) {
       console.error(`Error reading ${migration}:`, err instanceof Error ? err.message : err);

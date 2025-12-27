@@ -41,6 +41,11 @@ metal-master/
 - Default dev port: **3000** (API is served from the same Next instance at `/api`).
  - Tab Player extras: backing track preload for demo tabs, count-in control, learn-mode auto-slowdown on loop wrap, track selection, and synced 2D/3D highways (3D instanced, mobile-disabled).
 
+## API Surface (Next.js/Netlify vs Express)
+- **Next.js `/api` + Netlify Functions**: primary API surface when running `packages/web`; deploys with the web app (Netlify Functions or Next server).
+- **`packages/api` (Express)**: standalone Node/Express API you can run/deploy separately; point `NEXT_PUBLIC_API_URL` at it if you want the clients to use it.
+- **Python audio analysis**: optional ML/audio endpoints in `packages/api` (e.g., `ai_feedback_api.py`) can be run as a separate FastAPI service.
+
 ### Mobile (packages/mobile)
 - Expo app with practice, riffs/tabs, and auth.
 
@@ -54,7 +59,7 @@ yarn install
 
 2) Env
 ```bash
-cp .env .env.local # update SUPABASE_URL, SUPABASE_ANON_KEY, NEXT_PUBLIC_API_URL=<your_api_url>
+cp .env.local.example .env.local # update SUPABASE_URL, SUPABASE_ANON_KEY, NEXT_PUBLIC_API_URL=<your_api_url>
 ```
 
 3) Build shared packages (when types/schemas change)

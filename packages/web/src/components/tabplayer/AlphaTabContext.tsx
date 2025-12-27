@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useMemo, useRef } from "react";
+import type * as alphaTab from "@coderline/alphatab";
 
 export type AlphaTabControls = {
   playToggle: () => void;
@@ -14,7 +15,7 @@ export type AlphaTabControls = {
 
   // MIDI output
   enumerateOutputs?: () => Promise<any[] | undefined>;
-  setOutput?: (id: string | null) => void;
+  setOutput?: (device: alphaTab.synth.ISynthOutputDevice | null) => void;
 };
 
 type AlphaTabCtx = {

@@ -1,8 +1,25 @@
 # MetalMaster API (packages/api)
 
-This package provides a small FastAPI-based audio analysis API used by the MetalMaster project. It contains endpoints for generating ML-backed feedback and an onset/tempo analysis route.
+This package contains two API surfaces:
+- **Node/Express API (TypeScript)**: the main platform backend (`src/index.ts`) with `/api/*` routes.
+- **Python audio analysis API (FastAPI)**: optional ML/audio endpoints (e.g., `ai_feedback_api.py`) used for feedback and analysis.
 
-## Endpoints
+## Express API (Node/TypeScript)
+
+Run the Express server from the `packages/api` directory:
+
+```powershell
+cd f:\metalmaster\packages\api
+yarn dev
+```
+
+The server exposes `/api/*` routes (auth, lessons, riffs, tabs, progress, billing, etc.) and `GET /health`.
+
+## Audio Analysis API (Python/FastAPI)
+
+These endpoints are served by the optional FastAPI app (`ai_feedback_api.py`).
+
+### Endpoints
 
 - `POST /feedback`
   - Description: Runs the project's feedback analysis pipeline (dummy ML models in the repo) and returns a structured feedback response.
@@ -17,7 +34,7 @@ This package provides a small FastAPI-based audio analysis API used by the Metal
     - `timing_accuracy`: a 0..1 metric where 1.0 indicates very consistent inter-onset intervals
     - `onset_times`: object containing `onsets`, a list of onset timestamps in seconds
 
-## Requirements
+## Requirements (Python)
 
 Python dependencies are listed in `requirements.txt`. Key packages:
 
@@ -40,7 +57,7 @@ If `py -3` is not available, use the appropriate Python 3 executable on your sys
 
 Note: `librosa` requires `soundfile` (and system libs) to read some audio formats. Installing via `pip` from `requirements.txt` will typically pull the needed packages; on some systems you may need OS-level packages for `libsndfile`.
 
-## Run the API (development)
+## Run the Audio Analysis API (development)
 
 From the `packages/api` directory run:
 

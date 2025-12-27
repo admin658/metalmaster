@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, develop ]
 
 jobs:
   build:
@@ -16,15 +16,15 @@ jobs:
         with:
           node-version: 20
           cache: 'yarn'
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install
         run: yarn install --frozen-lockfile
       - name: Typecheck
-        run: yarn type-check
-      - name: Build packages
-        run: |
-          yarn workspace @metalmaster/shared-types build || true
-          yarn workspace @metalmaster/shared-validation build || true
-          yarn workspace @metalmaster/api build || true
-          yarn workspace @metalmaster/web build || true
-      - name: Run lint
-        run: yarn lint || true
+        run: yarn type-check:all
+      - name: Lint
+        run: yarn lint:all
+      - name: Build
+        run: yarn build:all
+      - name: Test
+        run: yarn test:all
