@@ -79,6 +79,36 @@ const localJamTracks: JamTrack[] = [
     description: 'Backing track from the jam library.',
     audio_url: '/jam/jam4.mp3',
   },
+  {
+    id: 'jam5',
+    title: 'Jam Track 5',
+    description: 'Backing track from the jam library.',
+    audio_url: '/jam/jam5.mp3',
+  },
+  {
+    id: 'jam6',
+    title: 'Jam Track 6',
+    description: 'Backing track from the jam library.',
+    audio_url: '/jam/jam6.mp3',
+  },
+  {
+    id: 'jam7',
+    title: 'Jam Track 7',
+    description: 'Backing track from the jam library.',
+    audio_url: '/jam/jam7.mp3',
+  },
+  {
+    id: 'jam8',
+    title: 'Jam Track 8',
+    description: 'Backing track from the jam library.',
+    audio_url: '/jam/jam8.mp3',
+  },
+  {
+    id: 'jam9',
+    title: 'Jam Track 9',
+    description: 'Backing track from the jam library.',
+    audio_url: '/jam/jam9.mp3',
+  },
 ];
 
 export function useLessons() {

@@ -6,6 +6,38 @@ import type { SpeedTrainerSession } from '@metalmaster/shared-validation';
 
 export const speedTrainerRoutes = express.Router();
 
+const MS_IN_DAY = 24 * 60 * 60 * 1000;
+
+const average = (values: number[]) =>
+  values.length === 0 ? 0 : values.reduce((sum, value) => sum + value, 0) / values.length;
+
+const calculateImprovementTrend = (sessions: SpeedTrainerSession[]) => {
+  const now = new Date();
+  const last7Start = new Date(now.getTime() - 7 * MS_IN_DAY);
+  const prev7Start = new Date(now.getTime() - 14 * MS_IN_DAY);
+
+  const last7Bpms = sessions
+    .filter((session) => new Date(session.created_at) >= last7Start)
+    .map((session) => session.current_bpm);
+
+  const prev7Bpms = sessions
+    .filter((session) => {
+      const createdAt = new Date(session.created_at);
+      return createdAt >= prev7Start && createdAt < last7Start;
+    })
+    .map((session) => session.current_bpm);
+
+  const last7Avg = average(last7Bpms);
+  const prev7Avg = average(prev7Bpms);
+
+  if (prev7Avg === 0) {
+    return 0;
+  }
+
+  const trend = ((last7Avg - prev7Avg) / prev7Avg) * 100;
+  return Math.round(trend * 100) / 100;
+};
+
 // Get user's speed trainer sessions with pagination
 speedTrainerRoutes.get('/', authenticate, async (req, res, next) => {
   try {
@@ -228,7 +260,7 @@ speedTrainerRoutes.get('/progress/stats', authenticate, async (req, res, next) =
         average_bpm: average,
         total_sessions: sessions.length,
         last_session_date: sessions[0].created_at,
-        improvement_trend: 0, // TODO: Calculate 7-day improvement
+        improvement_trend: calculateImprovementTrend(sessions),
       };
     });
 

@@ -25,6 +25,11 @@ jobs:
       - name: Lint
         run: yarn lint:all
       - name: Build
-        run: yarn build:all
+        run: yarn build
+      - name: Mobile Build (EAS)
+        if: ${{ secrets.EXPO_TOKEN != '' }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: yarn workspace @metalmaster/mobile build:ci
       - name: Test
         run: yarn test:all

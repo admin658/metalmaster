@@ -137,6 +137,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 # Server-only (optional)
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+AUDIO_ANALYSIS_ENABLED=false
 
 # Mobile (optional)
 REACT_APP_API_URL=http://localhost:3000/api
@@ -153,6 +154,9 @@ PORT=3000
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+#
+# Set to true to enable the audio analysis FastAPI endpoints.
+AUDIO_ANALYSIS_ENABLED=false
 
 CORS_ORIGIN=http://localhost:3000
 #

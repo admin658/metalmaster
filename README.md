@@ -113,6 +113,9 @@ yarn workspace @metalmaster/web dev      # http://localhost:3000 (serves API at 
 yarn test
 ```
 
+## Repo Search
+- `packages/web/public/alphatab/` is a vendored bundle; `.rgignore` excludes it to reduce TODO noise in `rg` scans.
+
 ## Admin Ops (Supabase)
 - Use service_role in Supabase SQL editor for admin changes.
 - Example: grant all achievements and set XP/level for a user by email:
@@ -140,3 +143,10 @@ MIT
 - New industrial homepage, hero console, and navigation/header matching the metal theme.
 - Redesigned login page with two-panel session snapshot and upgraded form styling.
 - Netlify Functions API layer added (`health`, `secure-example`) plus typed `apiClient` for function calls.
+- Jam Deck expanded with nine bundled jam tracks under `packages/web/public/jam`.
+- Added `AGENTS.md` with repo-specific guidance for automated coding agents.
+
+## Repo Snapshot (Dec 2025)
+- Stack versions: Next.js 16 + React 19 (web), Express 5 (API), Expo SDK 54 (mobile), Supabase JS 2.x, Stripe 20.
+- DB migrations extend through `008_exec_rpc.sql`, including level curve seeding, webhook events audit, and practice session summaries.
+- Netlify config uses Next.js plugin with functions under `netlify/functions` and a dev proxy to port 3000.

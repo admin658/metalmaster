@@ -20,9 +20,16 @@ export default function JamPage() {
             Choose a key, set your tempo, and jam with tight metal backings.
           </p>
         </div>
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-gray-100">
-          Loop • Slowdown • Record
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          {!loading && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-gray-100">
+              {jamTracks.length} tracks live
+            </span>
+          )}
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-gray-100">
+            Loop &gt; Slowdown &gt; Record
+          </span>
+        </div>
       </header>
 
       {loading ? (

@@ -18,7 +18,8 @@
   "scripts": {
     "dev": "concurrently \"yarn workspace @metalmaster/web dev\" \"yarn workspace @metalmaster/mobile start\"",
     "build": "yarn workspace @metalmaster/shared-types build && yarn workspace @metalmaster/shared-validation build && yarn workspace @metalmaster/api build && yarn workspace @metalmaster/web build",
-    "build:all": "yarn workspaces foreach -p -R -t run build",
+    "build:all": "yarn workspaces foreach -p -R -t --exclude @metalmaster/mobile run build",
+    "build:mobile": "yarn workspace @metalmaster/mobile build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:all": "yarn workspaces foreach -p -A run lint --max-warnings 0 --if-present",
     "type-check": "tsc --noEmit",

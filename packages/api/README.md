@@ -44,7 +44,9 @@ Python dependencies are listed in `requirements.txt`. Key packages:
 - `torch` - used by example/dummy models in the package
 - `python-multipart` - for file uploads
 
-Install in a virtual environment (recommended):
+Install in a virtual environment (recommended). If you need `basic_pitch`, use
+Python 3.10; its TensorFlow dependency does not support newer Python versions
+on Windows.
 
 ```powershell
 cd f:\metalmaster\packages\api
@@ -52,6 +54,19 @@ py -3 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
+
+Python 3.10 setup for `basic_pitch` (recommended for `/generate-tab` use):
+
+```powershell
+cd f:\metalmaster\packages\api
+py -3.10 -m venv ..\.venv_basic_pitch
+..\.venv_basic_pitch\Scripts\Activate.ps1
+pip install basic_pitch
+```
+
+If you only need the FastAPI analysis endpoints, you can install without
+`basic_pitch`/`torch` by removing them from `requirements.txt` or using a
+filtered requirements file.
 
 If `py -3` is not available, use the appropriate Python 3 executable on your system.
 
