@@ -14,6 +14,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
+      "@metalmaster/shared": ["packages/shared/src"],
       "@metalmaster/shared-types": ["packages/shared-types/src"],
       "@metalmaster/shared-validation": ["packages/shared-validation/src"]
     }

@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   transpilePackages: [
+    '@metalmaster/shared',
     '@metalmaster/shared-validation',
     '@metalmaster/shared-types',
     '@metalmaster/shared-schemas',

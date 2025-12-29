@@ -47,6 +47,8 @@ ldocs/
 lending docs/
 metalmaster-video-pipeline/
 venv/
+.venv_audio/
+.venv_basic_pitch/
 REPLACEMENTS.TXT
 .prettierignore
 .prettierrc

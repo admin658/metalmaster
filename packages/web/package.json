@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@coderline/alphatab": "1.6.3",
+    "@metalmaster/shared": "workspace:*",
     "@metalmaster/shared-types": "workspace:*",
     "@metalmaster/shared-validation": "workspace:*",
     "@react-three/drei": "^10.7.7",
@@ -19,6 +20,7 @@
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.38.0",
     "next": "^16.0.7",
+    "node-wav": "^0.0.2",
     "openai": "^6.9.1",
     "react": "^19.2.1",
     "react-calendar-heatmap": "^1.9.0",
@@ -33,6 +35,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
+    "@types/node-wav": "^0.0.3",
     "@types/node": "^24.10.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

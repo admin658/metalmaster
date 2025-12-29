@@ -145,6 +145,7 @@ MIT
 - Netlify Functions API layer added (`health`, `secure-example`) plus typed `apiClient` for function calls.
 - Jam Deck expanded with nine bundled jam tracks under `packages/web/public/jam`.
 - Added `AGENTS.md` with repo-specific guidance for automated coding agents.
+- Added grading pipeline: shared grading package, `/api/grading` route with WAV decode, grading lab UI at `/grading`, and mobile grading client helper.
 
 ## Repo Snapshot (Dec 2025)
 - Stack versions: Next.js 16 + React 19 (web), Express 5 (API), Expo SDK 54 (mobile), Supabase JS 2.x, Stripe 20.

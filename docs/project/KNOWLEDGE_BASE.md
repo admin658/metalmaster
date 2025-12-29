@@ -10,6 +10,7 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Guitar grading engine added: `packages/web/src/audio/grading.ts` aligns expected vs played notes with timing/pitch tolerances, coverage, jitter, bias, and overall grade; `GuitarFeedbackEngine` now captures played notes and returns a `GradeSummary`, and `RiffEvaluationResult` surfaces grade/pitch/timing metrics plus miss/extra counts.
 - Jam Deck bundled tracks expanded to nine local MP3s (`packages/web/public/jam`) with fallback entries in `packages/web/src/hooks/useMetalMasterHooks.ts`.
 - Added repo-specific agent guidance in `AGENTS.md` (update surfaces, jam track rules, and common paths).
+- Shared grading package and API flow added: `@metalmaster/shared` grading types/scoring, `/api/grading` WAV intake, `/grading` lab UI with timing heatmap, and mobile grading client helper.
 
 ## Architecture & Workspaces
 - `packages/shared-types` / `shared-validation` / `shared-schemas` - Shared TypeScript models + Zod schemas.

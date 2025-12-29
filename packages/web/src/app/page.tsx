@@ -77,6 +77,13 @@ const tools = [
     Icon: TabIcon,
   },
   {
+    href: '/grading',
+    title: 'Grading Lab',
+    description: 'Upload a take and audit timing accuracy with heatmaps and flags.',
+    badge: 'New',
+    Icon: SpeedIcon,
+  },
+  {
     href: '/leaderboard',
     title: 'Leaderboard',
     description: 'Climb weekly XP, streak, and tone ladders to see where you stand.',
