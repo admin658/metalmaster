@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ vars.EXPO_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -27,9 +29,7 @@ jobs:
       - name: Build
         run: yarn build
       - name: Mobile Build (EAS)
-        if: ${{ secrets.EXPO_TOKEN != '' }}
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        if: ${{ env.EXPO_TOKEN != '' }}
         run: yarn workspace @metalmaster/mobile build:ci
       - name: Test
         run: yarn test:all
