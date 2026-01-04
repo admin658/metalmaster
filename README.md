@@ -2,6 +2,9 @@
 
 Metal guitar learning platform spanning API, web, and mobile clients. Built with TypeScript, Next.js (App Router), Supabase, and Netlify Functions for serverless endpoints, plus Expo for mobile.
 
+## Canonical Documentation
+The source of truth is `docs/project/KNOWLEDGE_BASE.md`. Other docs are secondary and may lag behind.
+
 ## Features
 - Lessons & Riffs library, guided path, and jam decks
 - Speed Trainer with BPM progression and practice logging

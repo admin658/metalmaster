@@ -19,16 +19,6 @@ services:
     depends_on:
       - db
 
-  api:
-    build:
-      context: ./packages/api
-    env_file:
-      - ./packages/api/.env.example
-    ports:
-      - '3000:3000'
-    depends_on:
-      - db
-
   web:
     build:
       context: ./packages/web
@@ -37,13 +27,13 @@ services:
     ports:
       - '3001:3000'
     depends_on:
-      - api
+      - db
 
 volumes:
   db-data:
 
 # Notes:
-# - This compose file provides a Postgres database and simple API/web containers.
+# - This compose file provides a Postgres database and the Next.js web app (API served at /api).
 # - Supabase services (auth, storage, realtime) are not provided here; you
 #   should point `SUPABASE_URL`/`SUPABASE_ANON_KEY` env vars to a Supabase
 #   project for auth features to work correctly.

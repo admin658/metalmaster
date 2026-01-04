@@ -8,8 +8,6 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    appDir = "packages/web"
 
 [dev]
   command = "yarn workspace @metalmaster/web dev"

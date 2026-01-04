@@ -1,5 +1,7 @@
 # Metal Master - Setup Guide
 
+Note: The canonical source of truth is `docs/project/KNOWLEDGE_BASE.md`. This guide focuses on setup steps and may omit recent changes.
+
 ## Prerequisites
 
 - **Node.js** 18.0.0 or higher

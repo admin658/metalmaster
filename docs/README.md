@@ -1,6 +1,9 @@
 # Documentation index
 
+Canonical source of truth: `docs/project/KNOWLEDGE_BASE.md`. Other docs are supporting references and may lag behind.
+
 Start here:
+- docs/project/KNOWLEDGE_BASE.md (canonical overview)
 - README.md (project overview)
 - SETUP.md (local setup)
 - docs/ARCHITECTURE.md (system architecture)
