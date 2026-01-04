@@ -1,6 +1,0 @@
-[submodule "docs/alphatab"]
-	path = docs/alphatab
-	url = https://github.com/CoderLine/alphaTabWebsite
-[submodule "vexflow"]
-	path = vexflow
-	url = https://github.com/0xfe/vexflow
