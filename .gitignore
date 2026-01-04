@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
-
+PLAN.md
+PATCH.diff
 # Build outputs
 dist/
 build/
