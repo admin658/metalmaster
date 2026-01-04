@@ -21,7 +21,7 @@
         "../../packages/shared-types/src"
       ],
       "@metalmaster/shared-validation": [
-        "../../packages/shared-validation/dist"
+        "../../packages/shared-validation/src"
       ]
     },
     "allowJs": true,

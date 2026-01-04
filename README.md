@@ -25,7 +25,7 @@ metal-master/
     web/                # Next.js app (App Router + API routes under /api + Netlify functions)
     mobile/             # Expo app
   package.json          # Workspaces
-  .env                  # Root env (NEXT_PUBLIC_API_URL, Supabase, Stripe)
+  .env.local.example    # Root env template (copy to .env.local)
 ```
 
 ## Architecture Highlights
@@ -63,6 +63,9 @@ yarn install
 2) Env
 ```bash
 cp .env.local.example .env.local # update SUPABASE_URL, SUPABASE_ANON_KEY, NEXT_PUBLIC_API_URL=<your_api_url>
+cp packages/web/.env.example packages/web/.env.local
+cp packages/api/.env.example packages/api/.env.local
+cp packages/mobile/.env.example packages/mobile/.env
 ```
 `packages/api` prefers the repo-root `.env.local` (then `packages/api/.env.local`, then `packages/api/.env`).
 

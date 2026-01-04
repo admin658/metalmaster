@@ -11,6 +11,7 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Jam Deck bundled tracks expanded to nine local MP3s (`packages/web/public/jam`) with fallback entries in `packages/web/src/hooks/useMetalMasterHooks.ts`.
 - Added repo-specific agent guidance in `AGENTS.md` (update surfaces, jam track rules, and common paths).
 - Shared grading package and API flow added: `@metalmaster/shared` grading types/scoring, `/api/grading` WAV intake, `/grading` lab UI with timing heatmap, and mobile grading client helper.
+- Build flow aligned for shared packages: root `tsconfig.json` uses project references, `build:shared` runs `tsc -b`, and Netlify builds shared packages before the Next.js web build.
 
 ## Architecture & Workspaces
 - `packages/shared-types` / `shared-validation` / `shared-schemas` - Shared TypeScript models + Zod schemas.

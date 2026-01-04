@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "declaration": true,
     "declarationMap": false,
+    "composite": true,
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,

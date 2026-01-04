@@ -1,5 +1,5 @@
 [build]
-  command = "corepack enable && yarn install --frozen-lockfile && yarn workspace @metalmaster/shared build && yarn workspace @metalmaster/shared-types build && yarn workspace @metalmaster/shared-validation build && yarn workspace @metalmaster/shared-schemas build && yarn workspace @metalmaster/web build"
+  command = "corepack enable && yarn install --frozen-lockfile && yarn build:shared && yarn workspace @metalmaster/web build"
   functions = "netlify/functions"
   targetPort = 3003
 [build.environment]

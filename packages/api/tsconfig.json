@@ -13,13 +13,19 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@metalmaster/shared-types": ["../../packages/shared-types/dist"],
-      "@metalmaster/shared-validation": ["../../packages/shared-validation/dist"]
+      "@metalmaster/shared-types": ["../../packages/shared-types/src"],
+      "@metalmaster/shared-validation": ["../../packages/shared-validation/src"],
+      "@metalmaster/shared-schemas": ["../../packages/shared-schemas/src"]
     },
     "outDir": "./dist",
     "rootDir": "./src",
     "noImplicitAny": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../shared-types" },
+    { "path": "../shared-validation" },
+    { "path": "../shared-schemas" }
+  ]
 }

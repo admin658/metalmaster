@@ -16,7 +16,15 @@
     "paths": {
       "@metalmaster/shared": ["packages/shared/src"],
       "@metalmaster/shared-types": ["packages/shared-types/src"],
-      "@metalmaster/shared-validation": ["packages/shared-validation/src"]
+      "@metalmaster/shared-validation": ["packages/shared-validation/src"],
+      "@metalmaster/shared-schemas": ["packages/shared-schemas/src"]
     }
-  }
+  },
+  "files": [],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "packages/shared-types" },
+    { "path": "packages/shared-validation" },
+    { "path": "packages/shared-schemas" }
+  ]
 }
