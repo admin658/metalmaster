@@ -3000,14 +3000,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metalmaster/alphatab@workspace:packages/web/src/components/alphatab":
-  version: 0.0.0-use.local
-  resolution: "@metalmaster/alphatab@workspace:packages/web/src/components/alphatab"
-  dependencies:
-    "@coderline/alphatab": "npm:1.6.3"
-  languageName: unknown
-  linkType: soft
-
 "@metalmaster/api@workspace:packages/api":
   version: 0.0.0-use.local
   resolution: "@metalmaster/api@workspace:packages/api"
