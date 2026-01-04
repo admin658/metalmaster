@@ -7,6 +7,7 @@ type JsonBody =
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const ENABLE_SECURE_EXAMPLE = process.env.ENABLE_SECURE_EXAMPLE === 'true';
 
 const json = (statusCode: number, body: JsonBody) => ({
   statusCode,
@@ -33,6 +34,10 @@ function getServiceRoleClient(): SupabaseClient | null {
 }
 
 export const handler: Handler = async (event) => {
+  if (!ENABLE_SECURE_EXAMPLE) {
+    return json(404, { ok: false, message: 'Not found' });
+  }
+
   if (event.httpMethod !== 'GET') {
     return json(405, { ok: false, message: 'Method not allowed' });
   }

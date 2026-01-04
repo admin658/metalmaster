@@ -10,7 +10,12 @@ export const dynamic = 'force-dynamic';
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-11-17.clover' })
   : null;
-const DOMAIN = process.env.APP_URL || 'http://localhost:3000';
+const DOMAIN =
+  process.env.APP_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  process.env.URL ||
+  process.env.DEPLOY_PRIME_URL ||
+  'http://localhost:3000';
 
 export async function POST(req: NextRequest) {
   try {
