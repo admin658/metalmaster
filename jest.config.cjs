@@ -8,7 +8,7 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).[tj]s?(x)'],
   transform: {
-    '^.+\\.[tj]sx?$': 'ts-jest',
+    '^.+\\.[tj]sx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.jest.json' }],
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/packages/web/src/$1',

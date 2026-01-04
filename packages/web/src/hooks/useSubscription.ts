@@ -1,6 +1,7 @@
 import type { ApiResponse, SubscriptionStatus, UserStats } from '@metalmaster/shared-types';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
+import { getApiBase } from '../lib/apiBase';
 
 export interface UseSubscriptionReturn {
   status: SubscriptionStatus;
@@ -23,14 +24,7 @@ export const useSubscription = (): UseSubscriptionReturn => {
   const [status, setStatus] = useState<SubscriptionStatus>('free');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const apiBase = useMemo(() => {
-    const env = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
-    if (env.startsWith('http') || env.startsWith('/')) return env;
-    if (typeof window !== 'undefined') {
-      return `${window.location.origin.replace(/\/$/, '')}/${env}`.replace(/\/{2,}/g, '/');
-    }
-    return `/${env}`.replace(/\/{2,}/g, '/');
-  }, []);
+  const apiBase = useMemo(() => getApiBase(), []);
   const withBase = useCallback((path: string) => `${apiBase}${path}`, [apiBase]);
   const [upgradePending, setUpgradePending] = useState(false);
   const [portalPending, setPortalPending] = useState(false);

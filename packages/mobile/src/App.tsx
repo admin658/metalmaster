@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import HomeScreen from './screens/HomeScreen';
 import LearnScreen from './screens/LearnScreen';
 import RiffsScreen from './screens/RiffsScreen';

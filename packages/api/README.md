@@ -19,6 +19,25 @@ The server exposes `/api/*` routes (auth, lessons, riffs, tabs, progress, billin
 
 These endpoints are served by the optional FastAPI app (`ai_feedback_api.py`).
 
+## Deployment Strategy (Python Services)
+
+The Python audio services are not deployed by Netlify and should run as a separate
+service from the Node/Express API. Recommended options:
+
+- **Containerized service (preferred):** build a small Docker image from
+  `packages/api`, expose `uvicorn ai_feedback_api:app`, and deploy to a container
+  host (Fly.io, Railway, ECS, Cloud Run). Configure a dedicated base URL (e.g.,
+  `AI_API_URL`) and route client calls there.
+- **VM/process manager:** run `uvicorn` under `systemd` or `pm2` on a VM with
+  an Nginx/Traefik reverse proxy. Use a health check route and restart policy.
+
+Key requirements:
+- Python runtime (3.10+), `requirements.txt` installed, and `AUDIO_ANALYSIS_ENABLED=true`.
+- Optional `basic_pitch` only for `/generate-tab`; keep it out of the default deploy
+  if you want a smaller image.
+- Network access from the web/mobile clients or the Node API; decide whether the
+  Node API proxies requests or clients call the Python service directly.
+
 ### Endpoints
 
 - `POST /feedback`

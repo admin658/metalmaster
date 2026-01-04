@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
+import { getApiBase } from '../lib/apiBase';
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000/api';
+const API_URL = getApiBase();
 
 interface UseApiOptions {
   skip?: boolean;
@@ -20,6 +20,9 @@ export const useApi = <T,>(endpoint: string, options: UseApiOptions = {}) => {
     setError(null);
 
     try {
+      if (!API_URL) {
+        throw new Error('API base URL is not set; configure EXPO_PUBLIC_API_URL.');
+      }
       const token = await getAuthToken();
       const response = await fetch(`${API_URL}${endpoint}`, {
         headers: {
@@ -58,6 +61,9 @@ export const useApiMutation = () => {
     method: 'POST' | 'PATCH' | 'DELETE' = 'POST',
     body?: Record<string, any>
   ): Promise<T> => {
+    if (!API_URL) {
+      throw new Error('API base URL is not set; configure EXPO_PUBLIC_API_URL.');
+    }
     const token = await getAuthToken();
     
     const response = await fetch(`${API_URL}${endpoint}`, {

@@ -1,8 +1,7 @@
-import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import { DailyRiff } from '@metalmaster/shared-types';
 
-dotenv.config();
+import '../env';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;

@@ -1,4 +1,6 @@
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+import { getApiBase } from './apiBase';
+
+const API_BASE = getApiBase();
 
 export class ApiClientError extends Error {
   status?: number;
@@ -19,6 +21,8 @@ export type ApiClientOptions = {
   headers?: Record<string, string>;
   body?: unknown;
 };
+
+type ApiFetchInit = Omit<RequestInit, 'headers' | 'body'> & ApiClientOptions;
 
 const resolveUrl = (path: string) => {
   if (/^https?:\/\//i.test(path)) return path;
@@ -85,7 +89,7 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 export async function apiFetch<T = unknown>(
   path: string,
-  init: ApiClientOptions & RequestInit = {}
+  init: ApiFetchInit = {}
 ): Promise<T> {
   const url = resolveUrl(path);
 

@@ -10,6 +10,9 @@ const EXPECTED_NOTES_PLACEHOLDER = `[
   { "time": 1000, "barNumber": 1 }
 ]`;
 
+const AI_API_BASE = process.env.NEXT_PUBLIC_AI_API_URL || "";
+const GRADING_URL = AI_API_BASE ? `${AI_API_BASE.replace(/\/$/, "")}/grading` : "/api/grading";
+
 export default function GradingPage() {
   const [file, setFile] = useState<File | null>(null);
   const [pieceId, setPieceId] = useState("");
@@ -50,7 +53,7 @@ export default function GradingPage() {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/grading", {
+      const response = await fetch(GRADING_URL, {
         method: "POST",
         body: formData,
       });

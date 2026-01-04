@@ -20,8 +20,14 @@ jobs:
           cache: 'yarn'
       - name: Enable Corepack
         run: corepack enable
+      - name: Use Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Install
         run: yarn install --frozen-lockfile
+      - name: Install Python deps
+        run: python -m pip install --upgrade pip && python -m pip install -r packages/api/requirements.txt
       - name: Typecheck
         run: yarn type-check:all
       - name: Lint
