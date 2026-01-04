@@ -3035,6 +3035,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.28.5"
     "@expo/vector-icons": "npm:^15.0.3"
+    "@metalmaster/shared": "workspace:*"
     "@react-native-community/cli-server-api": "npm:20.0.2"
     "@react-navigation/bottom-tabs": "npm:^6.5.0"
     "@react-navigation/native": "npm:^6.1.0"
@@ -3087,11 +3088,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@metalmaster/shared@workspace:*, @metalmaster/shared@workspace:packages/shared":
+  version: 0.0.0-use.local
+  resolution: "@metalmaster/shared@workspace:packages/shared"
+  languageName: unknown
+  linkType: soft
+
 "@metalmaster/web@workspace:packages/web":
   version: 0.0.0-use.local
   resolution: "@metalmaster/web@workspace:packages/web"
   dependencies:
     "@coderline/alphatab": "npm:1.6.3"
+    "@metalmaster/shared": "workspace:*"
     "@metalmaster/shared-types": "workspace:*"
     "@metalmaster/shared-validation": "workspace:*"
     "@react-three/drei": "npm:^10.7.7"
@@ -3100,11 +3108,13 @@ __metadata:
     "@supabase/supabase-js": "npm:^2.38.0"
     "@tailwindcss/postcss": "npm:^4.1.17"
     "@types/node": "npm:^24.10.1"
+    "@types/node-wav": "npm:^0.0.3"
     "@types/react": "npm:^19.0.0"
     "@types/react-dom": "npm:^19.0.0"
     "@types/three": "npm:^0"
     autoprefixer: "npm:^10.4.22"
     next: "npm:^16.0.7"
+    node-wav: "npm:^0.0.2"
     openai: "npm:^6.9.1"
     postcss: "npm:^8.5.6"
     react: "npm:^19.2.1"
@@ -4609,6 +4619,15 @@ __metadata:
   version: 5.1.2
   resolution: "@types/minimatch@npm:5.1.2"
   checksum: 10c0/83cf1c11748891b714e129de0585af4c55dd4c2cafb1f1d5233d79246e5e1e19d1b5ad9e8db449667b3ffa2b6c80125c429dbee1054e9efb45758dbc4e118562
+  languageName: node
+  linkType: hard
+
+"@types/node-wav@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "@types/node-wav@npm:0.0.3"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/7ca1829d89d55b34c478ee6977b01bbb9bfd0142d16a6ea36a6442c22dd2285f624fe76b3e4501f6bddcc1cb2bd919b7067906de2acff836aed5bbcc7f6564ea
   languageName: node
   linkType: hard
 
@@ -11886,6 +11905,13 @@ __metadata:
   version: 2.0.27
   resolution: "node-releases@npm:2.0.27"
   checksum: 10c0/f1e6583b7833ea81880627748d28a3a7ff5703d5409328c216ae57befbced10ce2c991bea86434e8ec39003bd017f70481e2e5f8c1f7e0a7663241f81d6e00e2
+  languageName: node
+  linkType: hard
+
+"node-wav@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "node-wav@npm:0.0.2"
+  checksum: 10c0/58be3f0c735d0c4c1ca14da011bd06fd6a43847542e3d82ffa2230a48c69875b5f4af33656271ba1729742e254a492a4a7cb87d94b537157878541cc0446e53f
   languageName: node
   linkType: hard
 
