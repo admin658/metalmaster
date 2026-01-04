@@ -181,7 +181,7 @@ function Get-KeyConfigSnippets {
 
     # Keep compact: first ~160 lines
     $lines = ($content -split "`r?`n")
-    $take = [Math]::Min($lines.Count, 160)
+    $take = [Math]::Min($lines.Count, 80)
     if ($take -le 0) { continue }
     $snippet = ($lines[0..($take-1)] -join "`n")
 
@@ -358,13 +358,21 @@ $goalText
 }
 
 # Run Gemini (positional prompt; no deprecated --prompt)
-Write-Info "Running Gemini..."
-$raw = & gemini $prompt
+Write-Info "Running Gemini (stdin)..."
+
+# Send prompt via stdin to avoid Windows command-line length limits
+try {
+  $raw = $prompt | & gemini
+} catch {
+  Write-Err "Gemini failed when reading prompt from stdin."
+  throw
+}
 
 if (-not $raw) {
   Write-Err "Gemini returned no output."
   exit 1
 }
+
 
 # Parse outputs
 $plan = Extract-Section $raw "---BEGIN PLAN---" "---END PLAN---"
