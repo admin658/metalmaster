@@ -1,8 +1,9 @@
 import useSWR from 'swr';
 import { useCallback, useState } from 'react';
 import type { Achievement, UserAchievement, AchievementProgress } from '@metalmaster/shared-types';
+import { getApiBase } from '../lib/apiBase';
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
+const API_URL = getApiBase();
 
 const fetcher = async (url: string, options?: RequestInit) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;

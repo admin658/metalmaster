@@ -67,13 +67,21 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Stack versions: Next.js 16 + React 19 (web), Express 5 (API), Supabase JS 2.x, Stripe 20, Expo SDK 54 (mobile), Node 20 (Netlify build).
 - Netlify config: `netlify.toml` wires Next.js build, functions path `netlify/functions`, and dev proxy to port 3000.
 
+## Deployment Notes
+- Netlify hosts the Next.js web app and Netlify Functions (`netlify/functions/*`).
+- Express API in `packages/api` is a separate service (Node process or container); clients should point `NEXT_PUBLIC_API_URL` / `EXPO_PUBLIC_API_URL` at its base URL (or Netlify app origin if proxying).
+- Python audio services (`ai_feedback_api.py`, `audio_analysis_service.py`) are a separate deployment (container or VM). Clients should use `NEXT_PUBLIC_AI_API_URL` / `EXPO_PUBLIC_AI_API_URL` to reach that service when enabled.
+- Decide whether the Express API proxies AI requests or clients call the AI service directly; document the chosen routing in release notes to avoid mismatched URLs.
+
 ## Mobile
 - Expo app (React Native 0.81 / Expo SDK 54) with tab playback, pitch detection, auth, and practice flows; Supabase creds supplied via `.env.example` (includes NEXT_PUBLIC_* fallbacks for web parity).
 - Screen groups: auth, home, jam-tracks, lessons, profile, riffs.
 
 ## Ports & Environment
 - Web dev: `http://localhost:3000`; API dev: `http://localhost:3001` (adjust `NEXT_PUBLIC_API_URL` as needed).
-- Env keys: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (for migrations + server routes), `SUPABASE_ANON_KEY` (client), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `OPENAI_API_KEY` (tone), `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PRO_MONTHLY`, `APP_URL`, `JWT_SECRET`/`SESSION_SECRET` for the API.
+- Env keys: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (for migrations + server routes), `SUPABASE_ANON_KEY` (client), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `OPENAI_API_KEY` (tone), `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PRO_MONTHLY`, `APP_URL`, `JWT_SECRET`/`SESSION_SECRET` for the API, plus `NEXT_PUBLIC_API_URL` / `EXPO_PUBLIC_API_URL` and `NEXT_PUBLIC_AI_API_URL` / `EXPO_PUBLIC_AI_API_URL` for client base URLs.
+- CORS: Express API uses `CORS_ORIGIN` (comma-separated list; supports wildcards). Ensure production origins include your Netlify domain and any custom domains.
+- Billing redirects: `APP_URL` must match the public web origin used for Stripe checkout/portal redirects.
 
 ## TODO / Known Gaps
 - `run-migrations.ts` depends on a Supabase RPC `exec(sql text)` helper; it is now defined in `008_exec_rpc.sql`. Ensure `service_role` is used when running migrations.

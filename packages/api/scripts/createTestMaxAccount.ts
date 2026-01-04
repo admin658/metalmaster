@@ -11,7 +11,7 @@
  * TEST_ACCOUNT_EMAIL, TEST_ACCOUNT_PASSWORD, TEST_ACCOUNT_USERNAME
  * TEST_ACCOUNT_STREAK_DAYS, TEST_ACCOUNT_TOTAL_XP
  */
-import 'dotenv/config';
+import '../src/env';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 

@@ -5,9 +5,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { achievementsArraySchema } from "@metalmaster/shared-schemas/achievements";
-
-// Load env
-import "dotenv/config";
+import "../src/env";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,

@@ -4,8 +4,11 @@
  */
 import type { PerformanceGradeResult } from "@metalmaster/shared";
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? "<YOUR_SERVER_URL>";
-const GRADING_API_URL = `${API_BASE.replace(/\/$/, "")}/api/grading`;
+const API_BASE =
+  process.env.EXPO_PUBLIC_AI_API_URL ||
+  process.env.EXPO_PUBLIC_API_URL ||
+  '';
+const GRADING_API_URL = API_BASE ? `${API_BASE.replace(/\/$/, '')}/grading` : '';
 
 /**
  * Uploads a recorded performance audio file to the server for grading.
@@ -17,6 +20,9 @@ export async function gradePerformanceRecording(
   fileUri: string,
   pieceId: string,
 ): Promise<PerformanceGradeResult> {
+  if (!GRADING_API_URL) {
+    throw new Error('EXPO_PUBLIC_AI_API_URL or EXPO_PUBLIC_API_URL is not set; cannot submit grading request.');
+  }
   // Prepare form data with the audio file and piece identifier
   const formData = new FormData();
   // Append audio file; on React Native/Expo, we provide the URI and file info

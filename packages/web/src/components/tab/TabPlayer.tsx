@@ -10,8 +10,9 @@ import TonePresetPanel from '../amp/TonePresetPanel';
 import { createFeedbackEngine, ExpectedNote, type GradeSummary } from '../../audio/GuitarFeedbackEngine';
 import RiffEvaluationResult from '../feedback/RiffEvaluationResult';
 import { completeRiffXP } from '../../lib/CompleteRiffXP';
+import { getApiBase } from '../../lib/apiBase';
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
+const API_URL = getApiBase();
 
 async function fetchUserAchievements(): Promise<{ id: string; name: string }[]> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;

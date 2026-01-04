@@ -3,8 +3,9 @@ import { Linking } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { useAuth } from './useAuth';
 import type { ApiResponse, SubscriptionStatus } from '@metalmaster/shared-types';
+import { getApiBase } from '../lib/apiBase';
 
-const API_URL = 'http://localhost:3000/api'; // Default or from env
+const API_URL = getApiBase();
 
 export interface UseSubscriptionReturn {
   status: SubscriptionStatus;
@@ -39,6 +40,9 @@ export const useSubscription = (): UseSubscriptionReturn => {
 
       try {
         setIsLoading(true);
+        if (!API_URL) {
+          throw new Error('API base URL is not set; configure EXPO_PUBLIC_API_URL.');
+        }
         const token = await SecureStore.getItemAsync('auth_token');
 
         if (!token) {
@@ -75,6 +79,9 @@ export const useSubscription = (): UseSubscriptionReturn => {
 
   const upgradeToPro = async () => {
     try {
+      if (!API_URL) {
+        throw new Error('API base URL is not set; configure EXPO_PUBLIC_API_URL.');
+      }
       const token = await SecureStore.getItemAsync('auth_token');
       if (!token) {
         setError('Not authenticated');
@@ -106,6 +113,9 @@ export const useSubscription = (): UseSubscriptionReturn => {
 
   const manageBilling = async () => {
     try {
+      if (!API_URL) {
+        throw new Error('API base URL is not set; configure EXPO_PUBLIC_API_URL.');
+      }
       const token = await SecureStore.getItemAsync('auth_token');
       if (!token) {
         setError('Not authenticated');

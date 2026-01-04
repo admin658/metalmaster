@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { getApiBase } from '@/lib/apiBase';
 
 export default function BillingSuccessPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -20,7 +21,7 @@ export default function BillingSuccessPage() {
         const token = localStorage.getItem('auth_token');
         if (!token) return;
 
-        const apiBase = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
+        const apiBase = getApiBase();
         const res = await fetch(`${apiBase}/user-stats`, {
           headers: {
             Authorization: `Bearer ${token}`,
