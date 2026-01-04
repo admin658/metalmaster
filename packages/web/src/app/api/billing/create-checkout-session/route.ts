@@ -11,7 +11,12 @@ const stripe = process.env.STRIPE_SECRET_KEY
   : null;
 
 const PRICE_PRO_MONTHLY = process.env.STRIPE_PRICE_PRO_MONTHLY;
-const DOMAIN = process.env.APP_URL || 'http://localhost:3000';
+const DOMAIN =
+  process.env.APP_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  process.env.URL ||
+  process.env.DEPLOY_PRIME_URL ||
+  'http://localhost:3000';
 
 export async function POST(req: NextRequest) {
   try {
