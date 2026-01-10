@@ -39,6 +39,7 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Styling: monochrome AlphaTab skin in `src/app/alphaTab.css`; global metal theme via `globals.css` + Geist fonts.
 - Tab Lab UI tweaks: transport bar is bottom-sticky; section bar adds PM/Accents/Fingering/Rhythm/Strings toggles plus a Std Notation toggle; MIDI Out dropdown enumerates AlphaTab output devices when available; AlphaTab scrolling centers the playhead; custom per-fret note coloring with default fallbacks keeps notation visible.
 - Grading UX: `GuitarFeedbackEngine` captures mic input and aligns against expected notes; `grading.ts` scores pitch/timing with jitter/coverage/bias; `RiffEvaluationResult` now displays grade, pitch vs timing accuracy, avg/median offsets, jitter, and miss/extra counts.
+- Grading API (`/api/grading`) currently supports PCM WAV uploads and requires `expectedNotes` JSON (pieceId lookup and WebM decoding are not implemented yet).
 - App pages: achievements, daily-riff, jam, leaderboard, learn, practice-history, pricing, profile, riffs, speed-trainer, stats, tab-player, tab-playground, auth (login/signup), plus billing and server utilities.
 
 ## API & Data

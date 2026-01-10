@@ -49,8 +49,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       // For WebM/Opus or other formats, we would need to use a decoder (e.g., ffmpeg or audio-decode library)
       // TODO: Implement WebM (Opus) decoding if needed (possibly using ffmpeg WASM or server-side ffmpeg).
       return NextResponse.json(
-        { error: "Unsupported audio format (only PCM WAV supported in MVP)" },
-        { status: 400 },
+        { error: "Unsupported audio format. Send PCM WAV until WebM decoding is implemented." },
+        { status: 415 },
       );
     }
 
@@ -64,12 +64,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (pieceId) {
       // TODO: Fetch expectedNotes and tempo from database (Supabase) or cache using the pieceId.
       // This could involve querying a table that stores note timings (and possibly tempo and time signatures).
-      // For now, we will assume this data is available. If not, we cannot proceed.
-      // Example (pseudo-code):
-      // const { data } = await supabase.from('SongNotes').select('time, barNumber').eq('pieceId', pieceId);
-      // expectedNotes = data;
-      // Also fetch tempo if stored: tempoBpm = (await supabase.from('Songs').select('bpm').eq('id', pieceId)).data?.[0]?.bpm;
-      return NextResponse.json({ error: "Expected note data not provided" }, { status: 400 });
+      // For now, require explicit expectedNotes for the grading API.
+      return NextResponse.json(
+        { error: "pieceId lookup not implemented. Provide expectedNotes JSON for now." },
+        { status: 501 },
+      );
     } else if (expectedNotesPayload) {
       try {
         const parsedNotes = JSON.parse(expectedNotesPayload) as ExpectedNote[];

@@ -8,10 +8,16 @@ build/
 .next/
 out/
 .expo/
+*.tsbuildinfo
 
 # Coverage
 coverage/
 .nyc_output/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
 
 # Logs
 *.log
