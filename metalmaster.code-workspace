@@ -4,5 +4,17 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"github.copilot.enable": {
+			"*": true
+		},
+		"typescript.tsdk": "node_modules/typescript/lib",
+		"files.associations": {
+			"*.tsx": "typescriptreact",
+			"*.ts": "typescript",
+			"*.md": "markdown"
+		},
+		"workbench.colorTheme": "Default Dark Modern",
+		"workbench.editor.highlightModifiedTabs": true
+	}
 }
