@@ -26,8 +26,10 @@ userStatsRoutes.get('/', authenticate, async (req, res, next) => {
       .eq('user_id', req.user!.id)
       .single();
 
-    if (error && error.code === 'PGRST116') {
-      // Create default stats for new user
+    // If no row exists for this user, create default stats.
+    // Some Supabase/PostgREST setups return an error code when no row
+    // is found; others return null data. Handle both safely.
+    if (!data) {
       const { data: newStats, error: createError } = await supabase
         .from('user_stats')
         .insert({

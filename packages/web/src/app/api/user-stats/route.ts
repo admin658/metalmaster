@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { requireUser } from '../_lib/auth';
-import { handleRouteError, success, failure } from '../_lib/responses';
+import { failure, handleRouteError, success } from '../_lib/responses';
 import { supabaseAdmin } from '../_lib/supabase';
 
 export const runtime = 'nodejs';
@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
       .select('*')
       .eq('user_id', user.id)
       .single();
-
     if (error && error.code === 'PGRST116') {
       // Ensure a corresponding user row exists (FK constraint)
       const writeClient = supabaseAdmin || supabase;
@@ -32,21 +31,19 @@ export async function GET(req: NextRequest) {
         throw userRowError;
       }
 
-      const { error: insertUserError } = await writeClient
-        .from('users')
-        .upsert(
-          {
-            id: user.id,
-            email: user.email,
-          },
-          { onConflict: 'id' },
-        );
+      const { error: insertUserError } = await writeClient.from('users').upsert(
+        {
+          id: user.id,
+          email: user.email,
+        },
+        { onConflict: 'id' }
+      );
       if (insertUserError && insertUserError.code !== '23505') {
         return failure(
           500,
           insertUserError.code || 'USER_INSERT_FAILED',
           insertUserError.message || 'Failed to insert user row',
-          insertUserError,
+          insertUserError
         );
       }
 
@@ -90,8 +87,39 @@ export async function GET(req: NextRequest) {
       }
       return success(newStats);
     }
-
+    // If there's an error reading via the user client, try to read via the
+    // service role admin client (bypass RLS). This helps dev setups where
+    // RLS policies aren't configured yet.
     if (error) {
+      if (supabaseAdmin) {
+        const { data: adminData, error: adminErr } = await supabaseAdmin
+          .from('user_stats')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (adminErr) {
+          // Fall back to an empty payload if admin read also fails
+          return success({
+            user_id: user.id,
+            total_xp: 0,
+            level: 1,
+            level_tier: 'Novice',
+            total_practice_minutes: 0,
+            total_lessons_completed: 0,
+            current_streak_days: 0,
+            longest_streak_days: 0,
+            accuracy_score: 0,
+            speed_score: 0,
+            rhythm_score: 0,
+            tone_knowledge_score: 0,
+            subscription_status: 'free',
+          });
+        }
+
+        if (adminData) return success(adminData);
+      }
+
       return success({
         user_id: user.id,
         total_xp: 0,

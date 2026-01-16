@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import type { ComponentType, ReactNode, SVGProps } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   AchievementsIcon,
   DailyIcon,
   HistoryIcon,
   JamIcon,
-  LearnIcon,
   LeaderboardIcon,
+  LearnIcon,
   LoginIcon,
   PricingIcon,
   ProfileIcon,
@@ -16,16 +17,62 @@ import {
   TabIcon,
 } from '../components/icons';
 
+function Splash() {
+  const [visible, setVisible] = useState(true);
+  const vidRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const v = vidRef.current;
+    if (!v) return;
+    const tryPlay = async () => {
+      try {
+        await v.play();
+      } catch (e) {
+        // autoplay may be blocked; remain visible but muted play tried
+      }
+    };
+    tryPlay();
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
+      aria-hidden={!visible}
+    >
+      <video
+        ref={vidRef}
+        src="/splash3.mp4"
+        className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl"
+        autoPlay
+        muted
+        playsInline
+        onEnded={() => setVisible(false)}
+      />
+      <button
+        onClick={() => setVisible(false)}
+        className="absolute top-6 right-6 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-white hover:bg-white/20"
+        aria-label="Skip splash"
+      >
+        Skip
+      </button>
+    </div>
+  );
+}
+
 const pillars = [
   {
     title: 'Precision Engine',
-    description: 'Tempo ramps, subdivision honesty, and instant loop recall built for downpick discipline.',
+    description:
+      'Tempo ramps, subdivision honesty, and instant loop recall built for downpick discipline.',
     metric: 'Ramp 140 -> 180 BPM',
     Icon: SpeedIcon,
   },
   {
     title: 'Sound + Feel',
-    description: 'Jam decks with gain-stacked backings so your phrasing and pocket get tested, not hidden.',
+    description:
+      'Jam decks with gain-stacked backings so your phrasing and pocket get tested, not hidden.',
     metric: 'Live tone notes',
     Icon: JamIcon,
   },
@@ -165,6 +212,7 @@ const accountLinks = [
 export default function HomePage() {
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-[#0b0c10] via-[#0f1117] to-black text-white">
+      <Splash />
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-10 top-10 h-64 w-64 rounded-full bg-gradient-to-br from-metal-accent/25 via-orange-500/15 to-amber-400/10 blur-3xl" />
         <div className="absolute right-[-4rem] top-24 h-72 w-72 rounded-full bg-gradient-to-br from-slate-500/15 via-slate-800/30 to-black blur-3xl" />
@@ -197,7 +245,8 @@ function Hero() {
             Prove every rep.
           </h1>
           <p className="text-lg text-gray-200 max-w-2xl leading-relaxed">
-            Metal Master is an industrial-grade practice bunker: guided tracks, speed ramps, tab lab, and logs that show you the truth about your tempo and feel.
+            Metal Master is an industrial-grade practice bunker: guided tracks, speed ramps, tab
+            lab, and logs that show you the truth about your tempo and feel.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -214,14 +263,16 @@ function Hero() {
           <Metric label="Session tag" value="Downpick endurance" />
         </div>
         <div className="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-200">
-          {['Downpicks only', '16th-note triplets', 'Noise gate tight', 'Pick attack +6dB'].map((chip) => (
-            <span
-              key={chip}
-              className="rounded-full border border-amber-200/40 bg-amber-200/10 px-3 py-1 text-amber-100"
-            >
-              {chip}
-            </span>
-          ))}
+          {['Downpicks only', '16th-note triplets', 'Noise gate tight', 'Pick attack +6dB'].map(
+            (chip) => (
+              <span
+                key={chip}
+                className="rounded-full border border-amber-200/40 bg-amber-200/10 px-3 py-1 text-amber-100"
+              >
+                {chip}
+              </span>
+            )
+          )}
         </div>
       </div>
 
@@ -232,7 +283,9 @@ function Hero() {
             <p className="text-xs uppercase tracking-[0.24em] text-gray-400">Session console</p>
             <p className="text-lg font-semibold text-white">Live practice rig</p>
           </div>
-          <span className="rounded-full bg-green-500/15 px-3 py-1 text-xs font-semibold text-green-200">Live</span>
+          <span className="rounded-full bg-green-500/15 px-3 py-1 text-xs font-semibold text-green-200">
+            Live
+          </span>
         </div>
         <div className="grid gap-3 p-5 sm:grid-cols-2">
           <ConsoleCard
@@ -261,7 +314,8 @@ function Hero() {
           />
         </div>
         <div className="border-t border-white/5 bg-white/5 px-6 py-4 text-sm text-gray-200">
-          Session goal: 12 clean takes with consistent pick attack. Keep gate tight, no palm mute float.
+          Session goal: 12 clean takes with consistent pick attack. Keep gate tight, no palm mute
+          float.
         </div>
       </div>
     </section>
@@ -274,7 +328,9 @@ function Pillars() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.22em] text-gray-400">System</p>
-          <h2 className="font-display text-2xl sm:text-3xl">Three pillars for modern metal practice</h2>
+          <h2 className="font-display text-2xl sm:text-3xl">
+            Three pillars for modern metal practice
+          </h2>
         </div>
         <Link
           href="/practice-history"
@@ -316,7 +372,9 @@ function FeatureLanes() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.22em] text-gray-400">Tracks</p>
-          <h2 className="font-display text-2xl sm:text-3xl">Pick your lane for today&apos;s work</h2>
+          <h2 className="font-display text-2xl sm:text-3xl">
+            Pick your lane for today&apos;s work
+          </h2>
         </div>
         <Link
           href="/leaderboard"
@@ -408,7 +466,9 @@ function Proof() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.22em] text-gray-400">Proof</p>
-          <h2 className="font-display text-2xl sm:text-3xl">Players using Metal Master in the wild</h2>
+          <h2 className="font-display text-2xl sm:text-3xl">
+            Players using Metal Master in the wild
+          </h2>
         </div>
         <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-amber-300">
           4.8 / 5
@@ -425,7 +485,9 @@ function Proof() {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold">{item.name}</p>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-gray-400">{item.role}</p>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-gray-400">
+                    {item.role}
+                  </p>
                 </div>
                 <span className="rounded-full bg-amber-200/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100">
                   {item.tag}
@@ -449,9 +511,12 @@ function Account() {
     <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] items-center">
       <div className="space-y-3">
         <p className="text-xs uppercase tracking-[0.22em] text-gray-400">Get set up</p>
-        <h2 className="font-display text-2xl sm:text-3xl">Dial in your account and keep the momentum</h2>
+        <h2 className="font-display text-2xl sm:text-3xl">
+          Dial in your account and keep the momentum
+        </h2>
         <p className="text-gray-200 max-w-2xl">
-          Create your profile, log a session, and keep the streak alive. Your Supabase-authenticated session syncs XP, history, and stats across devices.
+          Create your profile, log a session, and keep the streak alive. Your Supabase-authenticated
+          session syncs XP, history, and stats across devices.
         </p>
         <div className="flex flex-wrap gap-3">
           <CTA href="/auth/signup" tone="primary">
@@ -473,10 +538,14 @@ function Account() {
               <item.Icon className="h-6 w-6" />
             </div>
             <div className="flex flex-col">
-              <span className="font-semibold group-hover:text-amber-200 transition">{item.title}</span>
+              <span className="font-semibold group-hover:text-amber-200 transition">
+                {item.title}
+              </span>
               <span className="text-sm text-gray-300">{item.description}</span>
             </div>
-            <span className="ml-auto text-amber-200 opacity-0 transition group-hover:opacity-100">-&gt;</span>
+            <span className="ml-auto text-amber-200 opacity-0 transition group-hover:opacity-100">
+              -&gt;
+            </span>
           </Link>
         ))}
       </div>
@@ -484,7 +553,15 @@ function Account() {
   );
 }
 
-function CTA({ href, tone = 'primary', children }: { href: string; tone?: 'primary' | 'ghost'; children: ReactNode }) {
+function CTA({
+  href,
+  tone = 'primary',
+  children,
+}: {
+  href: string;
+  tone?: 'primary' | 'ghost';
+  children: ReactNode;
+}) {
   const isPrimary = tone === 'primary';
   return (
     <Link
@@ -501,11 +578,21 @@ function CTA({ href, tone = 'primary', children }: { href: string; tone?: 'prima
   );
 }
 
-function Metric({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
+function Metric({
+  label,
+  value,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
   return (
     <div
       className={`rounded-xl border border-white/10 p-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)] ${
-        accent ? 'bg-gradient-to-br from-amber-300/15 via-amber-300/10 to-amber-200/5' : 'bg-white/5'
+        accent
+          ? 'bg-gradient-to-br from-amber-300/15 via-amber-300/10 to-amber-200/5'
+          : 'bg-white/5'
       }`}
     >
       <p className="text-gray-400 text-xs uppercase tracking-[0.22em]">{label}</p>
