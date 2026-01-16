@@ -46,6 +46,77 @@ def analyze_guitar_audio(audio_path: str, sr: int = 22050) -> Dict[str, Any]:
         "pick_attack_score": pick_attack_score
     }
 
+
+def analyze_guitar_tone(audio_samples: np.ndarray, sample_rate: int) -> Dict[str, float]:
+    features: Dict[str, float] = {}
+
+    if audio_samples.size == 0:
+        return {
+            "spectral_centroid_hz": 0.0,
+            "band_low_ratio": 0.0,
+            "band_mid_ratio": 0.0,
+            "band_high_ratio": 0.0,
+            "band_fizz_ratio": 0.0,
+            "spectral_tilt": 0.0,
+            "RMS": 0.0,
+            "crest_factor": 0.0,
+            "noise_floor": 0.0,
+        }
+
+    if audio_samples.ndim > 1:
+        audio = librosa.to_mono(audio_samples)
+    else:
+        audio = audio_samples
+
+    rms = float(np.sqrt(np.mean(audio**2) + 1e-12))
+    features["RMS"] = rms
+
+    centroid = librosa.feature.spectral_centroid(y=audio, sr=sample_rate)
+    features["spectral_centroid_hz"] = float(np.mean(centroid))
+
+    n_fft = 4096
+    S = np.abs(librosa.stft(audio, n_fft=n_fft)) ** 2
+    freqs = librosa.fft_frequencies(sr=sample_rate, n_fft=n_fft)
+    psd = np.mean(S, axis=1)
+    total_power = float(np.sum(psd))
+
+    bands = {
+        "low": (20.0, 250.0),
+        "mid": (250.0, 2000.0),
+        "high": (2000.0, 8000.0),
+        "fizz": (8000.0, 12000.0),
+    }
+    for band_name, (low_f, high_f) in bands.items():
+        band_mask = (freqs >= low_f) & (freqs < high_f)
+        band_power = float(np.sum(psd[band_mask]))
+        features[f"band_{band_name}_ratio"] = band_power / (total_power + 1e-9)
+
+    freq_mask = (freqs >= 50.0) & (freqs <= 10000.0)
+    log_freqs = np.log10(freqs[freq_mask] + 1e-9)
+    log_psd = np.log10(psd[freq_mask] + 1e-12)
+    if log_freqs.size > 0:
+        A = np.vstack([log_freqs, np.ones_like(log_freqs)]).T
+        m, _ = np.linalg.lstsq(A, log_psd, rcond=None)[0]
+        features["spectral_tilt"] = float(m)
+    else:
+        features["spectral_tilt"] = 0.0
+
+    peak = float(np.max(np.abs(audio)))
+    features["crest_factor"] = peak / (rms + 1e-9)
+
+    threshold = peak * (10 ** (-60 / 20))
+    if threshold > 0.0:
+        silent_parts = audio[np.abs(audio) < threshold]
+        if silent_parts.size > 0:
+            noise_rms = float(np.sqrt(np.mean(silent_parts**2) + 1e-12))
+        else:
+            noise_rms = rms
+    else:
+        noise_rms = rms
+    features["noise_floor"] = noise_rms
+
+    return features
+
 # Example usage:
 # result = analyze_guitar_audio("example.wav")
 # print(result)
