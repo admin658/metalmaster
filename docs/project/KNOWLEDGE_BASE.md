@@ -30,6 +30,17 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Monetization: Stripe checkout/portal routes; subscription status surfaced via `/api/user-stats` and `useSubscription`.
 - AI: `/api/tone-settings` uses OpenAI to generate tone presets validated against shared schemas; Python audio analysis now includes tone feature extraction and preset suggestion helpers.
 
+## Tone Feature Keys (Audio Analysis)
+- `spectral_centroid_hz`: average spectral centroid in Hz.
+- `band_low_ratio`: energy ratio between 20-250 Hz.
+- `band_mid_ratio`: energy ratio between 250-2000 Hz.
+- `band_high_ratio`: energy ratio between 2000-8000 Hz.
+- `band_fizz_ratio`: energy ratio between 8000-12000 Hz.
+- `spectral_tilt`: slope of log-spectrum between ~50-10k Hz (more negative = darker).
+- `RMS`: root-mean-square amplitude.
+- `crest_factor`: peak amplitude divided by RMS.
+- `noise_floor`: RMS estimate from low-level (silent) regions.
+
 ## Web (Next.js)
 - Tab Lab (`/tab-player`) uses `TabPlayerShell` + `AlphaTabProvider` with a rack layout: TopBar transport, SectionMap with bar-jump, AlphaTabCanvas driven by `useAlphaTab` (scroll snapping, bar tracking, track switching), BottomRack tabs (Practice, Tone, Mixer, Tools), and optional Coach side panel. Demo selector + GP upload sit above the stage.
 - Practice session autosave: `usePracticeSession` reads/writes Supabase `practice_sessions` via `supabaseClient` using `(user_id, session_key, track_index)` upsert and restores UI + AlphaTab seek. Requires `NEXT_PUBLIC_SUPABASE_URL/ANON_KEY` and the autosave columns from `003_practice_sessions_autosave.sql` (session key, track index, position/loop fields, BPM/speed, active section, rack tab, coach flag, UI jsonb).
