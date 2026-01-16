@@ -41,6 +41,15 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - `crest_factor`: peak amplitude divided by RMS.
 - `noise_floor`: RMS estimate from low-level (silent) regions.
 
+### Expected Ranges
+- Assumes 44.1 kHz input and peak-normalized audio at -1 dBFS.
+- `spectral_centroid_hz`: ~200-6000+ (content dependent, higher = brighter).
+- `band_*_ratio`: 0.0-1.0 (sums to ~1 across all bands).
+- `spectral_tilt`: typically negative for guitar; rough range -3.0 to 0.5.
+- `RMS`: 0.0-1.0 (normalized audio; depends on input gain).
+- `crest_factor`: 1.0-10.0 (higher = more transient/spiky).
+- `noise_floor`: 0.0-`RMS` (lower = quieter noise).
+
 ## Web (Next.js)
 - Tab Lab (`/tab-player`) uses `TabPlayerShell` + `AlphaTabProvider` with a rack layout: TopBar transport, SectionMap with bar-jump, AlphaTabCanvas driven by `useAlphaTab` (scroll snapping, bar tracking, track switching), BottomRack tabs (Practice, Tone, Mixer, Tools), and optional Coach side panel. Demo selector + GP upload sit above the stage.
 - Practice session autosave: `usePracticeSession` reads/writes Supabase `practice_sessions` via `supabaseClient` using `(user_id, session_key, track_index)` upsert and restores UI + AlphaTab seek. Requires `NEXT_PUBLIC_SUPABASE_URL/ANON_KEY` and the autosave columns from `003_practice_sessions_autosave.sql` (session key, track index, position/loop fields, BPM/speed, active section, rack tab, coach flag, UI jsonb).
