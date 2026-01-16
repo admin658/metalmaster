@@ -1,7 +1,9 @@
 import librosa
 import numpy as np
 import torch
-from typing import Dict, Any
+from typing import Callable, Dict, Any, List
+
+from .tone_preset import TonePreset
 
 # Placeholder PyTorch model for palm-mute and pick attack detection
 class DummyPalmMuteModel(torch.nn.Module):
@@ -16,6 +18,12 @@ class DummyPickAttackModel(torch.nn.Module):
 
 palm_mute_model = DummyPalmMuteModel()
 pick_attack_model = DummyPickAttackModel()
+
+library_presets: List[TonePreset] = []
+library_feature_list: List[Dict[str, float]] = []
+
+# Optional hook for audio rendering (DI -> preset -> audio).
+simulate_audio: Callable[[TonePreset], np.ndarray] | None = None
 
 def analyze_guitar_audio(audio_path: str, sr: int = 22050) -> Dict[str, Any]:
     y, _ = librosa.load(audio_path, sr=sr)
@@ -116,6 +124,61 @@ def analyze_guitar_tone(audio_samples: np.ndarray, sample_rate: int) -> Dict[str
     features["noise_floor"] = noise_rms
 
     return features
+
+
+def _distance(feat1: Dict[str, float], feat2: Dict[str, float], keys: List[str] | None = None) -> float:
+    if keys is None:
+        keys = [
+            "band_low_ratio",
+            "band_mid_ratio",
+            "band_high_ratio",
+            "band_fizz_ratio",
+            "spectral_centroid_hz",
+        ]
+    d = 0.0
+    for key in keys:
+        d += (feat1.get(key, 0.0) - feat2.get(key, 0.0)) ** 2
+    return float(np.sqrt(d))
+
+
+def _clamp_0_1(value: float) -> float:
+    return float(max(0.0, min(1.0, value)))
+
+
+def suggest_tone(target_features: Dict[str, float]) -> TonePreset:
+    best_idx = None
+    best_dist = float("inf")
+    for i, lib_feat in enumerate(library_feature_list):
+        dist = _distance(target_features, lib_feat)
+        if dist < best_dist:
+            best_dist = dist
+            best_idx = i
+
+    if best_idx is None:
+        base_preset = TonePreset()
+    else:
+        base_preset = library_presets[best_idx]
+
+    if simulate_audio is None:
+        return base_preset
+
+    best_preset = TonePreset(**vars(base_preset))
+    best_features = analyze_guitar_tone(simulate_audio(best_preset), sample_rate=44100)
+    best_score = _distance(target_features, best_features)
+
+    steps = (-0.1, 0.1)
+    for param in ("amp_bass", "amp_mid", "amp_treble"):
+        for step in steps:
+            new_preset = TonePreset(**vars(best_preset))
+            value = _clamp_0_1(getattr(best_preset, param) + step)
+            setattr(new_preset, param, value)
+            new_feat = analyze_guitar_tone(simulate_audio(new_preset), sample_rate=44100)
+            new_score = _distance(target_features, new_feat)
+            if new_score < best_score:
+                best_score = new_score
+                best_preset = new_preset
+
+    return best_preset
 
 # Example usage:
 # result = analyze_guitar_audio("example.wav")
