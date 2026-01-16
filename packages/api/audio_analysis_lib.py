@@ -3,7 +3,10 @@ import numpy as np
 import torch
 from typing import Callable, Dict, Any, List
 
-from .tone_preset import TonePreset
+try:
+    from .tone_preset import TonePreset
+except ImportError:  # pragma: no cover - allow direct module usage
+    from tone_preset import TonePreset
 
 # Placeholder PyTorch model for palm-mute and pick attack detection
 class DummyPalmMuteModel(torch.nn.Module):
