@@ -1,54 +1,60 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { demoFiles } from "@/app/tab-player/demoFiles.generated";
-import BottomRack from "./BottomRack";
-import CoachPanel from "./CoachPanel";
-import MainStage from "./MainStage";
-import TopBar from "./TopBar";
-import type { PlayerState, RackTab } from "./types";
-import { usePracticeSession } from "./usePracticeSession";
+import { demoFiles } from '@/app/tab-player/demoFiles.generated';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import BottomRack from './BottomRack';
+import CoachPanel from './CoachPanel';
+import MainStage from './MainStage';
+import TopBar from './TopBar';
+import type { PlayerState, RackTab } from './types';
+import { usePracticeSession } from './usePracticeSession';
 
 type Action =
-  | { type: "PLAY_TOGGLE" }
-  | { type: "STOP" }
-  | { type: "SEEK"; seconds: number }
-  | { type: "SET_SPEED"; speed: number }
-  | { type: "SET_BPM"; bpm: number }
-  | { type: "TOGGLE_LOOP" }
-  | { type: "SET_LOOP_IN"; seconds: number | null }
-  | { type: "SET_LOOP_OUT"; seconds: number | null }
-  | { type: "SET_RACK_TAB"; tab: RackTab }
-  | { type: "TOGGLE_COACH" }
-  | { type: "JUMP_SECTION"; sectionId: string }
-  | { type: "TOGGLE_METRONOME" }
+  | { type: 'PLAY_TOGGLE' }
+  | { type: 'STOP' }
+  | { type: 'SEEK'; seconds: number }
+  | { type: 'SET_SPEED'; speed: number }
+  | { type: 'SET_BPM'; bpm: number }
+  | { type: 'TOGGLE_LOOP' }
+  | { type: 'SET_LOOP_IN'; seconds: number | null }
+  | { type: 'SET_LOOP_OUT'; seconds: number | null }
+  | { type: 'SET_RACK_TAB'; tab: RackTab }
+  | { type: 'TOGGLE_COACH' }
+  | { type: 'JUMP_SECTION'; sectionId: string }
+  | { type: 'TOGGLE_METRONOME' }
   | {
-      type: "TOGGLE_UI";
+      type: 'TOGGLE_UI';
       key: keyof Pick<
         PlayerState,
-        "focusMode" | "showPalmMute" | "showAccents" | "showFingering" | "showRhythmHints" | "showStringNames"
+        | 'focusMode'
+        | 'showPalmMute'
+        | 'showAccents'
+        | 'showFingering'
+        | 'showRhythmHints'
+        | 'showStringNames'
       >;
     }
-  | { type: "SET_STATUS"; status: PlayerState["status"] }
-  | { type: "SET_POSITION"; seconds: number }
-  | { type: "SET_DURATION"; seconds: number }
-  | { type: "SET_ACTIVE_TRACK_INDEX"; index: number }
-  | { type: "SET_CURRENT_BAR"; barNumber: number }
-  | { type: "SET_ACTIVE_SECTION"; sectionId: string }
-  | { type: "TOGGLE_LOOP_ON" }
-  | { type: "TOGGLE_LOOP_OFF" }
-  | { type: "SET_COACH_OPEN"; open: boolean }
-  | { type: "SET_UI_FLAGS"; ui: Record<string, any> }
-  | { type: "SET_TRACKS"; tracks: PlayerState["tracks"]; activeTrackId?: string }
+  | { type: 'SET_STATUS'; status: PlayerState['status'] }
+  | { type: 'SET_POSITION'; seconds: number }
+  | { type: 'SET_DURATION'; seconds: number }
+  | { type: 'SET_ACTIVE_TRACK_INDEX'; index: number }
+  | { type: 'SET_CURRENT_BAR'; barNumber: number }
+  | { type: 'SET_ACTIVE_SECTION'; sectionId: string }
+  | { type: 'TOGGLE_LOOP_ON' }
+  | { type: 'TOGGLE_LOOP_OFF' }
+  | { type: 'SET_COACH_OPEN'; open: boolean }
+  | { type: 'SET_UI_FLAGS'; ui: Record<string, any> }
+  | { type: 'SET_TRACKS'; tracks: PlayerState['tracks']; activeTrackId?: string }
   | {
-      type: "SET_SCORE_META";
-      meta: Partial<Pick<PlayerState, "title" | "subtitle" | "bpm" | "timeSig">>;
+      type: 'SET_SCORE_META';
+      meta: Partial<Pick<PlayerState, 'title' | 'subtitle' | 'bpm' | 'timeSig'>>;
     }
-  | { type: "SET_COACH_EXPECTATION"; expected: number[]; beatWindowMs: number }
-  | { type: "SET_COACH_LISTENING"; listening: boolean; error?: string | null }
-  | { type: "RESET_COACH_METRICS" }
+  | { type: 'SET_COACH_EXPECTATION'; expected: number[]; beatWindowMs: number }
+  | { type: 'SET_COACH_LISTENING'; listening: boolean; error?: string | null }
+  | { type: 'SET_COACH_INPUT_DEVICE'; deviceId: string | null }
+  | { type: 'RESET_COACH_METRICS' }
   | {
-      type: "SET_COACH_METRICS";
+      type: 'SET_COACH_METRICS';
       hits: number;
       samples: number;
       accuracy: number;
@@ -65,7 +71,7 @@ type LessonOption = { label: string; url: string };
 function buildLessonOptions(files: typeof demoFiles): LessonOption[] {
   const seen = new Set<string>();
   return files
-    .filter((file) => file.path.startsWith("/lessons/"))
+    .filter((file) => file.path.startsWith('/lessons/'))
     .map((file) => ({ label: file.label, url: file.path }))
     .filter((file) => {
       if (seen.has(file.url)) return false;
@@ -78,48 +84,48 @@ const lessonOptions = buildLessonOptions(demoFiles);
 
 function reducer(state: PlayerState, action: Action): PlayerState {
   switch (action.type) {
-    case "PLAY_TOGGLE": {
-      if (state.status === "playing") return { ...state, status: "paused" };
-      return { ...state, status: "playing" };
+    case 'PLAY_TOGGLE': {
+      if (state.status === 'playing') return { ...state, status: 'paused' };
+      return { ...state, status: 'playing' };
     }
-    case "STOP":
-      return { ...state, status: "stopped", positionSeconds: 0 };
-    case "SEEK":
+    case 'STOP':
+      return { ...state, status: 'stopped', positionSeconds: 0 };
+    case 'SEEK':
       return { ...state, positionSeconds: clamp(action.seconds, 0, state.durationSeconds) };
-    case "SET_SPEED":
+    case 'SET_SPEED':
       return { ...state, speed: clamp(action.speed, 0.5, 1.25) };
-    case "SET_BPM":
+    case 'SET_BPM':
       return { ...state, bpm: clamp(action.bpm, 30, 300) };
-    case "TOGGLE_LOOP":
+    case 'TOGGLE_LOOP':
       return { ...state, loopEnabled: !state.loopEnabled };
-    case "SET_LOOP_IN":
+    case 'SET_LOOP_IN':
       return { ...state, loopInSeconds: action.seconds };
-    case "SET_LOOP_OUT":
+    case 'SET_LOOP_OUT':
       return { ...state, loopOutSeconds: action.seconds };
-    case "SET_RACK_TAB":
+    case 'SET_RACK_TAB':
       return { ...state, rackTab: action.tab };
-    case "TOGGLE_COACH":
+    case 'TOGGLE_COACH':
       return { ...state, coachOpen: !state.coachOpen };
-    case "JUMP_SECTION": {
+    case 'JUMP_SECTION': {
       const sec = state.sections.find((s) => s.id === action.sectionId);
       if (!sec) return state;
       return { ...state, activeSectionId: sec.id };
     }
-    case "TOGGLE_UI":
+    case 'TOGGLE_UI':
       return { ...state, [action.key]: !state[action.key] } as PlayerState;
-    case "TOGGLE_METRONOME":
+    case 'TOGGLE_METRONOME':
       return { ...state, metronomeEnabled: !state.metronomeEnabled };
-    case "SET_STATUS":
+    case 'SET_STATUS':
       return { ...state, status: action.status };
-    case "SET_POSITION":
+    case 'SET_POSITION':
       return { ...state, positionSeconds: action.seconds };
-    case "SET_DURATION":
+    case 'SET_DURATION':
       return { ...state, durationSeconds: action.seconds };
-    case "SET_ACTIVE_TRACK_INDEX": {
+    case 'SET_ACTIVE_TRACK_INDEX': {
       const track = state.tracks[action.index];
       return track ? { ...state, activeTrackId: track.id } : state;
     }
-    case "SET_TRACKS": {
+    case 'SET_TRACKS': {
       const nextTracks = action.tracks;
       const requestedId = action.activeTrackId ?? state.activeTrackId;
       const activeTrackId =
@@ -128,7 +134,7 @@ function reducer(state: PlayerState, action: Action): PlayerState {
         state.activeTrackId;
       return { ...state, tracks: nextTracks, activeTrackId };
     }
-    case "SET_SCORE_META": {
+    case 'SET_SCORE_META': {
       const { title, subtitle, bpm, timeSig } = action.meta;
       return {
         ...state,
@@ -138,17 +144,17 @@ function reducer(state: PlayerState, action: Action): PlayerState {
         timeSig: timeSig ?? state.timeSig,
       };
     }
-    case "SET_CURRENT_BAR":
+    case 'SET_CURRENT_BAR':
       return { ...state, currentBarNumber: action.barNumber };
-    case "SET_ACTIVE_SECTION":
+    case 'SET_ACTIVE_SECTION':
       return { ...state, activeSectionId: action.sectionId };
-    case "TOGGLE_LOOP_ON":
+    case 'TOGGLE_LOOP_ON':
       return { ...state, loopEnabled: true };
-    case "TOGGLE_LOOP_OFF":
+    case 'TOGGLE_LOOP_OFF':
       return { ...state, loopEnabled: false };
-    case "SET_COACH_OPEN":
+    case 'SET_COACH_OPEN':
       return { ...state, coachOpen: action.open };
-    case "SET_UI_FLAGS":
+    case 'SET_UI_FLAGS':
       return {
         ...state,
         focusMode: !!action.ui.focusMode,
@@ -158,19 +164,19 @@ function reducer(state: PlayerState, action: Action): PlayerState {
         showRhythmHints: !!action.ui.showRhythmHints,
         showStringNames: !!action.ui.showStringNames,
       };
-    case "SET_COACH_EXPECTATION":
+    case 'SET_COACH_EXPECTATION':
       return {
         ...state,
         coachExpectedMidis: action.expected,
         coachBeatWindowMs: action.beatWindowMs,
       };
-    case "SET_COACH_LISTENING":
+    case 'SET_COACH_LISTENING':
       return {
         ...state,
         coachListening: action.listening,
         coachError: action.error ?? null,
       };
-    case "RESET_COACH_METRICS":
+    case 'RESET_COACH_METRICS':
       return {
         ...state,
         coachHits: 0,
@@ -179,7 +185,7 @@ function reducer(state: PlayerState, action: Action): PlayerState {
         coachLastPitchHz: null,
         coachLastMidi: null,
       };
-    case "SET_COACH_METRICS":
+    case 'SET_COACH_METRICS':
       return {
         ...state,
         coachHits: action.hits,
@@ -188,6 +194,8 @@ function reducer(state: PlayerState, action: Action): PlayerState {
         coachLastPitchHz: action.pitchHz,
         coachLastMidi: action.midi,
       };
+    case 'SET_COACH_INPUT_DEVICE':
+      return { ...state, coachInputDeviceId: action.deviceId };
     default:
       return state;
   }
@@ -201,8 +209,8 @@ export default function TabPlayerShell() {
     const handleChange = () => {
       setIsFullscreen(document.fullscreenElement === shellRef.current);
     };
-    document.addEventListener("fullscreenchange", handleChange);
-    return () => document.removeEventListener("fullscreenchange", handleChange);
+    document.addEventListener('fullscreenchange', handleChange);
+    return () => document.removeEventListener('fullscreenchange', handleChange);
   }, []);
 
   const handleFullscreenToggle = async () => {
@@ -217,12 +225,12 @@ export default function TabPlayerShell() {
 
   const initial: PlayerState = useMemo(
     () => ({
-      title: "Metal Master Lesson",
-      subtitle: "Alternate Picking Drill",
+      title: 'Metal Master Lesson',
+      subtitle: 'Alternate Picking Drill',
 
-      status: "stopped",
+      status: 'stopped',
       bpm: 120,
-      timeSig: "4/4",
+      timeSig: '4/4',
       speed: 1.0,
 
       positionSeconds: 0,
@@ -236,23 +244,23 @@ export default function TabPlayerShell() {
       metronomeEnabled: false,
       currentBarNumber: 1,
 
-      activeTrackId: "gtr1",
+      activeTrackId: 'gtr1',
       tracks: [
-        { id: "gtr1", name: "Guitar 1", instrument: "Electric Guitar" },
-        { id: "bass", name: "Bass", instrument: "Electric Bass" },
-        { id: "drums", name: "Drums", instrument: "Kit" },
+        { id: 'gtr1', name: 'Guitar 1', instrument: 'Electric Guitar' },
+        { id: 'bass', name: 'Bass', instrument: 'Electric Bass' },
+        { id: 'drums', name: 'Drums', instrument: 'Kit' },
       ],
 
-      activeSectionId: "verse",
+      activeSectionId: 'verse',
       sections: [
-        { id: "intro", label: "Intro", bars: [1, 8] },
-        { id: "verse", label: "Verse", bars: [9, 16] },
-        { id: "chorus", label: "Chorus", bars: [17, 24] },
-        { id: "solo", label: "Solo", bars: [25, 32] },
-        { id: "outro", label: "Outro", bars: [33, 40] },
+        { id: 'intro', label: 'Intro', bars: [1, 8] },
+        { id: 'verse', label: 'Verse', bars: [9, 16] },
+        { id: 'chorus', label: 'Chorus', bars: [17, 24] },
+        { id: 'solo', label: 'Solo', bars: [25, 32] },
+        { id: 'outro', label: 'Outro', bars: [33, 40] },
       ],
 
-      rackTab: "practice",
+      rackTab: 'practice',
       coachOpen: true,
       coachListening: false,
       coachError: null,
@@ -261,6 +269,7 @@ export default function TabPlayerShell() {
       coachAccuracy: 0,
       coachLastPitchHz: null,
       coachLastMidi: null,
+      coachInputDeviceId: null,
       coachExpectedMidis: [],
       coachBeatWindowMs: 0,
 
@@ -279,14 +288,25 @@ export default function TabPlayerShell() {
   );
 
   const [state, dispatch] = useReducer(reducer, initial);
+  // load persisted coach input device selection
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('mm_coach_input_device');
+      if (saved !== null) {
+        dispatch({ type: 'SET_COACH_INPUT_DEVICE', deviceId: saved || null });
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
   const [scoreUrl, setScoreUrl] = useState<string>(
-    lessonOptions[0]?.url ?? "/lessons/Lesson01.alphaTex"
+    lessonOptions[0]?.url ?? '/lessons/Lesson01.alphaTex'
   );
   const [label, setLabel] = useState<string>(
-    lessonOptions[0]?.label ?? "Lesson 1 - Precision Chugs"
+    lessonOptions[0]?.label ?? 'Lesson 1 - Precision Chugs'
   );
   // Replace this with the real lesson UUID from your data.
-  const sessionKey = "de305d54-75b4-431b-adb2-eb6b9e546014";
+  const sessionKey = 'de305d54-75b4-431b-adb2-eb6b9e546014';
   const trackIndex = 0;
 
   const { disabledReason } = usePracticeSession({
@@ -310,9 +330,9 @@ export default function TabPlayerShell() {
     <div
       ref={shellRef}
       className={[
-        "mm-tabplayer-shell flex min-h-screen flex-col",
-        isFullscreen ? "mm-tabplayer-shell--fullscreen" : "mx-auto max-w-[1600px]",
-      ].join(" ")}
+        'mm-tabplayer-shell flex min-h-screen flex-col',
+        isFullscreen ? 'mm-tabplayer-shell--fullscreen' : 'mx-auto max-w-[1600px]',
+      ].join(' ')}
     >
       {disabledReason && (
         <div className="mx-3 mb-2 rounded-xl border border-amber-500/60 bg-amber-950/40 px-3 py-2 text-xs text-amber-100">

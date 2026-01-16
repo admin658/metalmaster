@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 interface Note {
   time: number;
@@ -9,9 +9,13 @@ interface Note {
 export default function NoteHighway2D({
   notes,
   currentTime,
+  activeIndex = -1,
+  hitIndex = -1,
 }: {
   notes: Note[];
   currentTime: number;
+  activeIndex?: number;
+  hitIndex?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dprRef = useRef<number>(1);
@@ -70,7 +74,7 @@ export default function NoteHighway2D({
     ctx.lineTo(playheadX, H / dpr);
     ctx.stroke();
 
-    notes.forEach((note) => {
+    notes.forEach((note, idx) => {
       const dt = note.time - currentTime;
       const x = playheadX + dt * 220;
       const clampedString = Math.max(0, Math.min(lanes - 1, note.string));
@@ -78,14 +82,26 @@ export default function NoteHighway2D({
 
       if (x < -40 || x > W / dpr + 40) return;
 
-      ctx.fillStyle = '#f87171';
+      const isActive = idx === activeIndex;
+      const isHit = idx === hitIndex;
+      // base color
+      ctx.fillStyle = isActive ? '#34d399' : '#f87171';
       ctx.beginPath();
-      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.arc(x, y, isActive ? 14 : 10, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = 'white';
-      ctx.font = '12px monospace';
-      ctx.fillText(note.fret.toString(), x - 3, y + 4);
+      // hit outline
+      if (isHit) {
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(x, y, isActive ? 18 : 14, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = isActive ? 'black' : 'white';
+      ctx.font = `${isActive ? 14 : 12}px monospace`;
+      ctx.fillText(note.fret.toString(), x - (isActive ? 4 : 3), y + (isActive ? 5 : 4));
     });
     ctx.restore();
   }, [currentTime, notes]);

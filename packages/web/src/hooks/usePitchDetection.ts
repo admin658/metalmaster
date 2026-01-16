@@ -1,13 +1,18 @@
 // Simple autocorrelation pitch detection for web
 export default function usePitchDetection() {
-  let audioContext: AudioContext;
-  let source: MediaStreamAudioSourceNode;
-  let analyser: AnalyserNode;
+  let audioContext: AudioContext | null = null;
+  let source: MediaStreamAudioSourceNode | null = null;
+  let analyser: AnalyserNode | null = null;
+  let stream: MediaStream | null = null;
   let buffer = new Float32Array(2048);
 
-  async function start() {
+  async function start(deviceId?: string | null) {
     audioContext = new AudioContext();
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const constraints: MediaStreamConstraints = deviceId
+      ? { audio: { deviceId: { exact: deviceId } } }
+      : { audio: true };
+
+    stream = await navigator.mediaDevices.getUserMedia(constraints as MediaStreamConstraints);
 
     source = audioContext.createMediaStreamSource(stream);
     analyser = audioContext.createAnalyser();
@@ -16,7 +21,25 @@ export default function usePitchDetection() {
     source.connect(analyser);
   }
 
+  function stop() {
+    if (stream) {
+      stream.getTracks().forEach((t) => t.stop());
+      stream = null;
+    }
+    if (audioContext) {
+      try {
+        audioContext.close();
+      } catch (e) {
+        // ignore
+      }
+      audioContext = null;
+    }
+    source = null;
+    analyser = null;
+  }
+
   function detectPitch(): number | null {
+    if (!analyser || !audioContext) return null;
     analyser.getFloatTimeDomainData(buffer);
 
     // Autocorrelation pitch detection
@@ -51,5 +74,5 @@ export default function usePitchDetection() {
     return sampleRate / bestOffset;
   }
 
-  return { start, detectPitch };
+  return { start, stop, detectPitch };
 }

@@ -51,6 +51,7 @@ export type PlayerState = {
   coachLastMidi: number | null;
   coachExpectedMidis: number[];
   coachBeatWindowMs: number;
+  coachInputDeviceId?: string | null;
 
   // UI toggles
   focusMode: boolean;

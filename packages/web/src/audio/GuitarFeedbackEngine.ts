@@ -1,5 +1,11 @@
 import usePitchDetection from '../hooks/usePitchDetection';
-import { gradePerformance, type ExpectedNote, type GradeOptions, type GradeSummary, type PlayedNote } from './grading';
+import {
+  gradePerformance,
+  type ExpectedNote,
+  type GradeOptions,
+  type GradeSummary,
+  type PlayedNote,
+} from './grading';
 
 export type { ExpectedNote, GradeOptions, GradeSummary, PlayedNote } from './grading';
 
@@ -16,26 +22,40 @@ export function createFeedbackEngine(expected: ExpectedNote[]) {
   function evaluate(currentTime: number) {
     const pitch = detectPitch();
     if (!pitch) return null;
-
-    const midi = Math.round(12 * (Math.log2(pitch / 440)) + 69);
+    // Keep fractional MIDI values (in semitones) — don't round here so grading
+    // can apply fine-grained pitch tolerances. Store freqHz for debugging.
+    const midi = 12 * Math.log2(pitch / 440) + 69;
     const sample: PlayedNote = { time: currentTime, midi, freqHz: pitch };
 
-    if (!lastCaptured || Math.abs(sample.time - lastCaptured.time) > 0.04 || sample.midi !== lastCaptured.midi) {
+    // Improve deduplication: treat notes as the same if they're very close in
+    // time and pitch (within small thresholds). Using exact equality caused
+    // repeated captures when using fractional MIDI values.
+    const isNewCapture =
+      !lastCaptured ||
+      Math.abs(sample.time - lastCaptured.time) > 0.04 ||
+      Math.abs(sample.midi - lastCaptured.midi) > 0.35;
+
+    if (isNewCapture) {
       playedNotes.push(sample);
       lastCaptured = sample;
     }
 
-    const target = expected.find((n) => Math.abs(n.time - currentTime) < matchWindowSeconds);
+    const idx = expected.findIndex((n) => Math.abs(n.time - currentTime) < matchWindowSeconds);
 
-    if (!target) return null;
+    if (idx === -1) return null;
 
-    const correct = Math.abs(target.midi - midi) <= 1;
+    const target = expected[idx];
+    const pitchError = midi - target.midi; // semitone difference (fractional)
+    const correct = Math.abs(pitchError) <= 1;
 
     return {
       pitch,
       midi,
       correct,
       expected: target.midi,
+      expectedIndex: idx,
+      pitchError,
+      played: sample,
     };
   }
 

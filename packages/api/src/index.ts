@@ -1,27 +1,28 @@
 import './env';
 
-import express, { Request, Response } from 'express';
-import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
-import { authRoutes } from './routes/auth.routes';
-import { userRoutes } from './routes/user.routes';
-import { lessonRoutes } from './routes/lesson.routes';
-import { riffRoutes } from './routes/riff.routes';
-import { tabRoutes } from './routes/tab.routes';
-import { progressRoutes } from './routes/progress.routes';
-import { jamTrackRoutes } from './routes/jam-track.routes';
-import { dailyRiffRoutes } from './routes/daily-riff.routes';
-import { speedTrainerRoutes } from './routes/speed-trainer.routes';
-import { achievementRoutes } from './routes/achievement.routes';
-import { userStatsRoutes } from './routes/user-stats.routes';
-import { practiceSessionRoutes } from './routes/practice-session.routes';
-import { xpRoutes } from './routes/xp.routes';
+import cors from 'cors';
+import express, { Request, Response } from 'express';
 import { errorHandler } from './middleware/error-handler';
 import { requestLogger } from './middleware/request-logger';
+import { achievementRoutes } from './routes/achievement.routes';
+import { aiToneRoutes } from './routes/ai-tone.routes';
+import { authRoutes } from './routes/auth.routes';
 import billingRoutes from './routes/billing.routes';
 import billingWebhook from './routes/billing.webhook';
-import { toneRoutes } from './routes/tone.routes';
+import { dailyRiffRoutes } from './routes/daily-riff.routes';
+import { jamTrackRoutes } from './routes/jam-track.routes';
 import { leaderboardRoutes } from './routes/leaderboard.routes';
+import { lessonRoutes } from './routes/lesson.routes';
+import { practiceSessionRoutes } from './routes/practice-session.routes';
+import { progressRoutes } from './routes/progress.routes';
+import { riffRoutes } from './routes/riff.routes';
+import { speedTrainerRoutes } from './routes/speed-trainer.routes';
+import { tabRoutes } from './routes/tab.routes';
+import { toneRoutes } from './routes/tone.routes';
+import { userStatsRoutes } from './routes/user-stats.routes';
+import { userRoutes } from './routes/user.routes';
+import { xpRoutes } from './routes/xp.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,32 +30,36 @@ const PORT = process.env.PORT || 3000;
 const defaultAllowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
 const envAllowedOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
-  .map(origin => origin.trim())
+  .map((origin) => origin.trim())
   .filter(Boolean);
 const allowAllOrigins = envAllowedOrigins.includes('*');
 const allowedOriginSuffixes = envAllowedOrigins
-  .filter(origin => origin.startsWith('*.') || origin.startsWith('.'))
-  .map(origin => (origin.startsWith('*.') ? origin.slice(1) : origin));
+  .filter((origin) => origin.startsWith('*.') || origin.startsWith('.'))
+  .map((origin) => (origin.startsWith('*.') ? origin.slice(1) : origin));
 const allowedOrigins = [
   ...defaultAllowedOrigins,
-  ...envAllowedOrigins.filter(origin => !origin.startsWith('*.') && !origin.startsWith('.') && origin !== '*'),
+  ...envAllowedOrigins.filter(
+    (origin) => !origin.startsWith('*.') && !origin.startsWith('.') && origin !== '*'
+  ),
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
 
-    const isAllowed =
-      allowAllOrigins ||
-      allowedOrigins.includes(origin) ||
-      allowedOriginSuffixes.some(suffix => origin.endsWith(suffix));
+      const isAllowed =
+        allowAllOrigins ||
+        allowedOrigins.includes(origin) ||
+        allowedOriginSuffixes.some((suffix) => origin.endsWith(suffix));
 
-    return callback(null, isAllowed);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+      return callback(null, isAllowed);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // Register Stripe webhook route.
 app.use('/api/billing/webhook', billingWebhook);
@@ -88,6 +93,7 @@ app.use('/api/practice-sessions', practiceSessionRoutes);
 app.use('/api/xp', xpRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/tone-settings', toneRoutes);
+app.use('/api/ai/tone', aiToneRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 
 app.get('/health', (_req: Request, res: Response) => {

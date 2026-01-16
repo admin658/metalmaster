@@ -1,16 +1,21 @@
 // packages/web/src/components/tab/TabPlayer.tsx
 
-import React, { useState, useEffect, useRef, useMemo, FC } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import * as Tone from 'tone';
 
-import { GuitarAmpSimulator, GuitarAmpPreset } from '../../audio/GuitarAmpSimulator';
-import NoteHighway2D from '../visual/NoteHighway2d';
-import NoteHighway3D from '../visual/NoteHighway3d';
-import TonePresetPanel from '../amp/TonePresetPanel';
-import { createFeedbackEngine, ExpectedNote, type GradeSummary } from '../../audio/GuitarFeedbackEngine';
-import RiffEvaluationResult from '../feedback/RiffEvaluationResult';
+import { GuitarAmpPreset, GuitarAmpSimulator } from '../../audio/GuitarAmpSimulator';
+import {
+  createFeedbackEngine,
+  ExpectedNote,
+  type GradeSummary,
+} from '../../audio/GuitarFeedbackEngine';
 import { completeRiffXP } from '../../lib/CompleteRiffXP';
 import { getApiBase } from '../../lib/apiBase';
+import TonePresetPanel from '../amp/TonePresetPanel';
+import RiffEvaluationResult from '../feedback/RiffEvaluationResult';
+import Tuner from '../tuner/Tuner';
+import NoteHighway2D from '../visual/NoteHighway2d';
+import NoteHighway3D from '../visual/NoteHighway3d';
 
 const API_URL = getApiBase();
 
@@ -33,7 +38,10 @@ async function fetchUserAchievements(): Promise<{ id: string; name: string }[]> 
       id: a.id || a.achievement_id || a?.achievements_library?.id,
       name: a?.achievements_library?.name || a.name,
     }))
-    .filter((a: { id?: string; name?: string }) => a.id && a.name) as { id: string; name: string }[];
+    .filter((a: { id?: string; name?: string }) => a.id && a.name) as {
+    id: string;
+    name: string;
+  }[];
 }
 
 // --------------------------------------------------
@@ -58,15 +66,36 @@ interface TabPlayerProps {
 const ampPresets: { label: string; preset: GuitarAmpPreset }[] = [
   {
     label: 'Modern Metal',
-    preset: { name: 'Modern Metal', gain: 0.6, distortion: 0.75, eq: { bass: 3, mid: -2, treble: 4 }, reverb: 1.2, irUrl: null },
+    preset: {
+      name: 'Modern Metal',
+      gain: 0.6,
+      distortion: 0.75,
+      eq: { bass: 3, mid: -2, treble: 4 },
+      reverb: 1.2,
+      irUrl: null,
+    },
   },
   {
     label: 'Crunch Rhythm',
-    preset: { name: 'Crunch Rhythm', gain: 0.35, distortion: 0.5, eq: { bass: 2, mid: 1, treble: 2.5 }, reverb: 0.6, irUrl: null },
+    preset: {
+      name: 'Crunch Rhythm',
+      gain: 0.35,
+      distortion: 0.5,
+      eq: { bass: 2, mid: 1, treble: 2.5 },
+      reverb: 0.6,
+      irUrl: null,
+    },
   },
   {
     label: 'Clean Chorus',
-    preset: { name: 'Clean Chorus', gain: 0.15, distortion: 0.2, eq: { bass: 1, mid: 0, treble: 3 }, reverb: 2.2, irUrl: null },
+    preset: {
+      name: 'Clean Chorus',
+      gain: 0.15,
+      distortion: 0.2,
+      eq: { bass: 1, mid: 0, treble: 3 },
+      reverb: 2.2,
+      irUrl: null,
+    },
   },
 ];
 
@@ -84,8 +113,13 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
 
   const [evalCount, setEvalCount] = useState(0);
   const [hitCount, setHitCount] = useState(0);
+  const [countDown, setCountDown] = useState<number | null>(null);
+  const [currentFeedback, setCurrentFeedback] = useState<any | null>(null);
+  const [hitFlashIndex, setHitFlashIndex] = useState<number | null>(null);
+  const hitFlashTimerRef = useRef<number | null>(null);
 
   const [showResult, setShowResult] = useState(false);
+  const [showTuner, setShowTuner] = useState(false);
   const [finalAccuracy, setFinalAccuracy] = useState(0);
   const [finalXP, setFinalXP] = useState(0);
   const [finalAchievements, setFinalAchievements] = useState<string[]>([]);
@@ -105,6 +139,30 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
     [notes]
   );
 
+  // Active expected note index for follow-along highlighting (closest expected note within 1.5s)
+  const activeExpectedIndex = useMemo(() => {
+    if (!expectedNotes || expectedNotes.length === 0) return -1;
+    let bestIdx = -1;
+    let bestAbs = Infinity;
+    for (let i = 0; i < expectedNotes.length; i++) {
+      const d = expectedNotes[i].time - currentTime;
+      const absd = Math.abs(d);
+      if (absd < bestAbs && absd <= 1.5) {
+        bestAbs = absd;
+        bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }, [expectedNotes, currentTime]);
+
+  function midiToNote(m: number) {
+    const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const n = Math.round(m);
+    const name = names[((n % 12) + 12) % 12];
+    const oct = Math.floor(n / 12) - 1;
+    return `${name}${oct}`;
+  }
+
   // Lazily create amp sim instance on client only
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -115,8 +173,7 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
       synthRef.current = new Tone.PolySynth(Tone.Synth, {
         oscillator: { type: 'triangle' },
         envelope: { attack: 0.005, decay: 0.2, sustain: 0.6, release: 0.3 },
-      })
-        .connect(ampRef.current.input);
+      }).connect(ampRef.current.input);
       synthRef.current.volume.value = 0;
     }
   }, []);
@@ -150,9 +207,10 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
   // Apply master volume to amp input gain
   useEffect(() => {
     if (!ampRef.current) return;
-    const lin = typeof Tone.dbToGain === 'function'
-      ? Tone.dbToGain(masterVolume)
-      : Math.pow(10, masterVolume / 20);
+    const lin =
+      typeof Tone.dbToGain === 'function'
+        ? Tone.dbToGain(masterVolume)
+        : Math.pow(10, masterVolume / 20);
     ampRef.current.input.gain.rampTo(lin, 0.05);
   }, [masterVolume]);
 
@@ -177,6 +235,14 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
           setEvalCount((c) => c + 1);
           if (res.correct) {
             setHitCount((h) => h + 1);
+          }
+          // show immediate feedback overlay and flash hit on highway
+          setCurrentFeedback({ ...res, time: t });
+          if (typeof res.expectedIndex === 'number') {
+            // flash the hit index briefly
+            setHitFlashIndex(res.expectedIndex);
+            if (hitFlashTimerRef.current) window.clearTimeout(hitFlashTimerRef.current);
+            hitFlashTimerRef.current = window.setTimeout(() => setHitFlashIndex(null), 250);
           }
         }
       }
@@ -222,25 +288,48 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
         feedbackRef.current = null;
       }
 
-      // Align our time with Tone's clock
-      playStartRef.current = Tone.now();
+      // Start playback after a short countdown so the player can get ready
+      const startPlayback = () => {
+        // Align our time with Tone's clock
+        playStartRef.current = Tone.now();
 
-      // MIDI synthesis through the amp chain (no backing track)
-      Tone.Transport.stop();
-      Tone.Transport.cancel(0);
-      if (partRef.current) {
-        partRef.current.dispose();
-        partRef.current = null;
+        // MIDI synthesis through the amp chain (no backing track)
+        Tone.Transport.stop();
+        Tone.Transport.cancel(0);
+        if (partRef.current) {
+          partRef.current.dispose();
+          partRef.current = null;
+        }
+        partRef.current = new Tone.Part(
+          (time, value: { midi: number }) => {
+            if (!synthRef.current) return;
+            synthRef.current.triggerAttackRelease(`${value.midi}m`, '8n', time);
+          },
+          notes.map((n) => ({ time: n.time, midi: n.midi }))
+        );
+        partRef.current.start(0);
+        Tone.Transport.seconds = 0;
+        Tone.Transport.start();
+
+        setIsPlaying(true);
+        setCountDown(null);
+      };
+
+      if (playMode === 'rate') {
+        setCountDown(3);
+        let c = 3;
+        const intervalId = window.setInterval(() => {
+          c -= 1;
+          if (c <= 0) {
+            window.clearInterval(intervalId);
+            startPlayback();
+          } else {
+            setCountDown(c);
+          }
+        }, 1000);
+      } else {
+        startPlayback();
       }
-      partRef.current = new Tone.Part((time, value: { midi: number }) => {
-        if (!synthRef.current) return;
-        synthRef.current.triggerAttackRelease(`${value.midi}m`, '8n', time);
-      }, notes.map((n) => ({ time: n.time, midi: n.midi })));
-      partRef.current.start(0);
-      Tone.Transport.seconds = 0;
-      Tone.Transport.start();
-
-      setIsPlaying(true);
     } catch (err) {
       console.error('Error starting playback:', err);
     }
@@ -269,7 +358,8 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
     // Compute accuracy using captured grading summary (fallback to simple ratio)
     const summary = feedbackRef.current ? feedbackRef.current.summarize() : null;
     setGradeSummary(summary);
-    const accuracy = summary?.gradePercent ?? (evalCount > 0 ? (hitCount / Math.max(evalCount, 1)) * 100 : 0);
+    const accuracy =
+      summary?.gradePercent ?? (evalCount > 0 ? (hitCount / Math.max(evalCount, 1)) * 100 : 0);
     setFinalAccuracy(accuracy);
 
     // Send XP to Supabase
@@ -370,6 +460,22 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
           >
             3D
           </button>
+          <button
+            onClick={() => setShowTuner((s) => !s)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 999,
+              border: showTuner ? '1px solid #34d399' : '1px solid #374151',
+              background: showTuner ? '#065f46' : '#020617',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: 12,
+              textTransform: 'uppercase',
+              letterSpacing: 1,
+            }}
+          >
+            {showTuner ? 'Tuner On' : 'Tuner'}
+          </button>
         </div>
       </div>
 
@@ -435,10 +541,20 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
         }}
       >
         {mode === '2D' ? (
-          <NoteHighway2D notes={notes} currentTime={currentTime} />
+          <NoteHighway2D
+            notes={notes}
+            currentTime={currentTime}
+            activeIndex={activeExpectedIndex}
+            hitIndex={hitFlashIndex ?? -1}
+          />
         ) : (
           <div style={{ height: 320 }}>
-            <NoteHighway3D notes={notes} currentTime={currentTime} />
+            <NoteHighway3D
+              notes={notes}
+              currentTime={currentTime}
+              activeIndex={activeExpectedIndex}
+              hitIndex={hitFlashIndex ?? -1}
+            />
           </div>
         )}
       </div>
@@ -524,6 +640,49 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
             />
             <span style={{ width: 40, textAlign: 'right', fontSize: 12 }}>{masterVolume} dB</span>
           </div>
+          {/* Countdown + live feedback */}
+          {countDown !== null && (
+            <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 999,
+                  background: 'rgba(249,115,22,0.95)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 20,
+                  fontWeight: 700,
+                }}
+              >
+                {countDown}
+              </div>
+              <div style={{ fontSize: 13, color: '#fef3c7' }}>
+                Get ready — start playing on the count
+              </div>
+            </div>
+          )}
+
+          {currentFeedback && (
+            <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 6,
+                  background: currentFeedback.correct ? '#34d399' : '#fb7185',
+                }}
+              />
+              <div style={{ fontSize: 12 }}>
+                Expected: {midiToNote(currentFeedback.expected)} — Detected:{' '}
+                {midiToNote(currentFeedback.midi)}{' '}
+                {typeof currentFeedback.pitchError === 'number' && (
+                  <span style={{ opacity: 0.8 }}>({currentFeedback.pitchError.toFixed(2)} st)</span>
+                )}
+              </div>
+            </div>
+          )}
           {playMode === 'rate' ? (
             <p style={{ margin: 0, fontSize: 12, color: '#a7f3d0' }}>
               Rate My Shred: uses your mic for pitch detection and grades your run.
@@ -549,6 +708,12 @@ const TabPlayer: FC<TabPlayerProps> = ({ riffId, notes, tonePreset }) => {
             onSelectPreset={(p) => setCurrentPreset(p)}
             onChange={(p) => setCurrentPreset(p)}
           />
+
+          {showTuner && (
+            <div style={{ marginTop: 8 }}>
+              <Tuner />
+            </div>
+          )}
 
           {showResult && (
             <RiffEvaluationResult

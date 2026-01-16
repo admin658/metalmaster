@@ -1,9 +1,9 @@
-import { WebSocketServer, WebSocket } from "ws";
-import midi from "midi";
-import { config } from "./config";
+import midi from 'midi';
+import { WebSocket, WebSocketServer } from 'ws';
+import { config } from './config';
 
 type IncomingMessage = {
-  type: "noteOn" | "noteOff" | "allNotesOff" | "controlChange";
+  type: 'noteOn' | 'noteOff' | 'allNotesOff' | 'controlChange';
   channel?: number;
   note?: number;
   velocity?: number;
@@ -45,9 +45,11 @@ class MidiOutput {
 
   send(data: number[]): void {
     if (this.portIndex === null) {
-      throw new Error("[MIDI] Output not opened.");
+      throw new Error('[MIDI] Output not opened.');
     }
-    this.output.sendMessage(data);
+    // @types/midi defines a strict tuple for MidiMessage; cast to any
+    // to allow callers to pass number[] without tuple-length errors.
+    this.output.sendMessage(data as any);
   }
 
   close(): void {
@@ -63,7 +65,7 @@ const midiOut = new MidiOutput(config.midiOutputName);
 
 function handleMessage(msg: IncomingMessage): void {
   switch (msg.type) {
-    case "noteOn": {
+    case 'noteOn': {
       if (msg.note === undefined) return;
       const ch = resolveChannel(msg.channel);
       const note = clampByte(msg.note);
@@ -71,7 +73,7 @@ function handleMessage(msg: IncomingMessage): void {
       midiOut.send([0x90 | ch, note, vel]);
       break;
     }
-    case "noteOff": {
+    case 'noteOff': {
       if (msg.note === undefined) return;
       const ch = resolveChannel(msg.channel);
       const note = clampByte(msg.note);
@@ -79,21 +81,21 @@ function handleMessage(msg: IncomingMessage): void {
       midiOut.send([0x80 | ch, note, vel]);
       break;
     }
-    case "controlChange": {
+    case 'controlChange': {
       if (msg.controller === undefined || msg.value === undefined) return;
       const ch = resolveChannel(msg.channel);
       const ctrl = clampByte(msg.controller);
       const val = clampByte(msg.value);
-      midiOut.send([0xB0 | ch, ctrl, val]);
+      midiOut.send([0xb0 | ch, ctrl, val]);
       break;
     }
-    case "allNotesOff": {
+    case 'allNotesOff': {
       const ch = resolveChannel(msg.channel);
-      midiOut.send([0xB0 | ch, 123, 0]);
+      midiOut.send([0xb0 | ch, 123, 0]);
       break;
     }
     default:
-      console.warn("[WS] Unknown message type:", (msg as any).type);
+      console.warn('[WS] Unknown message type:', (msg as any).type);
   }
 }
 
@@ -102,13 +104,13 @@ function startServer() {
 
   const wss = new WebSocketServer({
     host: config.wsHost,
-    port: config.wsPort
+    port: config.wsPort,
   });
 
-  wss.on("connection", (ws: WebSocket, req) => {
-    console.log(`[WS] Client connected from ${req.socket.remoteAddress || "unknown"}`);
+  wss.on('connection', (ws: WebSocket, req) => {
+    console.log(`[WS] Client connected from ${req.socket.remoteAddress || 'unknown'}`);
 
-    ws.on("message", (data) => {
+    ws.on('message', (data) => {
       try {
         const parsed = JSON.parse(data.toString()) as IncomingMessage | IncomingMessage[];
         if (Array.isArray(parsed)) {
@@ -117,28 +119,28 @@ function startServer() {
           handleMessage(parsed);
         }
       } catch (err) {
-        console.error("[WS] Failed to parse message:", err);
+        console.error('[WS] Failed to parse message:', err);
       }
     });
 
-    ws.on("close", () => {
-      console.log("[WS] Client disconnected");
+    ws.on('close', () => {
+      console.log('[WS] Client disconnected');
     });
   });
 
-  wss.on("listening", () => {
+  wss.on('listening', () => {
     console.log(`[WS] Listening on ws://${config.wsHost}:${config.wsPort}`);
   });
 
   const shutdown = () => {
-    console.log("Shutting down...");
+    console.log('Shutting down...');
     wss.close();
     midiOut.close();
     process.exit(0);
   };
 
-  process.on("SIGINT", shutdown);
-  process.on("SIGTERM", shutdown);
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 }
 
 startServer();

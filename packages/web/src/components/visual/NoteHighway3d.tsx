@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 interface Note {
@@ -8,7 +8,17 @@ interface Note {
   fret: number;
 }
 
-function InstancedNotes({ notes, currentTime }: { notes: Note[]; currentTime: number }) {
+function InstancedNotes({
+  notes,
+  currentTime,
+  activeIndex = -1,
+  hitIndex = -1,
+}: {
+  notes: Note[];
+  currentTime: number;
+  activeIndex?: number;
+  hitIndex?: number;
+}) {
   const count = notes.length;
   if (count === 0) return null;
 
@@ -17,27 +27,40 @@ function InstancedNotes({ notes, currentTime }: { notes: Note[]; currentTime: nu
   const laneSpacing = 0.5;
   const speed = 4; // z-units per second
   const geometry = useMemo(() => new THREE.BoxGeometry(0.35, 0.1, 0.35), []);
-  const material = useMemo(() => new THREE.MeshStandardMaterial({ color: '#f87171', emissive: '#7f1d1d' }), []);
+  const material = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#f87171', emissive: '#7f1d1d' }),
+    []
+  );
 
   useFrame(() => {
     if (!meshRef.current) return;
     for (let i = 0; i < count; i++) {
       const n = notes[i];
       const z = (n.time - currentTime) * speed;
+      const isActive = i === activeIndex;
+      const isHit = i === hitIndex;
       dummy.position.set((n.string - 2.5) * laneSpacing, 0, z);
-      dummy.scale.setScalar(0.4);
+      dummy.scale.setScalar(isHit ? 1.0 : isActive ? 0.7 : 0.4);
       dummy.updateMatrix();
       meshRef.current.setMatrixAt(i, dummy.matrix);
     }
     meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
-  return (
-    <instancedMesh ref={meshRef} args={[geometry, material, count]} />
-  );
+  return <instancedMesh ref={meshRef} args={[geometry, material, count]} />;
 }
 
-export default function NoteHighway3D({ notes, currentTime }: { notes: Note[]; currentTime: number }) {
+export default function NoteHighway3D({
+  notes,
+  currentTime,
+  activeIndex = -1,
+  hitIndex = -1,
+}: {
+  notes: Note[];
+  currentTime: number;
+  activeIndex?: number;
+  hitIndex?: number;
+}) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -60,7 +83,12 @@ export default function NoteHighway3D({ notes, currentTime }: { notes: Note[]; c
     <Canvas camera={{ position: [0, 3, 8], fov: 60 }} dpr={[1, 1.5]} gl={{ antialias: false }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[0, 5, 5]} />
-      <InstancedNotes notes={notes} currentTime={currentTime} />
+      <InstancedNotes
+        notes={notes}
+        currentTime={currentTime}
+        activeIndex={activeIndex}
+        hitIndex={hitIndex}
+      />
       <mesh position={[0, -1, 0]} rotation={[-Math.PI / 8, 0, 0]}>
         <planeGeometry args={[5, 20]} />
         <meshStandardMaterial color="#111" />

@@ -14,6 +14,7 @@
     "test": "python -m pytest"
   },
   "dependencies": {
+    "@metalmaster/ai-tone-assistant": "workspace:*",
     "@metalmaster/shared-types": "workspace:*",
     "@metalmaster/shared-validation": "workspace:*",
     "@supabase/supabase-js": "^2.84.0",

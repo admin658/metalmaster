@@ -1,6 +1,7 @@
 {
-  "name": "metal-master-vst-companion",
+  "name": "@metalmaster/vst-companion",
   "version": "1.0.0",
+  "private": true,
   "description": "Metal Master VST Companion - WebSocket to MIDI bridge",
   "main": "dist/index.js",
   "type": "commonjs",
@@ -15,6 +16,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/midi": "^2.0.0",
     "@types/node": "^20.11.5",
     "@types/ws": "^8.5.10",
     "ts-node-dev": "^2.0.0",
