@@ -12,6 +12,7 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Added repo-specific agent guidance in `AGENTS.md` (update surfaces, jam track rules, and common paths).
 - Shared grading package and API flow added: `@metalmaster/shared` grading types/scoring, `/api/grading` WAV intake, `/grading` lab UI with timing heatmap, and mobile grading client helper.
 - Build flow aligned for shared packages: root `tsconfig.json` uses project references, `build:shared` runs `tsc -b`, and Netlify builds shared packages before the Next.js web build.
+- Audio tone tooling expanded in `packages/api/audio_analysis_lib.py`: tone feature extraction, tone preset mapping support, and a retrieval+EQ tweak suggestion workflow (with pytest coverage).
 
 ## Architecture & Workspaces
 - `packages/shared-types` / `shared-validation` / `shared-schemas` - Shared TypeScript models + Zod schemas.
@@ -27,7 +28,7 @@ Full-stack metal guitar learning platform spanning shared types/schemas, an Expr
 - Progression: XP/level tiers, streaks, achievements, skill scores, practice heatmap, and stats summary endpoints.
 - Gameplay: AlphaTab tab player (demo + GP upload), 2D/3D highways, track mixer, loop/count-in, learn mode, and mic-driven grading with pitch/timing scoring.
 - Monetization: Stripe checkout/portal routes; subscription status surfaced via `/api/user-stats` and `useSubscription`.
-- AI: `/api/tone-settings` uses OpenAI to generate tone presets validated against shared schemas.
+- AI: `/api/tone-settings` uses OpenAI to generate tone presets validated against shared schemas; Python audio analysis now includes tone feature extraction and preset suggestion helpers.
 
 ## Web (Next.js)
 - Tab Lab (`/tab-player`) uses `TabPlayerShell` + `AlphaTabProvider` with a rack layout: TopBar transport, SectionMap with bar-jump, AlphaTabCanvas driven by `useAlphaTab` (scroll snapping, bar tracking, track switching), BottomRack tabs (Practice, Tone, Mixer, Tools), and optional Coach side panel. Demo selector + GP upload sit above the stage.

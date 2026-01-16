@@ -77,6 +77,8 @@ AI Tone Assistant
 - Suggests amp, IR, and pedal settings to emulate iconic tones.
 - Matches tones for Metallica, Gojira, Meshuggah, Lamb of God, Behemoth, Arch Enemy, etc.
 - Exports presets for software amps.
+- Analyzes audio tone features (centroid, band energy ratios, spectral tilt, dynamics).
+- Recommends closest preset with simple EQ tweaks to reduce spectral mismatch.
 Community Riff Hub
 - Users upload riffs and tabs.
 - Upvote system.
